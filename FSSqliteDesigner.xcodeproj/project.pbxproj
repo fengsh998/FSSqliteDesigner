@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */; };
+		9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */; };
 		9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DBE62871B4BB7210054B463 /* FSDesignerView.m */; };
 		9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD95B211B4BA09C00D54DBA /* FSSqliteDesignerManager.m */; };
 		9DD95B2A1B4BA13900D54DBA /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD95B291B4BA13900D54DBA /* AppKit.framework */; };
@@ -17,9 +19,15 @@
 		9DD95B391B4BA77600D54DBA /* TemplateIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B351B4BA77600D54DBA /* TemplateIcon.icns */; };
 		9DD95B3A1B4BA77600D54DBA /* TemplateInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B361B4BA77600D54DBA /* TemplateInfo.plist */; };
 		9DD95B3C1B4BA78000D54DBA /* install_templates.sh in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B3B1B4BA78000D54DBA /* install_templates.sh */; };
+		9DE2C8431B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE2C8411B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m */; };
+		9DE2C8441B4C09DC0049C545 /* FSXcodeWindowFrameDebug.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9DE2C8421B4C09DC0049C545 /* FSXcodeWindowFrameDebug.xib */; };
+		9DE2C8471B4CB58D0049C545 /* FSViewListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE2C8461B4CB58D0049C545 /* FSViewListModel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerViewController.h; sourceTree = "<group>"; };
+		9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignerViewController.m; sourceTree = "<group>"; };
+		9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSDesignerViewController.xib; sourceTree = "<group>"; };
 		9DBE62861B4BB7210054B463 /* FSDesignerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerView.h; sourceTree = "<group>"; };
 		9DBE62871B4BB7210054B463 /* FSDesignerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignerView.m; sourceTree = "<group>"; };
 		9DCF1A3C1B4B926C000E114A /* FSSqliteDesigner.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FSSqliteDesigner.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -34,6 +42,11 @@
 		9DD95B351B4BA77600D54DBA /* TemplateIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = TemplateIcon.icns; sourceTree = "<group>"; };
 		9DD95B361B4BA77600D54DBA /* TemplateInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = TemplateInfo.plist; sourceTree = "<group>"; };
 		9DD95B3B1B4BA78000D54DBA /* install_templates.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = install_templates.sh; path = FSSqliteDesigner/install_templates.sh; sourceTree = SOURCE_ROOT; };
+		9DE2C8401B4C09DC0049C545 /* FSXcodeWindowFrameDebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXcodeWindowFrameDebug.h; sourceTree = "<group>"; };
+		9DE2C8411B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXcodeWindowFrameDebug.m; sourceTree = "<group>"; };
+		9DE2C8421B4C09DC0049C545 /* FSXcodeWindowFrameDebug.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSXcodeWindowFrameDebug.xib; sourceTree = "<group>"; };
+		9DE2C8451B4CB58D0049C545 /* FSViewListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSViewListModel.h; sourceTree = "<group>"; };
+		9DE2C8461B4CB58D0049C545 /* FSViewListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSViewListModel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +98,9 @@
 			children = (
 				9DBE62861B4BB7210054B463 /* FSDesignerView.h */,
 				9DBE62871B4BB7210054B463 /* FSDesignerView.m */,
+				9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */,
+				9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */,
+				9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */,
 			);
 			path = FSDesignerView;
 			sourceTree = "<group>";
@@ -138,6 +154,11 @@
 		9DE2C83C1B4C03200049C545 /* FSDesignerDebug */ = {
 			isa = PBXGroup;
 			children = (
+				9DE2C8401B4C09DC0049C545 /* FSXcodeWindowFrameDebug.h */,
+				9DE2C8411B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m */,
+				9DE2C8421B4C09DC0049C545 /* FSXcodeWindowFrameDebug.xib */,
+				9DE2C8451B4CB58D0049C545 /* FSViewListModel.h */,
+				9DE2C8461B4CB58D0049C545 /* FSViewListModel.m */,
 			);
 			path = FSDesignerDebug;
 			sourceTree = "<group>";
@@ -199,7 +220,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DE2C8441B4C09DC0049C545 /* FSXcodeWindowFrameDebug.xib in Resources */,
 				9DD95B3A1B4BA77600D54DBA /* TemplateInfo.plist in Resources */,
+				9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */,
 				9DD95B371B4BA77600D54DBA /* contents in Resources */,
 				9DD95B381B4BA77600D54DBA /* version-model.plist in Resources */,
 				9DD95B391B4BA77600D54DBA /* TemplateIcon.icns in Resources */,
@@ -232,7 +255,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */,
+				9DE2C8431B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m in Sources */,
 				9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */,
+				9DE2C8471B4CB58D0049C545 /* FSViewListModel.m in Sources */,
+				9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

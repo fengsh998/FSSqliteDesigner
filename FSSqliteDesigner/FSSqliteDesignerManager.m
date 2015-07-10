@@ -7,10 +7,25 @@
 //
 
 #import "FSSqliteDesignerManager.h"
+#import "FSXcodeWindowFrameDebug.h"
+#import "FSViewListModel.h"
+#import "FSDesignerView.h"
 
 @interface FSSqliteDesignerManager()
 
-@property (nonatomic, strong) NSBundle *bundle;
+@property (nonatomic, strong) NSBundle                              *bundle;
+@property (nonatomic, strong) FSXcodeWindowFrameDebug               *debugVC;
+@property (nonatomic, weak)   NSWindow                              *workspacewindow;
+@property (nonatomic, strong) FSDesignerView                        *sqliteDesignView;
+@property (nonatomic, weak)   id                                    ideEditorController;
+@property (nonatomic, weak)   id                                    editorContextController;
+@property (nonatomic, weak)   NSSplitView                           *debuggerSplitView;
+@property (nonatomic, weak)   NSView                                *editorView;
+@property (nonatomic, weak)   NSView                                *dubagToolsView;
+@property (nonatomic, weak)   NSView                                *editorAutolayoutView;
+//左边源码显示view
+@property (nonatomic, weak)   NSOutlineView                         *navStructureView;
+@property (nonatomic, weak)   NSView                                *IDENavigatorAreaView;
 
 @end
 
@@ -46,6 +61,10 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(splitViewDidResizeSubviews:) name:NSSplitViewDidResizeSubviewsNotification object:nil];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(outlineSelectChange:) name:NSOutlineViewSelectionDidChangeNotification object:nil];
+        
+        
+        
         //读取插件中的图标
         /*
          //preload our icons
@@ -56,7 +75,6 @@
          _successImage = [bundle imageForResource:@"XCBuildSuccessIcon"];
          */
         
-
     }
     
     return self;
@@ -64,7 +82,7 @@
 
 - (void)FSDesigerSettings:(NSMenuItem *)item
 {
-    
+
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
@@ -78,113 +96,205 @@
                                                          keyEquivalent:@""];
         [actionMenuItem setTarget:self];
         [[menuItem submenu] addItem:actionMenuItem];
+        
+        actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"FSDesigerDebug"
+                                                                action:@selector(FSDesigerDebug:)
+                                                         keyEquivalent:@""];
+        [actionMenuItem setTarget:self];
+        [[menuItem submenu] addItem:actionMenuItem];
     }
+    
+//    [NSEvent addLocalMonitorForEventsMatchingMask:NSLeftMouseDownMask | NSMouseMovedMask  handler:^NSEvent * __nullable(NSEvent * __nonnull event) {
+//        switch (event.type) {
+//                            case NSLeftMouseDown:
+//                                    [self toDoCheckIsSelectSqliteFolder];
+//                                break;
+//                            case NSMouseMoved:
+//                
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//        return event;
+//    }];
+
 }
 
-- (void)setViewBorderColor:(NSView *)v withColor:(NSColor *)clr withWitdh:(CGFloat)w
+#pragma mark - 菜单处理
+- (void)FSDesigerDebug:(NSMenuItem *)item
 {
-    v.wantsLayer = YES;
-    v.layer.borderWidth = w;
-    v.layer.borderColor = clr.CGColor;
+    if (!self.debugVC) {
+        self.debugVC = [[FSXcodeWindowFrameDebug alloc]initWithWindowNibName:@"FSXcodeWindowFrameDebug"];
+        self.debugVC.xcwindow = [NSApp keyWindow];
+        [self.debugVC.window setContentMinSize:(NSMakeSize(600, 300))];
+        [self.debugVC.window setContentMaxSize:(NSMakeSize(900, 500))];
+        [self.debugVC.window setContentSize:(NSMakeSize(750, 400))];
+    }
+    
+    [self.debugVC showWindow:self.debugVC];
 }
 
-#pragma mark - 遍历NSTabView
-- (void)todoErgodicNSTabview:(NSView *)nstabview
+- (FSDesignerView *)sqliteDesignView
 {
-    for (NSView *subItem in nstabview.subviews)
+    if (!_sqliteDesignView) {
+        _sqliteDesignView = [[FSDesignerView alloc]initWithFrame:CGRectMake(0, 0, 30, 30)];
+        //_sqliteDesignView.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
+    }
+    return _sqliteDesignView;
+}
+
+#pragma mark - 调试获取区
+- (void)getEditorAreaViewInWorkspaceWindow:(NSWindow *)workspacewindow
+{
+    if (!self.ideEditorController)
     {
-        if ([subItem isKindOfClass:[NSClassFromString(@"DVTControllerContentView")class]])
-        {
-            //和NSTabView一样大
-            NSLog(@"DVTControllerContentView.frame = %@",NSStringFromRect(subItem.frame));
-            [self setViewBorderColor:subItem withColor:[NSColor redColor]withWitdh:1.0f];
+        NSWindowController *windowController = [workspacewindow windowController];
+        if ([windowController isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")]) {
+            //id workspace = [windowController valueForKey:@"_workspace"];
+            id workspacetabcontroller = [windowController valueForKey:@"_activeWorkspaceTabController"];
+            NSSplitView *designArea = [workspacetabcontroller valueForKey:@"_designAreaSplitView"];
             
-            [self todoErgodicControllerContentViewInNSTabview:subItem];
-        }
-        else //未知的
-        {
-            NSLog(@"NSTabView 存在未知的 %@.frame = %@ ",subItem.className,NSStringFromRect(subItem.frame));
-            [self setViewBorderColor:subItem withColor:[NSColor greenColor]withWitdh:4.0f];
+            for (NSView *item in designArea.subviews) {
+                if ([item isKindOfClass:[NSClassFromString(@"DVTReplacementView")class]]) {
+                    Class cls = [item valueForKey:@"_controllerClass"];
+                    if ([NSClassFromString(@"IDEEditorArea")class] == cls)
+                    {
+                        id installedviewcontroller = [item valueForKey:@"_installedViewController"];
+                        
+                        self.ideEditorController = installedviewcontroller;
+                        
+                        //NSView *v = [installedviewcontroller valueForKey:@"_editorModeHostView"];
+                        
+                        self.debuggerSplitView = [installedviewcontroller valueForKey:@"_debuggerSplitView"];
+                        
+                        //获取调试单步，多步，断点调试view
+                        NSView *debugv = [installedviewcontroller valueForKey:@"_debuggerBarBorderedView"];
+                        //最后代码编辑区
+                        id editorContext = [installedviewcontroller valueForKey:@"_lastActiveEditorContext"];
+                        self.editorContextController = editorContext;
+                        //带当前打开文件显示导航的视图
+                        //NSView *navAndEditor = [editorContext valueForKey:@"_editorAndNavBarView"];
+                        //获取文件显示导航区
+                        //NSView *nav = [editorContext valueForKey:@"_navBar"];
+                        
+                        //id debugBar = [installedviewcontroller valueForKey:@"_activeDebuggerBar"];
+                        self.dubagToolsView = debugv;
+                        //代码或查看资源文件的编辑区
+                        NSView *editorSourceView = [editorContext valueForKey:@"_editorBorderedView"];
+                        self.editorView = editorSourceView;
+                        
+                        self.editorAutolayoutView = [installedviewcontroller valueForKey:@"_editorAreaAutoLayoutView"];
+                        
+                        if (![self.editorAutolayoutView.subviews containsObject:self.sqliteDesignView])
+                        {
+                            [self.editorAutolayoutView addSubview:self.sqliteDesignView];
+                        }
+                    }
+                    else if ([NSClassFromString(@"IDENavigatorArea")class] == cls)
+                    {
+                        self.IDENavigatorAreaView = item;
+                    }
+                }
+            }
         }
     }
 }
 
-#pragma mark - 遍历NSTabview -> DVTControllerContentView上的view
-- (void)todoErgodicControllerContentViewInNSTabview:(NSView *)v
+//- (NSView *)designOfSqliteView
+//{
+//    NSBundle *bundle = [NSBundle bundleForClass:self.class];
+//    NSMutableArray *nibs = [[NSMutableArray alloc]init];
+//    BOOL ok = [bundle loadNibNamed:@"FSDesignContentView" owner:nil topLevelObjects:&nibs];
+//    
+//    if (ok)
+//    {
+//        return [nibs objectAtIndex:1];
+//    }
+//    
+//    return nil;
+//}
+
+#pragma mark - 获取左边代码区
+- (NSOutlineView *)findNavSourceArea
 {
-    for (NSView *subItem in v.subviews)
-    {
-        if ([subItem isKindOfClass:[NSClassFromString(@"DVTSplitView")class]])
-        {
-            //和NSTabView一样大
-            NSLog(@"DVTSplitView.frame = %@",NSStringFromRect(subItem.frame));
-            [self setViewBorderColor:subItem withColor:[NSColor redColor]withWitdh:1.0f];
-            
-            [self todoErgodicSpliteView:subItem];
-        }
-        else //未知的
-        {
-            NSLog(@"NSTabView 存在未知的 %@.frame = %@ ",subItem.className,NSStringFromRect(subItem.frame));
-            [self setViewBorderColor:subItem withColor:[NSColor greenColor]withWitdh:4.0f];
+    @try {
+        if (self.IDENavigatorAreaView) {
+            if (!self.navStructureView) {
+                id navAreacontroller = [self.IDENavigatorAreaView valueForKey:@"_installedViewController"];
+                id repView = [navAreacontroller valueForKey:@"_replacementView"];
+                id structureNav = [repView valueForKey:@"_installedViewController"];
+
+                NSOutlineView *olv = [structureNav valueForKey:@"_outlineView"];
+                self.navStructureView = olv;
+            }
+            return self.navStructureView;
         }
     }
+    @catch (NSException *exception) {
+        
+    }
+    return nil;
 }
 
-#pragma mark - 遍历DVTControllerContentView->DVTSpliteView上的view
-- (void)todoErgodicSpliteView:(NSView *)v
+#pragma mark - 获取代码或查看资源文件的编辑区
+- (NSView *)findResAndSourceTextAreaView
 {
-    for (NSView *subItem in v.subviews)
-    {
-        if ([subItem isKindOfClass:[NSClassFromString(@"DVTReplacementView")class]])
-        {
-            //和NSTabView一样大
-            NSLog(@"DVTReplacementView.frame = %@",NSStringFromRect(subItem.frame));
-            [self setViewBorderColor:subItem withColor:[NSColor blueColor]withWitdh:1.0f];
-            
-        }
-        else //未知的
-        {
-            NSLog(@"NSTabView 存在未知的 %@.frame = %@ ",subItem.className,NSStringFromRect(subItem.frame));
-            [self setViewBorderColor:subItem withColor:[NSColor greenColor]withWitdh:4.0f];
+    @try {
+        if (self.editorContextController) {
+            return [self.editorContextController valueForKey:@"_editorBorderedView"];
         }
     }
+    @catch (NSException *exception) {
+
+    }
+
+    return nil;
+}
+
+#pragma mark - 获取调试单步，多步，断点调试view
+- (NSView *)fineDebugAreaView
+{
+    @try {
+        if (self.ideEditorController) {
+            return [self.ideEditorController valueForKey:@"_debuggerBarBorderedView"];
+        }
+    }
+    @catch (NSException *exception) {
+        
+    }
+    
+    return nil;
+}
+
+#pragma mark - 获取调试区和编辑区的splitview
+- (NSSplitView *)findDebugAndEditorSplitView
+{
+    @try {
+        if (self.ideEditorController) {
+            return [self.ideEditorController valueForKey:@"_debuggerSplitView"];
+        }
+    }
+    @catch (NSException *exception) {
+        
+    }
+    
+    return nil;
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
 {
     NSWindow *window = [notification object];
-    if ([window isKindOfClass:NSClassFromString(@"IDEWorkspaceWindow")]) {
+    if ([window isKindOfClass:NSClassFromString(@"IDEWorkspaceWindow")])
+    {
+        if (!self.workspacewindow) {
+            self.workspacewindow = window;
+        }
+        
         @try {
             NSWindowController *windowController = [window windowController];
-            if ([windowController isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")]) {
-                //id workspace = [windowController valueForKey:@"_workspace"];
-
-            }
-            
-            NSLog(@"window.contentView.frame = %@",NSStringFromRect(window.contentView.frame));
-            
-            [self setViewBorderColor:window.contentView withColor:[NSColor redColor] withWitdh:1.0f];
-            
-            for (NSView *item in window.contentView.subviews) {
-                if ([item isKindOfClass:[NSClassFromString(@"DVTTabBarEnclosureView")class]])
-                {
-                    //在整个IDE的最下面还未知是什么东东
-                    NSLog(@"DVTTabBarEnclosureView.frame = %@",NSStringFromRect(item.frame));
-                    [self setViewBorderColor:item withColor:[NSColor yellowColor]withWitdh:2.0f];
-                }
-                else if ([item isKindOfClass:[NSClassFromString(@"NSTabView")class]])
-                {
-                    //结论是NSTabView与ContentView一样大小，contentview add nstabview
-                    NSLog(@"NSTabView.frame = %@",NSStringFromRect(item.frame));
-                    [self setViewBorderColor:item withColor:[NSColor orangeColor]withWitdh:3.0f];
-                    
-                    [self todoErgodicNSTabview:item];
-                }
-                else //未知的
-                {
-                    NSLog(@"ContentView 存在未知的 %@.frame = %@ ",item.className,NSStringFromRect(item.frame));
-                    [self setViewBorderColor:item withColor:[NSColor greenColor]withWitdh:4.0f];
-                }
+            if ([windowController isKindOfClass:NSClassFromString(@"IDEWorkspaceWindowController")])
+            {
+                [self getEditorAreaViewInWorkspaceWindow:self.workspacewindow];
             }
         }
         @catch (NSException *exception) { }
@@ -193,51 +303,77 @@
 
 - (void)splitViewDidResizeSubviews:(NSNotification *)notification
 {
-    NSString *clsname = [[NSApp mainWindow]className];
-    
     @try {
-        NSLog(@"notification = %@ , clsname = %@",notification.object,clsname);
-        
-        NSSplitView *sp = notification.object;
-        
-        NSArray *spitems = [sp valueForKey:@"_splitViewItems"];
-        
-        for (id item in  spitems) {
-            NSString *identifier = [item valueForKey:@"_identifier"];
-            if (identifier.length > 0)
+            NSSplitView *sp = notification.object;
+            
+            if (sp == self.debuggerSplitView)
             {
-                if ([identifier isEqualToString:@"IDEEditor"]) {//374
-                    
+                CGFloat y = self.dubagToolsView.hidden ? 0 : 29;
+                CGSize s = self.editorAutolayoutView.frame.size;
+                
+                self.sqliteDesignView.frame = CGRectMake(0, y,s.width, s.height - 29 - y);
+            }
+    }
+    @catch (NSException *exception) { }
+}
+
+#pragma mark - 点击判断
+- (void)toDoCheckIsSelectSqliteFolder
+{
+//    @try {
+//    }
+//    @catch (NSException *exception) { }
+}
+
+- (void)notificationListener:(NSNotification *)notification
+{
+    @try {
+        NSLog(@"========================= %@",notification);
+    }
+    @catch (NSException *exception) { }
+}
+
+- (void)outlineSelectChange:(NSNotification *)notification
+{
+    @try {
+        NSOutlineView *outlineview = notification.object;
+        if (outlineview == [self findNavSourceArea]) {
+            id selectedItem = [outlineview itemAtRow:[outlineview selectedRow]];
+            
+            NSString *name = [selectedItem valueForKey:@"_name"];
+            NSString *ext = [name pathExtension];
+            
+            if ([ext isEqualToString:@"sqlitemodeld"])
+            {
+                self.sqliteDesignView.hidden = NO;
+                if (self.editorView) {
+                    self.editorView.hidden = !self.sqliteDesignView.hidden;
                 }
-                else if ([identifier isEqualToString:@"IDEDebuggerArea"])//226
+                
+                NSArray * subitems = [selectedItem valueForKey:@"_subitems"];
+                for (id item in subitems)
                 {
+                    id filepath = [item valueForKey:@"_watchedFilePath"];
+                    NSURL *filepathURL = [filepath valueForKey:@"_fileURL"];
                     
-                }
-                else if ([identifier isEqualToString:@"IDEEditorArea"])
-                {
+                    NSLog(@"+++++++++ url = %@",filepathURL);
                     
+                    //NSXMLParser
+//                    NSError *parseError = nil;
+//                    NSDictionary *xmlDictionary = [XMLReader dictionaryForXMLString:testXMLString error:&parseError];
                 }
             }
-        }
-        
-        
-        for (NSView *item in sp.subviews)
-        {
-            if ([item isKindOfClass:[NSClassFromString(@"DVTReplacementView") class]])
+            else
             {
-                Class cls = [item valueForKey:@"_controllerClass"];
-                if (NSClassFromString(@"IDENavigatorArea") == cls )
-                {
-                    
-                }
-                else if (NSClassFromString(@"IDEEditorArea") == cls )
-                {
-                    
+                self.sqliteDesignView.hidden = YES;
+                if (self.editorView) {
+                    self.editorView.hidden = !self.sqliteDesignView.hidden;
                 }
             }
         }
     }
     @catch (NSException *exception) { }
 }
+
 
 @end
