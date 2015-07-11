@@ -10,6 +10,7 @@
 #import "FSXcodeWindowFrameDebug.h"
 #import "FSViewListModel.h"
 #import "FSDesignerView.h"
+#import "FSDesignerViewController.h"
 
 @interface FSSqliteDesignerManager()
 
@@ -26,6 +27,8 @@
 //左边源码显示view
 @property (nonatomic, weak)   NSOutlineView                         *navStructureView;
 @property (nonatomic, weak)   NSView                                *IDENavigatorAreaView;
+//sqliet designer view controller
+@property (nonatomic, strong) FSDesignerViewController              *designVC;
 
 @end
 
@@ -63,8 +66,9 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(outlineSelectChange:) name:NSOutlineViewSelectionDidChangeNotification object:nil];
         
-        
-        
+        NSBundle *bd = [NSBundle bundleForClass:self.class];
+        self.designVC = [[FSDesignerViewController alloc]initWithNibName:@"FSDesignerViewController" bundle:bd];
+        self.designVC.view.translatesAutoresizingMaskIntoConstraints = NO;
         //读取插件中的图标
         /*
          //preload our icons
@@ -139,6 +143,14 @@
     if (!_sqliteDesignView) {
         _sqliteDesignView = [[FSDesignerView alloc]initWithFrame:CGRectMake(0, 0, 30, 30)];
         //_sqliteDesignView.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
+        _sqliteDesignView.hidden = YES;
+        
+        [_sqliteDesignView.contentView addSubview:self.designVC.view];
+        
+        [_sqliteDesignView.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.designVC.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:_sqliteDesignView.contentView attribute:NSLayoutAttributeLeft multiplier:1 constant:0]];
+        [_sqliteDesignView.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.designVC.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_sqliteDesignView.contentView attribute:NSLayoutAttributeTop multiplier:1 constant:0]];
+        [_sqliteDesignView.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.designVC.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:_sqliteDesignView.contentView attribute:NSLayoutAttributeRight multiplier:1 constant:0]];
+        [_sqliteDesignView.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.designVC.view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_sqliteDesignView.contentView attribute:NSLayoutAttributeBottom multiplier:1 constant:0]];
     }
     return _sqliteDesignView;
 }
@@ -343,24 +355,36 @@
             NSString *name = [selectedItem valueForKey:@"_name"];
             NSString *ext = [name pathExtension];
             
-            if ([ext isEqualToString:@"sqlitemodeld"])
+            NSURL *fileUrl = [selectedItem valueForKey:@"_fileURL"];
+
+            if ([ext isEqualToString:@"sqlitemodeld"] || [ext isEqualToString:@"sqlitemodel"])
             {
                 self.sqliteDesignView.hidden = NO;
                 if (self.editorView) {
                     self.editorView.hidden = !self.sqliteDesignView.hidden;
                 }
                 
-                NSArray * subitems = [selectedItem valueForKey:@"_subitems"];
-                for (id item in subitems)
+                NSURL *loadFileUrl = [fileUrl copy];
+                
+                if ([ext isEqualToString:@"sqlitemodeld"])
                 {
-                    id filepath = [item valueForKey:@"_watchedFilePath"];
-                    NSURL *filepathURL = [filepath valueForKey:@"_fileURL"];
+                    fileUrl = [fileUrl URLByAppendingPathComponent:@"version-model.plist"];
+                    NSDictionary *dic = [NSDictionary dictionaryWithContentsOfURL:fileUrl];
+                    NSString *mdname = dic[@"currentModelName"];
+                    if (!mdname) {
+                        mdname = [NSString stringWithFormat:@"%@.sqlitemodel",[name stringByDeletingPathExtension]];
+                        
+                        NSMutableDictionary *save = [NSMutableDictionary dictionaryWithDictionary:dic];
+                        [save setObject:mdname forKey:@"currentModelName"];
+                        [save writeToURL:fileUrl atomically:YES];
+                    }
+
+                    loadFileUrl = [loadFileUrl URLByAppendingPathComponent:mdname];
+                }
+                
+                if ([[loadFileUrl pathExtension] isEqualToString:@"sqlitemodel"]) {
                     
-                    NSLog(@"+++++++++ url = %@",filepathURL);
-                    
-                    //NSXMLParser
-//                    NSError *parseError = nil;
-//                    NSDictionary *xmlDictionary = [XMLReader dictionaryForXMLString:testXMLString error:&parseError];
+                    [self.designVC setModelUrl:loadFileUrl];
                 }
             }
             else

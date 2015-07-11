@@ -9,9 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
-#import "FSDesignerViewController.h"
 
 @interface FSDesignerView : NSVisualEffectView
 @property (nonatomic, strong) NSView                            *contentView;
-@property (nonatomic, strong) FSDesignerViewController          *designVC;
 @end

@@ -9,13 +9,14 @@
 /* Begin PBXBuildFile section */
 		9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */; };
 		9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */; };
+		9D6BB8151B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel in Resources */ = {isa = PBXBuildFile; fileRef = 9D6BB8131B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel */; };
+		9D6BB8161B50F50B005630B8 /* version-model.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D6BB8141B50F50B005630B8 /* version-model.plist */; };
+		9D6BB8191B51182D005630B8 /* FSDesignModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6BB8181B51182D005630B8 /* FSDesignModel.m */; };
 		9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DBE62871B4BB7210054B463 /* FSDesignerView.m */; };
 		9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD95B211B4BA09C00D54DBA /* FSSqliteDesignerManager.m */; };
 		9DD95B2A1B4BA13900D54DBA /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD95B291B4BA13900D54DBA /* AppKit.framework */; };
 		9DD95B2C1B4BA14D00D54DBA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD95B2B1B4BA14D00D54DBA /* Foundation.framework */; };
 		9DD95B2E1B4BA15900D54DBA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD95B2D1B4BA15900D54DBA /* Cocoa.framework */; };
-		9DD95B371B4BA77600D54DBA /* contents in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B331B4BA77600D54DBA /* contents */; };
-		9DD95B381B4BA77600D54DBA /* version-model.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B341B4BA77600D54DBA /* version-model.plist */; };
 		9DD95B391B4BA77600D54DBA /* TemplateIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B351B4BA77600D54DBA /* TemplateIcon.icns */; };
 		9DD95B3A1B4BA77600D54DBA /* TemplateInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B361B4BA77600D54DBA /* TemplateInfo.plist */; };
 		9DD95B3C1B4BA78000D54DBA /* install_templates.sh in Resources */ = {isa = PBXBuildFile; fileRef = 9DD95B3B1B4BA78000D54DBA /* install_templates.sh */; };
@@ -28,6 +29,10 @@
 		9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerViewController.h; sourceTree = "<group>"; };
 		9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignerViewController.m; sourceTree = "<group>"; };
 		9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSDesignerViewController.xib; sourceTree = "<group>"; };
+		9D6BB8131B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "___FILEBASENAME___.sqlitemodel"; sourceTree = "<group>"; };
+		9D6BB8141B50F50B005630B8 /* version-model.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "version-model.plist"; sourceTree = "<group>"; };
+		9D6BB8171B51182D005630B8 /* FSDesignModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignModel.h; sourceTree = "<group>"; };
+		9D6BB8181B51182D005630B8 /* FSDesignModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignModel.m; sourceTree = "<group>"; };
 		9DBE62861B4BB7210054B463 /* FSDesignerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerView.h; sourceTree = "<group>"; };
 		9DBE62871B4BB7210054B463 /* FSDesignerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignerView.m; sourceTree = "<group>"; };
 		9DCF1A3C1B4B926C000E114A /* FSSqliteDesigner.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FSSqliteDesigner.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -37,8 +42,6 @@
 		9DD95B291B4BA13900D54DBA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9DD95B2B1B4BA14D00D54DBA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9DD95B2D1B4BA15900D54DBA /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		9DD95B331B4BA77600D54DBA /* contents */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = contents; sourceTree = "<group>"; };
-		9DD95B341B4BA77600D54DBA /* version-model.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "version-model.plist"; sourceTree = "<group>"; };
 		9DD95B351B4BA77600D54DBA /* TemplateIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = TemplateIcon.icns; sourceTree = "<group>"; };
 		9DD95B361B4BA77600D54DBA /* TemplateInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = TemplateInfo.plist; sourceTree = "<group>"; };
 		9DD95B3B1B4BA78000D54DBA /* install_templates.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = install_templates.sh; path = FSSqliteDesigner/install_templates.sh; sourceTree = SOURCE_ROOT; };
@@ -63,6 +66,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9D6BB8121B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodeld */ = {
+			isa = PBXGroup;
+			children = (
+				9D6BB8131B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel */,
+				9D6BB8141B50F50B005630B8 /* version-model.plist */,
+			);
+			path = "___FILEBASENAME___.sqlitemodeld";
+			sourceTree = "<group>";
+		};
 		9DCF1A331B4B926B000E114A = {
 			isa = PBXGroup;
 			children = (
@@ -101,6 +113,8 @@
 				9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */,
 				9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */,
 				9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */,
+				9D6BB8171B51182D005630B8 /* FSDesignModel.h */,
+				9D6BB8181B51182D005630B8 /* FSDesignModel.m */,
 			);
 			path = FSDesignerView;
 			sourceTree = "<group>";
@@ -127,28 +141,11 @@
 		9DD95B301B4BA77600D54DBA /* Sqlite Model Object.xctemplate */ = {
 			isa = PBXGroup;
 			children = (
-				9DD95B311B4BA77600D54DBA /* ___FILEBASENAME___.sqlitemodeld */,
+				9D6BB8121B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodeld */,
 				9DD95B351B4BA77600D54DBA /* TemplateIcon.icns */,
 				9DD95B361B4BA77600D54DBA /* TemplateInfo.plist */,
 			);
 			path = "Sqlite Model Object.xctemplate";
-			sourceTree = "<group>";
-		};
-		9DD95B311B4BA77600D54DBA /* ___FILEBASENAME___.sqlitemodeld */ = {
-			isa = PBXGroup;
-			children = (
-				9DD95B321B4BA77600D54DBA /* ___FILEBASENAME___.sqlitemodel */,
-				9DD95B341B4BA77600D54DBA /* version-model.plist */,
-			);
-			path = "___FILEBASENAME___.sqlitemodeld";
-			sourceTree = "<group>";
-		};
-		9DD95B321B4BA77600D54DBA /* ___FILEBASENAME___.sqlitemodel */ = {
-			isa = PBXGroup;
-			children = (
-				9DD95B331B4BA77600D54DBA /* contents */,
-			);
-			path = "___FILEBASENAME___.sqlitemodel";
 			sourceTree = "<group>";
 		};
 		9DE2C83C1B4C03200049C545 /* FSDesignerDebug */ = {
@@ -223,8 +220,8 @@
 				9DE2C8441B4C09DC0049C545 /* FSXcodeWindowFrameDebug.xib in Resources */,
 				9DD95B3A1B4BA77600D54DBA /* TemplateInfo.plist in Resources */,
 				9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */,
-				9DD95B371B4BA77600D54DBA /* contents in Resources */,
-				9DD95B381B4BA77600D54DBA /* version-model.plist in Resources */,
+				9D6BB8151B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel in Resources */,
+				9D6BB8161B50F50B005630B8 /* version-model.plist in Resources */,
 				9DD95B391B4BA77600D54DBA /* TemplateIcon.icns in Resources */,
 				9DD95B3C1B4BA78000D54DBA /* install_templates.sh in Resources */,
 			);
@@ -258,6 +255,7 @@
 				9DE2C8431B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m in Sources */,
 				9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */,
 				9DE2C8471B4CB58D0049C545 /* FSViewListModel.m in Sources */,
+				9D6BB8191B51182D005630B8 /* FSDesignModel.m in Sources */,
 				9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
