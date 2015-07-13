@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "FSDesignFileObject.h"
 
 @interface FSDesignerViewController : NSViewController
 ///sqlitemodeld包路径

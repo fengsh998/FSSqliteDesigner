@@ -8,18 +8,10 @@
 
 #import "FSDesignerViewController.h"
 
-typedef enum
-{
-    stDatabase              = 1,                 //库
-    stTabel                 = 1 << 1,            //表
-    stIndex                 = 1 << 2,            //索引
-    stView                  = 1 << 3,            //视图
-    stTigger                = 1 << 4             //触发器
-} SelectType;
-
 @interface FSDesignerViewController ()<NSSplitViewDelegate,NSOutlineViewDataSource,NSOutlineViewDelegate>
 {
     NSURL                   *_modelUrl;
+    NSMutableArray                              *_dbs;
 }
 
 @property (nonatomic, strong)               NSMenu                      *popMenu;
@@ -31,6 +23,17 @@ typedef enum
     [super viewDidLoad];
     // Do view setup here.
     self.splitview.delegate = self;
+    _dbs = [[NSMutableArray alloc]init];
+
+    self.dblistview.delegate = self;
+    self.dblistview.dataSource = self;
+    
+    
+    NSBundle *bd = [NSBundle bundleForClass:self.class];
+    NSImage *imgadd = [bd imageForResource:@"add"];
+    [self.btnAdd setImage:imgadd];
+    NSImage *imgremove = [bd imageForResource:@"remove"];
+    [self.btnRemove setImage:imgremove];
 }
 
 - (NSURL *)modelUrl
@@ -72,18 +75,44 @@ typedef enum
     return _popMenu;
 }
 
-- (void)updateMenuForSelectType:(SelectType)stype
+- (void)disableAllItem
 {
-    NSMenuItem * item = [self.popMenu itemAtIndex:1];
-    
-    if (stype == stDatabase) {
+    for (NSInteger i = 1; i < self.popMenu.itemArray.count ; i++) {
+        NSMenuItem * item = [self.popMenu itemAtIndex:i];
         [item setAction:nil];
     }
-    else
-    {
-        [item setAction: @selector(toDoAddTable:)];
+}
+
+- (void)enableItemAtIndex:(NSInteger)index
+{
+    switch (index) {
+        case 1: //enable table
+        {
+            NSMenuItem * item = [self.popMenu itemAtIndex:1];
+            if (!item.action) {
+                [item setAction: @selector(toDoAddTable:)];
+            }
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+}
+
+#pragma mark - 根据选中项来启用菜单
+- (void)checkMenuState
+{
+    FSNode *selectitem = [self getSelectItemInList];
+    if (selectitem) {
+        if ((selectitem.type == nodeDatabase) || ([selectitem isKindOfClass:[FSTableCategory class]]))
+        {
+            [self enableItemAtIndex:1];
+        }
     }
 }
+
 
 - (void)loadModelFilepath:(NSURL *)modelUrl
 {
@@ -94,11 +123,11 @@ typedef enum
 
 - (IBAction)btnAddClicked:(id)sender
 {
+    [self disableAllItem];
+    [self checkMenuState];
+    
     NSPoint location = CGPointMake(20, 60);
     NSMenu *contextmenu = [self popMenu];
-
-    [self updateMenuForSelectType:stTabel];
-    
     [contextmenu popUpMenuPositioningItem:nil atLocation:location inView:self.view];
 }
 
@@ -130,44 +159,81 @@ typedef enum
 #pragma mark - outline 代理
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
     if (!item) {
-        return [self.viewlists count];//無item內容為第一層，所以顯示第一層的Staff數量
+        return [_dbs count];//無item內容為第一層，所以顯示第一層的Staff數量
     }
-    return ((FSViewListModel*)item).subvs.count;//非第一層時會將目前這層的物件傳入，此時我們列出這層下的Staff數量
+    return ((FSNode*)item).childcounts;//非第一層時會將目前這層的物件傳入，此時我們列出這層下的Staff數量
 }
 //顯示index陣列值中的內容
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item {
     if (!item) {
-        return [self.viewlists objectAtIndex:index];//無item內容為第一層，所以顯示第一層的內容
+        return [_dbs objectAtIndex:index];//無item內容為第一層，所以顯示第一層的內容
     }
-    return [((FSViewListModel*)item).subvs objectAtIndex:index];//非第一層時會將目前這層的物件傳入，此時我們列出這層下是否有還有
+    return [((FSNode*)item).childrens objectAtIndex:index];//非第一層時會將目前這層的物件傳入，此時我們列出這層下是否有還有
 }
 //返回YES代表下層還有物件要列出
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item {
     if (!item) {
         return NO;//無item內容時代表已經無下層物件
     }
-    return ((FSViewListModel*)item).subvs.count > 0;//非第一層時會將目前這層的物件傳入，此時我們列出這層下還有Staff時會將isBoss=YES
+    return ((FSNode*)item).childcounts > 0;//非第一層時會將目前這層的物件傳入，此時我們列出這層下還有Staff時會將isBoss=YES
 }
 
 /* NOTE: this method is optional for the View Based OutlineView.
  */
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item {
-    
-    NSView *av = ((FSViewListModel*)item).v;
-    return [NSString stringWithFormat:@"%@ <%p>",av.className,av];
+
+    return ((FSNode*)item).nodename;
 }
+
+//- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+//{
+//    NSLog(@"aaaaaaa");
+//    NSTableCellView *result = [outlineView makeViewWithIdentifier:tableColumn.identifier owner:self];
+//    NSImage *i = [NSImage imageNamed:@"NSAddTemplate"];
+//    [[result imageView] setImage:i];
+//    return result;
+//}
 
 
 #pragma mark - 菜单处理
 - (void)toDoAddDatabase:(NSMenuItem *)item
 {
+    NSString *v = _dbs.count>0?[NSString stringWithFormat:@"%ld",(long)_dbs.count]:@"";
+    NSString *tbn = [NSString stringWithFormat:@"dbname%@",v];
+    FSDatabse *ts = [[FSDatabse alloc]initWithDatabaseName:tbn];
+    [_dbs addObject:ts];
     
+    [self.dblistview reloadData];
+}
+
+- (FSNode *)getSelectItemInList
+{
+    return [self.dblistview itemAtRow:[self.dblistview selectedRow]];
 }
 
 //创建表的时候把视图，索引，触发器的固定属性加上
 - (void)toDoAddTable:(NSMenuItem *)item
 {
-    
+    id selectitem = [self getSelectItemInList];
+    if (selectitem)
+    {
+        if ([selectitem isKindOfClass:[FSDatabse class]])
+        {
+            NSInteger tbcount = ((FSDatabse *)selectitem).tables.count;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+
+            [((FSDatabse *)selectitem)addTable:[NSString stringWithFormat:@"tablename%@",v]];
+        }
+        else if ([selectitem isKindOfClass:[FSTableCategory class]])
+        {
+            NSInteger tbcount = ((FSTableCategory *)selectitem).childcounts;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+            FSTable *newtable = [[FSTable alloc]initWithTableName:[NSString stringWithFormat:@"tablename%@",v]];
+            [((FSTableCategory *)selectitem) addChildrenNode:newtable];
+        }
+        
+        [self.dblistview reloadData];
+    }
 }
 
 @end
