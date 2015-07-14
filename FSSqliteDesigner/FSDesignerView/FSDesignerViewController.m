@@ -8,7 +8,8 @@
 
 #import "FSDesignerViewController.h"
 
-@interface FSDesignerViewController ()<NSSplitViewDelegate,NSOutlineViewDataSource,NSOutlineViewDelegate>
+@interface FSDesignerViewController ()<NSSplitViewDelegate,NSOutlineViewDataSource,
+NSOutlineViewDelegate,NSTextFieldDelegate>
 {
     NSURL                   *_modelUrl;
     NSMutableArray                              *_dbs;
@@ -62,12 +63,12 @@
         menuItem = [[NSMenuItem alloc] initWithTitle:@"添加表" action:nil keyEquivalent:@""];
         menuItem.target = self;
         [mContextualMenu addItem:menuItem];
-//        menuItem = [[NSMenuItem alloc] initWithTitle:@"添加索引" action:@selector(toDoAddIndex:) keyEquivalent:@""];
-//        [mContextualMenu addItem:menuItem];
-//        menuItem = [[NSMenuItem alloc] initWithTitle:@"添加视图" action:@selector(toDoAddTable:) keyEquivalent:@""];
-//        [mContextualMenu addItem:menuItem];
-//        menuItem = [[NSMenuItem alloc] initWithTitle:@"添加触发器" action:@selector(toDoAddTable:) keyEquivalent:@""];
-//        [mContextualMenu addItem:menuItem];
+        menuItem = [[NSMenuItem alloc] initWithTitle:@"添加索引" action:nil keyEquivalent:@""];
+        [mContextualMenu addItem:menuItem];
+        menuItem = [[NSMenuItem alloc] initWithTitle:@"添加视图" action:nil keyEquivalent:@""];
+        [mContextualMenu addItem:menuItem];
+        menuItem = [[NSMenuItem alloc] initWithTitle:@"添加触发器" action:nil keyEquivalent:@""];
+        [mContextualMenu addItem:menuItem];
         
         _popMenu = mContextualMenu;
     }
@@ -94,6 +95,30 @@
             }
         }
             break;
+        case 2:
+        {
+            NSMenuItem * item = [self.popMenu itemAtIndex:2];
+            if (!item.action) {
+                [item setAction: @selector(toDoAddIndex:)];
+            }
+        }
+            break;
+        case 3:
+        {
+            NSMenuItem * item = [self.popMenu itemAtIndex:3];
+            if (!item.action) {
+                [item setAction: @selector(toDoAddView:)];
+            }
+        }
+            break;
+        case 4:
+        {
+            NSMenuItem * item = [self.popMenu itemAtIndex:4];
+            if (!item.action) {
+                [item setAction: @selector(toDoAddTrigger:)];
+            }
+        }
+            break;
             
         default:
             break;
@@ -106,11 +131,37 @@
 {
     FSNode *selectitem = [self getSelectItemInList];
     if (selectitem) {
-        if ((selectitem.type == nodeDatabase) || ([selectitem isKindOfClass:[FSTableCategory class]]))
+        if (selectitem.type == nodeDatabase)
+        {
+            [self enableItemAtIndex:1];
+            [self enableItemAtIndex:2];
+            [self enableItemAtIndex:3];
+            [self enableItemAtIndex:4];
+        }
+        else if ([selectitem isKindOfClass:[FSTableCategory class]])
         {
             [self enableItemAtIndex:1];
         }
+        else if ([selectitem isKindOfClass:[FSIndexCategory class]])
+        {
+            [self enableItemAtIndex:2];
+        }
+        else if ([selectitem isKindOfClass:[FSViewCategory class]])
+        {
+            [self enableItemAtIndex:3];
+        }
+        else if ([selectitem isKindOfClass:[FSTriggerCategory class]])
+        {
+            [self enableItemAtIndex:4];
+        }
     }
+}
+
+- (NSImage *)getIconWithName:(NSString *)name
+{
+    NSBundle *bd = [NSBundle bundleForClass:self.class];
+    NSImage *img = [bd imageForResource:name];
+    return img;
 }
 
 
@@ -178,22 +229,92 @@
     return ((FSNode*)item).childcounts > 0;//非第一層時會將目前這層的物件傳入，此時我們列出這層下還有Staff時會將isBoss=YES
 }
 
-/* NOTE: this method is optional for the View Based OutlineView.
- */
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item {
-
-    return ((FSNode*)item).nodename;
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    return YES;
 }
 
-//- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item
-//{
-//    NSLog(@"aaaaaaa");
-//    NSTableCellView *result = [outlineView makeViewWithIdentifier:tableColumn.identifier owner:self];
-//    NSImage *i = [NSImage imageNamed:@"NSAddTemplate"];
-//    [[result imageView] setImage:i];
-//    return result;
+
+/* NOTE: this method is optional for the View Based OutlineView.
+ */
+//- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item {
+//
+//    return ((FSNode*)item).nodename;
 //}
 
+//双击修改 (但可惜的view base 不支持该方法)
+- (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(nullable id)object forTableColumn:(nullable NSTableColumn *)tableColumn byItem:(nullable id)item
+{
+    FSNode *editnode = item;
+    if (editnode.type != nodeNone) {
+        editnode.nodename = object;
+    }
+}
+
+- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    NSTableCellView *result = [outlineView makeViewWithIdentifier:@"listcell"
+                                                            owner:self];
+    FSNode *node = item;
+    NSString *iconname = [self iconnameWithNode:node];
+    
+    NSImage *img =[self getIconWithName:iconname];
+    
+    [[result imageView] setImage:img];
+    result.textField.delegate = self;
+    result.textField.allowsEditingTextAttributes = YES;
+    result.textField.stringValue = node.nodename;
+    return result;
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)obj
+{
+//    NSTextField *textField = [obj object];
+//    NSString *newTitle = [textField stringValue];
+//    
+//    NSUInteger row = [self.sidebarOutlineView rowForView:textField];
+//    
+//    MyItem *myItem = [self.sidebarOutlineView itemAtRow:row];
+//    myItem.name = newTitle;
+}
+
+//选中
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+    
+}
+
+- (NSString *)iconnameWithNode:(FSNode *)node
+{
+    switch (node.type) {
+        case nodeDatabase:
+            return @"dblist";
+            break;
+        case nodeTabel:
+            return @"table";
+            break;
+        case nodeIndex:
+            return @"common";
+            break;
+        case nodeView:
+            return @"view";
+            break;
+        case nodeTigger:
+            return @"trigger";
+            break;
+            
+        default:
+            if ([node isKindOfClass:[FSTableCategory class]]) {
+                return @"tables";
+            }
+            else if ([node isKindOfClass:[FSViewCategory class]])
+            {
+                return @"views";
+            }
+            break;
+    }
+    return @"common";
+}
 
 #pragma mark - 菜单处理
 - (void)toDoAddDatabase:(NSMenuItem *)item
@@ -234,6 +355,21 @@
         
         [self.dblistview reloadData];
     }
+}
+
+- (void)toDoAddIndex:(NSMenuItem *)item
+{
+    
+}
+
+- (void)toDoAddView:(NSMenuItem *)item
+{
+    
+}
+
+- (void)toDoAddTrigger:(NSMenuItem *)item
+{
+    
 }
 
 @end

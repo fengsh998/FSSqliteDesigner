@@ -14,7 +14,7 @@
 		9D55CAE81B536280004A1F11 /* tables.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CADF1B536280004A1F11 /* tables.png */; };
 		9D55CAE91B536280004A1F11 /* table.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE01B536280004A1F11 /* table.png */; };
 		9D55CAEA1B536280004A1F11 /* remove.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE11B536280004A1F11 /* remove.png */; };
-		9D55CAEB1B536280004A1F11 /* ooopic_1436755620.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE21B536280004A1F11 /* ooopic_1436755620.png */; };
+		9D55CAEB1B536280004A1F11 /* dblist.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE21B536280004A1F11 /* dblist.png */; };
 		9D55CAEC1B536280004A1F11 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE31B536280004A1F11 /* add.png */; };
 		9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */; };
 		9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */; };
@@ -42,7 +42,7 @@
 		9D55CADF1B536280004A1F11 /* tables.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tables.png; path = ../../../../../Downloads/tables.png; sourceTree = "<group>"; };
 		9D55CAE01B536280004A1F11 /* table.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = table.png; path = ../../../../../Downloads/table.png; sourceTree = "<group>"; };
 		9D55CAE11B536280004A1F11 /* remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = remove.png; path = ../../../../../Downloads/remove.png; sourceTree = "<group>"; };
-		9D55CAE21B536280004A1F11 /* ooopic_1436755620.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ooopic_1436755620.png; path = ../../../../../Downloads/ooopic_1436755620.png; sourceTree = "<group>"; };
+		9D55CAE21B536280004A1F11 /* dblist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dblist.png; path = ../../../../../Downloads/dblist.png; sourceTree = "<group>"; };
 		9D55CAE31B536280004A1F11 /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add.png; path = ../../../../../Downloads/add.png; sourceTree = "<group>"; };
 		9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerViewController.h; sourceTree = "<group>"; };
 		9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignerViewController.m; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 				9D55CADF1B536280004A1F11 /* tables.png */,
 				9D55CAE01B536280004A1F11 /* table.png */,
 				9D55CAE11B536280004A1F11 /* remove.png */,
-				9D55CAE21B536280004A1F11 /* ooopic_1436755620.png */,
+				9D55CAE21B536280004A1F11 /* dblist.png */,
 				9D55CAE31B536280004A1F11 /* add.png */,
 			);
 			name = res;
@@ -263,7 +263,7 @@
 				9D6BB8151B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel in Resources */,
 				9D6BB8161B50F50B005630B8 /* version-model.plist in Resources */,
 				9DD95B391B4BA77600D54DBA /* TemplateIcon.icns in Resources */,
-				9D55CAEB1B536280004A1F11 /* ooopic_1436755620.png in Resources */,
+				9D55CAEB1B536280004A1F11 /* dblist.png in Resources */,
 				9D55CAEC1B536280004A1F11 /* add.png in Resources */,
 				9DD95B3C1B4BA78000D54DBA /* install_templates.sh in Resources */,
 				9D55CAEA1B536280004A1F11 /* remove.png in Resources */,
