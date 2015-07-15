@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "FSDesignFileObject.h"
+#import "FSOutlineView.h"
 
 @interface FSDesignerViewController : NSViewController
 ///sqlitemodeld包路径
@@ -17,7 +18,7 @@
 ///分区
 @property (weak) IBOutlet               NSSplitView         *splitview;
 ///库(1)，表(2)，(视图，触发器，索引显示区 3)
-@property (weak) IBOutlet               NSOutlineView       *dblistview;
+@property (weak) IBOutlet               FSOutlineView       *dblistview;
 ///右边分区多页
 @property (weak) IBOutlet               NSTabView           *tabview;
 ///添加菜单

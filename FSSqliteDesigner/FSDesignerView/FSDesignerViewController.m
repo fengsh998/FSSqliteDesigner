@@ -26,6 +26,8 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
     self.splitview.delegate = self;
     _dbs = [[NSMutableArray alloc]init];
 
+    NSArray *all = [self.dblistview tableColumns];
+    [[all objectAtIndex: 0] setEditable: YES];
     self.dblistview.delegate = self;
     self.dblistview.dataSource = self;
     
@@ -229,19 +231,6 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
     return ((FSNode*)item).childcounts > 0;//非第一層時會將目前這層的物件傳入，此時我們列出這層下還有Staff時會將isBoss=YES
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
-{
-    return YES;
-}
-
-
-/* NOTE: this method is optional for the View Based OutlineView.
- */
-//- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item {
-//
-//    return ((FSNode*)item).nodename;
-//}
-
 //双击修改 (但可惜的view base 不支持该方法)
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(nullable id)object forTableColumn:(nullable NSTableColumn *)tableColumn byItem:(nullable id)item
 {
@@ -261,27 +250,41 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
     NSImage *img =[self getIconWithName:iconname];
     
     [[result imageView] setImage:img];
-    result.textField.delegate = self;
-    result.textField.allowsEditingTextAttributes = YES;
     result.textField.stringValue = node.nodename;
+    BOOL edit = [self isCanEditText:node];
+    [result.textField setEditable:edit];
+    [result.textField setSelectable:edit];
     return result;
 }
 
+//使用了view base后
 - (void)controlTextDidEndEditing:(NSNotification *)obj
 {
-//    NSTextField *textField = [obj object];
-//    NSString *newTitle = [textField stringValue];
-//    
-//    NSUInteger row = [self.sidebarOutlineView rowForView:textField];
-//    
-//    MyItem *myItem = [self.sidebarOutlineView itemAtRow:row];
-//    myItem.name = newTitle;
+    NSTextField *textField = [obj object];
+    NSString *newTitle = [textField stringValue];
+
+    NSUInteger row = [self.dblistview rowForView:textField];
+
+    FSNode *item = [self.dblistview itemAtRow:row];
+    item.nodename = newTitle;
 }
 
 //选中
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
     
+}
+
+- (BOOL)isCanEditText:(FSNode *)item
+{
+    if ([item isKindOfClass:[FSTableCategory class]] ||
+    [item isKindOfClass:[FSIndexCategory class]] ||
+    [item isKindOfClass:[FSViewCategory class]] ||
+    [item isKindOfClass:[FSTriggerCategory class]])
+    {
+        return NO;
+    }
+    return YES;
 }
 
 - (NSString *)iconnameWithNode:(FSNode *)node

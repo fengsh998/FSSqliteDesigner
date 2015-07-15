@@ -16,6 +16,7 @@
 		9D55CAEA1B536280004A1F11 /* remove.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE11B536280004A1F11 /* remove.png */; };
 		9D55CAEB1B536280004A1F11 /* dblist.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE21B536280004A1F11 /* dblist.png */; };
 		9D55CAEC1B536280004A1F11 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE31B536280004A1F11 /* add.png */; };
+		9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6090AF1B55593B002CF276 /* FSOutlineView.m */; };
 		9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */; };
 		9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */; };
 		9D6BB8151B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel in Resources */ = {isa = PBXBuildFile; fileRef = 9D6BB8131B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel */; };
@@ -44,6 +45,8 @@
 		9D55CAE11B536280004A1F11 /* remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = remove.png; path = ../../../../../Downloads/remove.png; sourceTree = "<group>"; };
 		9D55CAE21B536280004A1F11 /* dblist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dblist.png; path = ../../../../../Downloads/dblist.png; sourceTree = "<group>"; };
 		9D55CAE31B536280004A1F11 /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add.png; path = ../../../../../Downloads/add.png; sourceTree = "<group>"; };
+		9D6090AE1B55593B002CF276 /* FSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSOutlineView.h; sourceTree = "<group>"; };
+		9D6090AF1B55593B002CF276 /* FSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSOutlineView.m; sourceTree = "<group>"; };
 		9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerViewController.h; sourceTree = "<group>"; };
 		9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignerViewController.m; sourceTree = "<group>"; };
 		9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSDesignerViewController.xib; sourceTree = "<group>"; };
@@ -145,6 +148,8 @@
 				9D55CAED1B536289004A1F11 /* res */,
 				9DBE62861B4BB7210054B463 /* FSDesignerView.h */,
 				9DBE62871B4BB7210054B463 /* FSDesignerView.m */,
+				9D6090AE1B55593B002CF276 /* FSOutlineView.h */,
+				9D6090AF1B55593B002CF276 /* FSOutlineView.m */,
 				9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */,
 				9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */,
 				9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */,
@@ -299,6 +304,7 @@
 				9DE2C8431B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m in Sources */,
 				9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */,
 				9DE2C8471B4CB58D0049C545 /* FSViewListModel.m in Sources */,
+				9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */,
 				9D6BB8191B51182D005630B8 /* FSDesignFileObject.m in Sources */,
 				9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */,
 			);
