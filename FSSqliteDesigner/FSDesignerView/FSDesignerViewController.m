@@ -9,7 +9,7 @@
 #import "FSDesignerViewController.h"
 
 @interface FSDesignerViewController ()<NSSplitViewDelegate,NSOutlineViewDataSource,
-NSOutlineViewDelegate,NSTextFieldDelegate>
+NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSource>
 {
     NSURL                   *_modelUrl;
     NSMutableArray                              *_dbs;
@@ -26,17 +26,18 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
     self.splitview.delegate = self;
     _dbs = [[NSMutableArray alloc]init];
 
-    NSArray *all = [self.dblistview tableColumns];
-    [[all objectAtIndex: 0] setEditable: YES];
     self.dblistview.delegate = self;
     self.dblistview.dataSource = self;
     
+    self.fieldlistview.delegate = self;
+    self.fieldlistview.dataSource = self;
     
-    NSBundle *bd = [NSBundle bundleForClass:self.class];
-    NSImage *imgadd = [bd imageForResource:@"add"];
-    [self.btnAdd setImage:imgadd];
-    NSImage *imgremove = [bd imageForResource:@"remove"];
-    [self.btnRemove setImage:imgremove];
+    [self setButtonStyle];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 - (NSURL *)modelUrl
@@ -53,6 +54,19 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
     }
 }
 
+#pragma mark - 设置按钮样式
+- (void)setButtonStyle
+{
+    NSBundle *bd = [NSBundle bundleForClass:self.class];
+    NSImage *imgadd = [bd imageForResource:@"add"];
+    [self.btnAdd setImage:imgadd];
+    [self.btnAddColumn setImage:[imgadd copy]];
+    NSImage *imgremove = [bd imageForResource:@"remove"];
+    [self.btnRemove setImage:imgremove];
+    [self.btnRemoveColumn setImage:[imgremove copy]];
+}
+
+#pragma mark - 设置弹出菜单
 - (NSMenu *)popMenu
 {
     if (!_popMenu)
@@ -186,7 +200,38 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
 
 - (IBAction)btnRemoveClicked:(id)sender
 {
+    FSNode *node = [self getSelectItemInList];
     
+    switch (node.type) {
+        case nodeDatabase:
+        {
+            ///删除库做二次确认
+        }
+            break;
+        case nodeTabel:
+        {
+            ///删除表
+        }
+            break;
+        case nodeView:
+        {
+            ///删除视图
+        }
+            break;
+        case nodeIndex:
+        {
+            ///删除索引
+        }
+            break;
+        case nodeTigger:
+        {
+            ///删除触发器
+        }
+            break;
+            
+        default:
+            break;
+    }
 }
 
 #pragma mark - splitedelegate
@@ -212,23 +257,25 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
 #pragma mark - outline 代理
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
     if (!item) {
-        return [_dbs count];//無item內容為第一層，所以顯示第一層的Staff數量
+        return [_dbs count];
     }
-    return ((FSNode*)item).childcounts;//非第一層時會將目前這層的物件傳入，此時我們列出這層下的Staff數量
+    return ((FSNode*)item).childcounts;
 }
-//顯示index陣列值中的內容
+
+//显示index结点中的內容
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item {
     if (!item) {
-        return [_dbs objectAtIndex:index];//無item內容為第一層，所以顯示第一層的內容
+        return [_dbs objectAtIndex:index];//无item內容為第一层，所以显示第一层的內容
     }
-    return [((FSNode*)item).childrens objectAtIndex:index];//非第一層時會將目前這層的物件傳入，此時我們列出這層下是否有還有
+    return [((FSNode*)item).childrens objectAtIndex:index];//非第一层时会将目前的内容结点加载
 }
-//返回YES代表下層還有物件要列出
+
+//返回YES代表下层还有孩子要列出
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item {
     if (!item) {
-        return NO;//無item內容時代表已經無下層物件
+        return NO;//无item內容时代表无孩子
     }
-    return ((FSNode*)item).childcounts > 0;//非第一層時會將目前這層的物件傳入，此時我們列出這層下還有Staff時會將isBoss=YES
+    return ((FSNode*)item).childcounts > 0;
 }
 
 //双击修改 (但可惜的view base 不支持该方法)
@@ -253,6 +300,7 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
     result.textField.stringValue = node.nodename;
     BOOL edit = [self isCanEditText:node];
     [result.textField setEditable:edit];
+    result.textField.delegate = self;
     [result.textField setSelectable:edit];
     return result;
 }
@@ -297,7 +345,7 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
             return @"table";
             break;
         case nodeIndex:
-            return @"common";
+            return @"trigger"; //使用与触发器一样的图标
             break;
         case nodeView:
             return @"view";
@@ -330,6 +378,7 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
     [self.dblistview reloadData];
 }
 
+#pragma mark - 获取选中的项
 - (FSNode *)getSelectItemInList
 {
     return [self.dblistview itemAtRow:[self.dblistview selectedRow]];
@@ -362,17 +411,77 @@ NSOutlineViewDelegate,NSTextFieldDelegate>
 
 - (void)toDoAddIndex:(NSMenuItem *)item
 {
-    
+    id selectitem = [self getSelectItemInList];
+    if (selectitem)
+    {
+        if ([selectitem isKindOfClass:[FSDatabse class]])
+        {
+            NSInteger tbcount = ((FSDatabse *)selectitem).indexObjects.count;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+            
+            [((FSDatabse *)selectitem)addIndex:[NSString stringWithFormat:@"index%@",v]];
+        }
+        else if ([selectitem isKindOfClass:[FSIndexCategory class]])
+        {
+            NSInteger tbcount = ((FSIndexCategory *)selectitem).childcounts;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+            
+            FSIndex *newIndex = [[FSIndex alloc]initWithIndexName:[NSString stringWithFormat:@"index%@",v]];
+            [((FSIndexCategory *)selectitem) addChildrenNode:newIndex];
+        }
+        
+        [self.dblistview reloadData];
+    }
 }
 
 - (void)toDoAddView:(NSMenuItem *)item
 {
-    
+    id selectitem = [self getSelectItemInList];
+    if (selectitem)
+    {
+        if ([selectitem isKindOfClass:[FSDatabse class]])
+        {
+            NSInteger tbcount = ((FSDatabse *)selectitem).views.count;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+            
+            [((FSDatabse *)selectitem)addView:[NSString stringWithFormat:@"view%@",v]];
+        }
+        else if ([selectitem isKindOfClass:[FSViewCategory class]])
+        {
+            NSInteger tbcount = ((FSViewCategory *)selectitem).childcounts;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+            
+            FSView *newIndex = [[FSView alloc]initWithViewName:[NSString stringWithFormat:@"view%@",v]];
+            [((FSViewCategory *)selectitem) addChildrenNode:newIndex];
+        }
+        
+        [self.dblistview reloadData];
+    }
 }
 
 - (void)toDoAddTrigger:(NSMenuItem *)item
 {
-    
+    id selectitem = [self getSelectItemInList];
+    if (selectitem)
+    {
+        if ([selectitem isKindOfClass:[FSDatabse class]])
+        {
+            NSInteger tbcount = ((FSDatabse *)selectitem).triggers.count;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+            
+            [((FSDatabse *)selectitem)addTrigger:[NSString stringWithFormat:@"trigger%@",v]];
+        }
+        else if ([selectitem isKindOfClass:[FSTriggerCategory class]])
+        {
+            NSInteger tbcount = ((FSTriggerCategory *)selectitem).childcounts;
+            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
+            
+            FSTrigger *newIndex = [[FSTrigger alloc]initWithTriggerName:[NSString stringWithFormat:@"trigger%@",v]];
+            [((FSTriggerCategory *)selectitem) addChildrenNode:newIndex];
+        }
+        
+        [self.dblistview reloadData];
+    }
 }
 
 @end

@@ -122,10 +122,71 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 #import "FSDesignFileObject.h"
 
-@implementation FSDesignFileObject
-
+@interface FSDesignFileObject ()
+{
+    NSMutableArray          *_fsDatabases;
+}
 @end
 
+@implementation FSDesignFileObject
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _fsDatabases = [[NSMutableArray alloc]init];
+    }
+    return self;
+}
+
+- (void)addDatabase:(FSDatabse *)database
+{
+    [_fsDatabases addObject:database];
+}
+
+- (FSDatabse *)addDatabaseWithName:(NSString *)name
+{
+    FSDatabse * db = [[FSDatabse alloc]initWithDatabaseName:name];
+    [self addDatabase:db];
+    return db;
+}
+
+- (FSDatabse *)databaseOfIndex:(NSInteger)index
+{
+    return [_fsDatabases objectAtIndex:index];
+}
+
+- (NSInteger)indexOfDatabaseObject:(FSDatabse *)database
+{
+    return [_fsDatabases indexOfObject:database];
+}
+
+- (void)removeDatabaseAtIndex:(NSInteger)index
+{
+    [_fsDatabases removeObjectAtIndex:index];
+}
+
+- (void)removeDatabaseOfObject:(FSDatabse *)database
+{
+    [_fsDatabases removeObject:database];
+}
+
+- (void)removeAllDatabase
+{
+    [_fsDatabases removeAllObjects];
+}
+
+- (void)loadFromFile:(NSURL *)filepath
+{
+    //解释sqlitemodel文件
+}
+
+- (void)saveToFile:(NSURL *)filepath
+{
+    //保存为sqlitemodel文件
+}
+
+@end
 
 @implementation FSNode
 
@@ -486,7 +547,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return view;
 }
 
-- (FSTrigger *)addTriggers:(NSString *)triggerName
+- (FSTrigger *)addTrigger:(NSString *)triggerName
 {
     if ([triggerKind exsistNodeName:triggerName])
     {

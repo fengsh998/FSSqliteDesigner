@@ -22,6 +22,7 @@
 		9D6BB8151B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel in Resources */ = {isa = PBXBuildFile; fileRef = 9D6BB8131B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel */; };
 		9D6BB8161B50F50B005630B8 /* version-model.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D6BB8141B50F50B005630B8 /* version-model.plist */; };
 		9D6BB8191B51182D005630B8 /* FSDesignFileObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6BB8181B51182D005630B8 /* FSDesignFileObject.m */; };
+		9DB191B81B578F52004FF4FE /* FSDesignerViewController+column.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DB191B71B578F52004FF4FE /* FSDesignerViewController+column.m */; };
 		9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DBE62871B4BB7210054B463 /* FSDesignerView.m */; };
 		9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD95B211B4BA09C00D54DBA /* FSSqliteDesignerManager.m */; };
 		9DD95B2A1B4BA13900D54DBA /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD95B291B4BA13900D54DBA /* AppKit.framework */; };
@@ -54,6 +55,8 @@
 		9D6BB8141B50F50B005630B8 /* version-model.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "version-model.plist"; sourceTree = "<group>"; };
 		9D6BB8171B51182D005630B8 /* FSDesignFileObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignFileObject.h; sourceTree = "<group>"; };
 		9D6BB8181B51182D005630B8 /* FSDesignFileObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignFileObject.m; sourceTree = "<group>"; };
+		9DB191B61B578F52004FF4FE /* FSDesignerViewController+column.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FSDesignerViewController+column.h"; sourceTree = "<group>"; };
+		9DB191B71B578F52004FF4FE /* FSDesignerViewController+column.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "FSDesignerViewController+column.m"; sourceTree = "<group>"; };
 		9DBE62861B4BB7210054B463 /* FSDesignerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerView.h; sourceTree = "<group>"; };
 		9DBE62871B4BB7210054B463 /* FSDesignerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDesignerView.m; sourceTree = "<group>"; };
 		9DCF1A3C1B4B926C000E114A /* FSSqliteDesigner.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FSSqliteDesigner.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +153,8 @@
 				9DBE62871B4BB7210054B463 /* FSDesignerView.m */,
 				9D6090AE1B55593B002CF276 /* FSOutlineView.h */,
 				9D6090AF1B55593B002CF276 /* FSOutlineView.m */,
+				9DB191B61B578F52004FF4FE /* FSDesignerViewController+column.h */,
+				9DB191B71B578F52004FF4FE /* FSDesignerViewController+column.m */,
 				9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */,
 				9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */,
 				9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */,
@@ -300,6 +305,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DB191B81B578F52004FF4FE /* FSDesignerViewController+column.m in Sources */,
 				9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */,
 				9DE2C8431B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m in Sources */,
 				9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */,

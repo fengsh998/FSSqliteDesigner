@@ -25,7 +25,15 @@
 @property (weak) IBOutlet               NSButton            *btnAdd;
 ///移除菜单
 @property (weak) IBOutlet               NSButton            *btnRemove;
+///添加字段
+@property (weak) IBOutlet               NSButton            *btnAddColumn;
+///移除字段
+@property (weak) IBOutlet               NSButton            *btnRemoveColumn;
+///字段列表view
+@property (weak) IBOutlet               NSTableView         *fieldlistview;
 
+///加载sqlitemodel的路径
 - (void)setModelUrl:(NSURL *)modelUrl;
-
+///获取选中项
+- (FSNode *)getSelectItemInList;
 @end

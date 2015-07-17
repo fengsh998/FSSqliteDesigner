@@ -138,6 +138,8 @@ typedef enum
 ///类型长度
 @property (nonatomic, assign) NSInteger                             typeLength;
 @property (nonatomic, assign) FSFieldType                           fieldtype;
+///字段备注
+@property (nonatomic, strong) NSString                              *mark;
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *fieldName;
 
 + (FSColumn *)column:(NSString *)filedName;
@@ -149,6 +151,8 @@ typedef enum
 ///表
 @interface FSTable : FSNode
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *tableName;
+///记录表的语句
+@property (nonatomic, strong) NSString                          *createsqls;
 - (instancetype)initWithTableName:(NSString *)name;
 /**
  *  添加一个字段
@@ -192,7 +196,7 @@ typedef enum
 ///添加视图
 - (FSView *)addView:(NSString *)viewName;
 ///添加触发器
-- (FSTrigger *)addTriggers:(NSString *)triggerName;
+- (FSTrigger *)addTrigger:(NSString *)triggerName;
 
 /**
  *  移除一个表
@@ -280,7 +284,16 @@ typedef enum
 
 @interface FSDesignFileObject : NSObject
 
+@property (nonatomic,readonly) NSArray          *databases;
 
+- (void)addDatabase:(FSDatabse *)database;
+- (FSDatabse *)addDatabaseWithName:(NSString *)name;
+- (FSDatabse *)databaseOfIndex:(NSInteger)index;
+- (NSInteger)indexOfDatabaseObject:(FSDatabse *)database;
+
+- (void)removeDatabaseAtIndex:(NSInteger)index;
+- (void)removeDatabaseOfObject:(FSDatabse *)database;
+- (void)removeAllDatabase;
 
 - (void)loadFromFile:(NSURL *)filepath;
 - (void)saveToFile:(NSURL *)filepath;
