@@ -20,7 +20,7 @@
 
 typedef enum
 {
-    ftInteger,
+    ftInteger     = 0,
     ftDouble,
     ftFloat,
     ftReal,
@@ -30,18 +30,20 @@ typedef enum
     ftTimestamp,
     ftString,
     ftText,
+    ftVarchar,
     ftBlob,
-    ftBinary
+    ftBinary,
+    ftUnknow
 }FSFieldType;
 
 typedef enum
 {
-    scNone                    = 1,
-    scPrimarykey              = 1 << 1,
-    scAutoIncreament          = 1 << 2,
-    scNotNull                 = 1 << 3,
-    scUnique                  = 1 << 4,
-    scDefaultValue            = 1 << 5
+    fcNone                    = 1,
+    fcPrimarykey              = 1 << 1,
+    fcAutoIncreament          = 1 << 2,
+    fcNotNull                 = 1 << 3,
+    fcUnique                  = 1 << 4,
+    fcDefaultValue            = 1 << 5
 }FSFieldConstraint;
 
 typedef enum
@@ -127,25 +129,48 @@ typedef enum
 
 ///索引
 @interface FSIndex : FSNode
+///是否唯一索引
+@property (nonatomic,assign) BOOL                                           unique;
+@property (nonatomic, setter=setNodename:,getter=nodename) NSString         *indexName;
+///建立的索引表名
+@property (nonatomic,copy)   NSString                                       *indexTableName;
+///索引字段名
+@property (nonatomic,copy)   NSString                                       *indexFieldName;
+///指定一的升序字段(可选)
+@property (nonatomic,strong) NSArray                                        *ascFields;
+///指定一的降序字段(可选)
+@property (nonatomic,strong) NSArray                                        *descFields;
+///索引sqls
+@property (nonatomic,strong) NSString                                       *indexsqls;
+
 - (instancetype)initWithIndexName:(NSString *)indexname;
 @end
 
 ///字段
 @interface FSColumn : FSNode
 ///约束默认值
-@property (nonatomic, strong) NSString                              *defaultvalue;
+@property (nonatomic, copy) NSString                              *defaultvalue;
+///约束P,A,U,N
 @property (nonatomic, assign) FSFieldConstraint                     constraint;
 ///类型长度
 @property (nonatomic, assign) NSInteger                             typeLength;
+///字段类型
 @property (nonatomic, assign) FSFieldType                           fieldtype;
 ///字段备注
-@property (nonatomic, strong) NSString                              *mark;
+@property (nonatomic, copy) NSString                              *mark;
+///提供当前支持的字段类型
+@property (nonatomic, readonly) NSArray                             *supportFieldTypes;
+
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *fieldName;
 
 + (FSColumn *)column:(NSString *)filedName;
 + (FSColumn *)column:(NSString *)filedName ofType:(FSFieldType)fieldtype withTypeLength:(NSInteger)length;
 
 - (instancetype)initWithName:(NSString *)filedName;
+
+- (NSString *)covertToString:(FSFieldType)fieldtype;
+- (FSFieldType)covertToType:(NSString *)fieldstring;
+
 @end
 
 ///表

@@ -10,6 +10,6 @@
 #import <Foundation/Foundation.h>
 #import "FSDesignerViewController.h"
 
-@interface FSDesignerViewController(column)
+@interface FSDesignerViewController(column)<NSComboBoxDelegate>
 
 @end

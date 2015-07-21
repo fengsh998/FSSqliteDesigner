@@ -139,6 +139,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self;
 }
 
+- (NSArray *)databases
+{
+    return _fsDatabases;
+}
+
 - (void)addDatabase:(FSDatabse *)database
 {
     [_fsDatabases addObject:database];
@@ -183,7 +188,148 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (void)saveToFile:(NSURL *)filepath
 {
+    
+    /*
+     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+     <model name="Test1.sqlitemodel" userDefinedModelVersionIdentifier="" type="com.apple.fshSqlite.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+     <elements/>
+     </model>
+     */
+    
     //保存为sqlitemodel文件
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    [self parseObject:self outToNSArray:dic];
+    
+    NSLog(@"fileurl %@ \n===============save === %@",filepath,dic);
+    //[dic writeToURL:filepath atomically:dic];
+}
+
+- (void)parseObject:(FSDesignFileObject *)designobject outToNSArray:(NSMutableDictionary *)dic
+{
+    NSMutableArray *staticdb = [NSMutableArray array];
+    NSMutableArray *dynamicdb = [NSMutableArray array];
+    [dic setObject:staticdb forKey:@"StaticDBList"];
+    [dic setObject:dynamicdb forKey:@"DynamicDBList"];
+    
+    for (FSDatabse *db in designobject.databases)
+    {
+        if (db.dynamic) {
+            [self parseNode:db toNSArray:dynamicdb];
+        }
+        else
+        {
+            [self parseNode:db toNSArray:staticdb];
+        }
+    }
+}
+
+- (void)parseNode:(FSNode *)node toNSArray:(NSMutableArray *)array
+{
+    switch (node.type) {
+        case nodeDatabase:
+        {
+            NSMutableDictionary *db = [NSMutableDictionary dictionary];
+            [db setObject:node.nodename forKey:@"DBName"];
+            [db setObject:@"1.0" forKey:@"DBVersion"];
+            [array addObject:db];
+            
+            NSMutableArray *tmp = [NSMutableArray array];
+            //DBFields
+            [db setObject:tmp forKey:@"DBTables"];
+            for (FSTable *tb in ((FSDatabse *)node).tables)
+            {
+                [self parseNode:tb toNSArray:tmp];
+            }
+            
+            tmp = [NSMutableArray array];
+            [db setObject:tmp forKey:@"DBIndexs"];
+            
+            for (FSIndex *idxobj in ((FSDatabse *)node).indexObjects) {
+                [self parseNode:idxobj toNSArray:tmp];
+            }
+            
+            tmp = [NSMutableArray array];
+            [db setObject:tmp forKey:@"DBViews"];
+            
+            for (FSView *v in ((FSDatabse *)node).views) {
+                [self parseNode:v toNSArray:tmp];
+            }
+            
+            tmp = [NSMutableArray array];
+            [db setObject:tmp forKey:@"DBTriggers"];
+            
+            for (FSTrigger *trigger in ((FSDatabse *)node).triggers) {
+                [self parseNode:trigger toNSArray:tmp];
+            }
+        }
+            break;
+        case nodeTabel:
+        {
+             NSMutableDictionary *tbs = [NSMutableDictionary dictionary];
+            
+            [tbs setObject:node.nodename forKey:@"DBTableName"];
+            NSMutableArray *fields = [NSMutableArray array];
+            [tbs setObject:fields forKey:@"DBFields"];
+            [array addObject:tbs];
+            
+            for (FSColumn *column in node.childrens) {
+                [self parseNode:column toNSArray:fields];
+            }
+        }
+            break;
+        case nodeColumn:
+        {
+            FSColumn *c = (FSColumn *)node;
+            
+            NSMutableDictionary *columns = [NSMutableDictionary dictionary];
+            
+            [columns setObject:c.fieldName forKey:@"FieldName"];
+            NSString *ft = [c covertToString:c.fieldtype];
+            [columns setObject:ft forKey:@"FieldType"];
+            NSString *constraint = @"";//c.constraint;
+            [columns setObject:constraint forKey:@"FieldConstraint"];
+
+            [array addObject:columns];
+        }
+            break;
+        case nodeIndex:
+        {
+            FSIndex *i = (FSIndex*)node;
+            NSMutableDictionary *indexs = [NSMutableDictionary dictionary];
+            [indexs setObject:i.indexName forKey:@"FieldIndexName"];
+            if (i.unique) {
+                [indexs setObject:@"UNIQUE" forKey:@"FieldIndexType"];
+            }
+            [indexs setObject:i.indexTableName forKey:@"DBTableName"];
+            [indexs setObject:i.indexFieldName forKey:@"FieldName"];
+            
+            if (i.ascFields.count > 0) {
+                [indexs setObject:[[i.ascFields componentsJoinedByString:@","] uppercaseString] forKey:@"ColumnASC"];
+            }
+            
+            if (i.descFields.count > 0) {
+                [indexs setObject:[[i.descFields componentsJoinedByString:@","] uppercaseString] forKey:@"ColumnDESC"];
+            }
+            
+            [array addObject:indexs];
+        }
+            break;
+        case nodeView:
+        {
+            FSView *v = (FSView *)node;
+            [array addObject:v.sqls];
+        }
+            break;
+        case nodeTigger:
+        {
+            FSTrigger *trigger = (FSTrigger *)node;
+            [array addObject:trigger.sqls];
+        }
+            break;
+            
+        default:
+            break;
+    }
 }
 
 @end
@@ -393,6 +539,8 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         self.nodename = filedName;
         self.allowRename = NO;
         self.type = nodeColumn;
+        self.fieldtype = ftInteger;
+        self.constraint = fcNone;
     }
     return self;
 }
@@ -408,6 +556,23 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     [fc setFieldtype:fieldtype];
     [fc setTypeLength:length];
     return fc;
+}
+
+- (NSArray *)supportFieldTypes
+{
+    //TEXT,REAL,INTEGER,BLOB,VARCHAR,FLOAT,DOUBLE,DATE,TIME,BOOLEAN,TIMESTAMP,BINARY
+    return [NSArray arrayWithObjects:@"INTEGER",@"DOUBLE",@"FLOAT",@"REAL",@"BOOLEAN",
+                @"DATE",@"TIME",@"TIMESTAMP",@"TEXT",@"VARCHAR",@"BLOB",@"BINARY", nil];
+}
+
+- (NSString *)covertToString:(FSFieldType)fieldtype
+{
+    return [[self supportFieldTypes]objectAtIndex:fieldtype];
+}
+
+- (FSFieldType)covertToType:(NSString *)fieldstring
+{
+    return (FSFieldType)[[self supportFieldTypes]indexOfObject:fieldstring];
 }
 
 @end

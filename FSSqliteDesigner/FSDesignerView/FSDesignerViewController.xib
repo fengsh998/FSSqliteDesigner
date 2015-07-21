@@ -9,12 +9,15 @@
             <connections>
                 <outlet property="btnAdd" destination="d5U-sh-89n" id="kpd-hh-3xo"/>
                 <outlet property="btnAddColumn" destination="3Mz-UF-Wp4" id="1aD-oW-T7L"/>
+                <outlet property="btnCheckDymic" destination="cfV-2T-pxa" id="BSt-xe-9Yp"/>
                 <outlet property="btnRemove" destination="XBR-Qj-rzh" id="fdT-dx-gY1"/>
                 <outlet property="btnRemoveColumn" destination="BOO-AF-zuL" id="Giv-A8-9bd"/>
                 <outlet property="dblistview" destination="ZpG-FH-jJT" id="ioi-ra-kjg"/>
                 <outlet property="fieldlistview" destination="iqT-od-2dt" id="uUD-4c-2g5"/>
                 <outlet property="splitview" destination="3BT-d6-bwv" id="qty-WU-dAT"/>
                 <outlet property="tabview" destination="9Gx-eR-xSu" id="09Z-K3-2R0"/>
+                <outlet property="tfDBName" destination="XOl-KM-2nx" id="FQm-1d-KNl"/>
+                <outlet property="tvMark" destination="13p-DX-PyX" id="a70-6t-Ikl"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
         </customObject>
@@ -166,16 +169,16 @@
                                     <tabViewItems>
                                         <tabViewItem label="column editor" identifier="id_column" id="Da8-RD-XaO">
                                             <view key="view" id="2rb-GB-XzW">
-                                                <rect key="frame" x="0.0" y="0.0" width="479" height="400"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="492" height="400"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tabView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cQi-Co-j0z">
+                                                    <tabView translatesAutoresizingMaskIntoConstraints="NO" id="cQi-Co-j0z">
                                                         <rect key="frame" x="0.0" y="0.0" width="488" height="390"/>
                                                         <font key="font" metaFont="system"/>
                                                         <tabViewItems>
                                                             <tabViewItem label="字段" identifier="1" id="q93-Ug-5yc">
                                                                 <view key="view" id="Eiw-qp-WcE">
-                                                                    <rect key="frame" x="10" y="33" width="455" height="344"/>
+                                                                    <rect key="frame" x="10" y="33" width="468" height="344"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <scrollView misplaced="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yJQ-Sn-YTC">
@@ -330,6 +333,9 @@
                                                                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                                                     <font key="font" metaFont="system"/>
                                                                                                                 </buttonCell>
+                                                                                                                <connections>
+                                                                                                                    <action selector="onPermaryCheck:" target="-2" id="8eN-2c-R4I"/>
+                                                                                                                </connections>
                                                                                                             </button>
                                                                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="hgF-pf-JCd">
                                                                                                                 <rect key="frame" x="42" y="0.0" width="40" height="18"/>
@@ -340,6 +346,9 @@
                                                                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                                                     <font key="font" metaFont="system"/>
                                                                                                                 </buttonCell>
+                                                                                                                <connections>
+                                                                                                                    <action selector="onAutoIncreamCheck:" target="-2" id="oQi-yJ-0Do"/>
+                                                                                                                </connections>
                                                                                                             </button>
                                                                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="rr1-T6-9Wl">
                                                                                                                 <rect key="frame" x="82" y="0.0" width="40" height="18"/>
@@ -350,6 +359,9 @@
                                                                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                                                     <font key="font" metaFont="system"/>
                                                                                                                 </buttonCell>
+                                                                                                                <connections>
+                                                                                                                    <action selector="onNotNullCheck:" target="-2" id="AzA-19-gGi"/>
+                                                                                                                </connections>
                                                                                                             </button>
                                                                                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="F4F-EC-B35">
                                                                                                                 <rect key="frame" x="122" y="0.0" width="40" height="18"/>
@@ -360,6 +372,9 @@
                                                                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                                                     <font key="font" metaFont="system"/>
                                                                                                                 </buttonCell>
+                                                                                                                <connections>
+                                                                                                                    <action selector="onUniqueCheck:" target="-2" id="h46-7E-jTq"/>
+                                                                                                                </connections>
                                                                                                             </button>
                                                                                                         </subviews>
                                                                                                         <constraints>
@@ -429,7 +444,7 @@
                                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                             </tableHeaderView>
                                                                         </scrollView>
-                                                                        <customView translatesAutoresizingMaskIntoConstraints="NO" id="GRR-QY-u71">
+                                                                        <customView misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GRR-QY-u71">
                                                                             <rect key="frame" x="0.0" y="32" width="471" height="60"/>
                                                                             <subviews>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7QR-ac-MLo">
@@ -440,7 +455,7 @@
                                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                     </textFieldCell>
                                                                                 </textField>
-                                                                                <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="drd-3c-afN">
+                                                                                <scrollView misplaced="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="drd-3c-afN">
                                                                                     <rect key="frame" x="41" y="18" width="415" height="36"/>
                                                                                     <clipView key="contentView" id="zhP-8F-0fR">
                                                                                         <rect key="frame" x="1" y="1" width="398" height="34"/>
@@ -661,7 +676,7 @@
                                                                     <rect key="frame" x="10" y="33" width="468" height="344"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <scrollView misplaced="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b9r-HA-PWi">
+                                                                        <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b9r-HA-PWi">
                                                                             <rect key="frame" x="5" y="5" width="459" height="336"/>
                                                                             <clipView key="contentView" id="2CN-mD-eI0">
                                                                                 <rect key="frame" x="1" y="1" width="442" height="334"/>
@@ -748,6 +763,9 @@
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="onCheckDymicClicked:" target="-2" id="gpc-Fi-mQC"/>
+                                                                    </connections>
                                                                 </button>
                                                             </subviews>
                                                             <constraints>
@@ -782,6 +800,12 @@
                                         </tabViewItem>
                                         <tabViewItem label="trigger editor" identifier="id_trigger" id="gps-Q6-GSG">
                                             <view key="view" id="bqC-ak-Bft">
+                                                <rect key="frame" x="0.0" y="0.0" width="492" height="400"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            </view>
+                                        </tabViewItem>
+                                        <tabViewItem label="none" identifier="id_none" id="cwR-la-Oux">
+                                            <view key="view" id="ZuK-1K-jzr">
                                                 <rect key="frame" x="0.0" y="0.0" width="492" height="400"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             </view>

@@ -31,6 +31,14 @@
 @property (weak) IBOutlet               NSButton            *btnRemoveColumn;
 ///字段列表view
 @property (weak) IBOutlet               NSTableView         *fieldlistview;
+///库名
+@property (weak) IBOutlet               NSTextField         *tfDBName;
+///checkbox
+@property (weak) IBOutlet               NSButton            *btnCheckDymic;
+///备注
+@property (unsafe_unretained) IBOutlet  NSTextView          *tvMark;
+
+@property (nonatomic,strong)            FSDesignFileObject  *designer;
 
 ///加载sqlitemodel的路径
 - (void)setModelUrl:(NSURL *)modelUrl;

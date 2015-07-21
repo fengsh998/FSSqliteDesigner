@@ -7,15 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9D55CAE41B536280004A1F11 /* common.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CADB1B536280004A1F11 /* common.png */; };
-		9D55CAE51B536280004A1F11 /* trigger.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CADC1B536280004A1F11 /* trigger.png */; };
-		9D55CAE61B536280004A1F11 /* view.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CADD1B536280004A1F11 /* view.png */; };
-		9D55CAE71B536280004A1F11 /* views.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CADE1B536280004A1F11 /* views.png */; };
-		9D55CAE81B536280004A1F11 /* tables.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CADF1B536280004A1F11 /* tables.png */; };
-		9D55CAE91B536280004A1F11 /* table.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE01B536280004A1F11 /* table.png */; };
-		9D55CAEA1B536280004A1F11 /* remove.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE11B536280004A1F11 /* remove.png */; };
-		9D55CAEB1B536280004A1F11 /* dblist.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE21B536280004A1F11 /* dblist.png */; };
-		9D55CAEC1B536280004A1F11 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D55CAE31B536280004A1F11 /* add.png */; };
+		9D42F6E71B5A215800E93336 /* images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D42F6E61B5A215800E93336 /* images.xcassets */; };
 		9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6090AF1B55593B002CF276 /* FSOutlineView.m */; };
 		9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */; };
 		9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D61D4951B4EB31500007E10 /* FSDesignerViewController.xib */; };
@@ -37,15 +29,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9D55CADB1B536280004A1F11 /* common.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = common.png; path = ../../../../../Downloads/common.png; sourceTree = "<group>"; };
-		9D55CADC1B536280004A1F11 /* trigger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = trigger.png; path = ../../../../../Downloads/trigger.png; sourceTree = "<group>"; };
-		9D55CADD1B536280004A1F11 /* view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = view.png; path = ../../../../../Downloads/view.png; sourceTree = "<group>"; };
-		9D55CADE1B536280004A1F11 /* views.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = views.png; path = ../../../../../Downloads/views.png; sourceTree = "<group>"; };
-		9D55CADF1B536280004A1F11 /* tables.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tables.png; path = ../../../../../Downloads/tables.png; sourceTree = "<group>"; };
-		9D55CAE01B536280004A1F11 /* table.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = table.png; path = ../../../../../Downloads/table.png; sourceTree = "<group>"; };
-		9D55CAE11B536280004A1F11 /* remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = remove.png; path = ../../../../../Downloads/remove.png; sourceTree = "<group>"; };
-		9D55CAE21B536280004A1F11 /* dblist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dblist.png; path = ../../../../../Downloads/dblist.png; sourceTree = "<group>"; };
-		9D55CAE31B536280004A1F11 /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add.png; path = ../../../../../Downloads/add.png; sourceTree = "<group>"; };
+		9D42F6E61B5A215800E93336 /* images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = images.xcassets; sourceTree = "<group>"; };
 		9D6090AE1B55593B002CF276 /* FSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSOutlineView.h; sourceTree = "<group>"; };
 		9D6090AF1B55593B002CF276 /* FSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSOutlineView.m; sourceTree = "<group>"; };
 		9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDesignerViewController.h; sourceTree = "<group>"; };
@@ -90,22 +74,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		9D55CAED1B536289004A1F11 /* res */ = {
-			isa = PBXGroup;
-			children = (
-				9D55CADB1B536280004A1F11 /* common.png */,
-				9D55CADC1B536280004A1F11 /* trigger.png */,
-				9D55CADD1B536280004A1F11 /* view.png */,
-				9D55CADE1B536280004A1F11 /* views.png */,
-				9D55CADF1B536280004A1F11 /* tables.png */,
-				9D55CAE01B536280004A1F11 /* table.png */,
-				9D55CAE11B536280004A1F11 /* remove.png */,
-				9D55CAE21B536280004A1F11 /* dblist.png */,
-				9D55CAE31B536280004A1F11 /* add.png */,
-			);
-			name = res;
-			sourceTree = "<group>";
-		};
 		9D6BB8121B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodeld */ = {
 			isa = PBXGroup;
 			children = (
@@ -141,6 +109,7 @@
 				9DCF1A3F1B4B926C000E114A /* Info.plist */,
 				9DD95B201B4BA09C00D54DBA /* FSSqliteDesignerManager.h */,
 				9DD95B211B4BA09C00D54DBA /* FSSqliteDesignerManager.m */,
+				9D42F6E61B5A215800E93336 /* images.xcassets */,
 			);
 			path = FSSqliteDesigner;
 			sourceTree = "<group>";
@@ -148,7 +117,6 @@
 		9DD95B231B4BA0CC00D54DBA /* FSDesignerView */ = {
 			isa = PBXGroup;
 			children = (
-				9D55CAED1B536289004A1F11 /* res */,
 				9DBE62861B4BB7210054B463 /* FSDesignerView.h */,
 				9DBE62871B4BB7210054B463 /* FSDesignerView.m */,
 				9D6090AE1B55593B002CF276 /* FSOutlineView.h */,
@@ -264,20 +232,12 @@
 			files = (
 				9DE2C8441B4C09DC0049C545 /* FSXcodeWindowFrameDebug.xib in Resources */,
 				9DD95B3A1B4BA77600D54DBA /* TemplateInfo.plist in Resources */,
-				9D55CAE71B536280004A1F11 /* views.png in Resources */,
+				9D42F6E71B5A215800E93336 /* images.xcassets in Resources */,
 				9D61D4971B4EB31500007E10 /* FSDesignerViewController.xib in Resources */,
-				9D55CAE41B536280004A1F11 /* common.png in Resources */,
-				9D55CAE81B536280004A1F11 /* tables.png in Resources */,
-				9D55CAE61B536280004A1F11 /* view.png in Resources */,
-				9D55CAE91B536280004A1F11 /* table.png in Resources */,
 				9D6BB8151B50F50B005630B8 /* ___FILEBASENAME___.sqlitemodel in Resources */,
 				9D6BB8161B50F50B005630B8 /* version-model.plist in Resources */,
 				9DD95B391B4BA77600D54DBA /* TemplateIcon.icns in Resources */,
-				9D55CAEB1B536280004A1F11 /* dblist.png in Resources */,
-				9D55CAEC1B536280004A1F11 /* add.png in Resources */,
 				9DD95B3C1B4BA78000D54DBA /* install_templates.sh in Resources */,
-				9D55CAEA1B536280004A1F11 /* remove.png in Resources */,
-				9D55CAE51B536280004A1F11 /* trigger.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

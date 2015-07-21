@@ -108,19 +108,16 @@
         [[menuItem submenu] addItem:actionMenuItem];
     }
     
-//    [NSEvent addLocalMonitorForEventsMatchingMask:NSLeftMouseDownMask | NSMouseMovedMask  handler:^NSEvent * __nullable(NSEvent * __nonnull event) {
-//        switch (event.type) {
-//                            case NSLeftMouseDown:
-//                                    [self toDoCheckIsSelectSqliteFolder];
-//                                break;
-//                            case NSMouseMoved:
-//                
-//                                break;
-//                            default:
-//                                break;
-//                        }
-//        return event;
-//    }];
+    [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask  handler:^NSEvent * __nullable(NSEvent * __nonnull event) {
+        if((([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask) && [[event charactersIgnoringModifiers] compare:@"s"] == 0) {
+            if (self.designVC && self.designVC.designer)
+            {
+                [self.designVC.designer saveToFile:self.designVC.modelUrl];
+            }
+        }
+        
+        return event;
+    }];
 
 }
 

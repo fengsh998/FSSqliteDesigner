@@ -8,11 +8,19 @@
 
 #import "FSDesignerViewController.h"
 
+#define SuppressPerformSelectorLeakWarning(Stuff) \
+do { \
+_Pragma("clang diagnostic push") \
+_Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
+Stuff; \
+_Pragma("clang diagnostic pop") \
+} while (0)
+
 @interface FSDesignerViewController ()<NSSplitViewDelegate,NSOutlineViewDataSource,
-NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSource>
+NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSource,
+NSTextViewDelegate>
 {
-    NSURL                   *_modelUrl;
-    NSMutableArray                              *_dbs;
+    NSURL                               *_modelUrl;
 }
 
 @property (nonatomic, strong)               NSMenu                      *popMenu;
@@ -24,13 +32,20 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
     [super viewDidLoad];
     // Do view setup here.
     self.splitview.delegate = self;
-    _dbs = [[NSMutableArray alloc]init];
+
+    self.designer = [[FSDesignFileObject alloc]init];
 
     self.dblistview.delegate = self;
     self.dblistview.dataSource = self;
     
     self.fieldlistview.delegate = self;
     self.fieldlistview.dataSource = self;
+    
+    self.tvMark.delegate = self;
+
+    //默不显示
+    [self.tabview selectTabViewItemWithIdentifier:@"id_none"];
+    
     
     [self setButtonStyle];
 }
@@ -257,7 +272,7 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
 #pragma mark - outline 代理
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
     if (!item) {
-        return [_dbs count];
+        return self.designer.databases.count;
     }
     return ((FSNode*)item).childcounts;
 }
@@ -265,7 +280,7 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
 //显示index结点中的內容
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item {
     if (!item) {
-        return [_dbs objectAtIndex:index];//无item內容為第一层，所以显示第一层的內容
+        return [self.designer.databases objectAtIndex:index];//无item內容為第一层，所以显示第一层的內容
     }
     return [((FSNode*)item).childrens objectAtIndex:index];//非第一层时会将目前的内容结点加载
 }
@@ -301,11 +316,13 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
     BOOL edit = [self isCanEditText:node];
     [result.textField setEditable:edit];
     result.textField.delegate = self;
+    result.textField.action = @selector(onEditTreeName:);
     [result.textField setSelectable:edit];
     return result;
 }
 
 //使用了view base后
+/*
 - (void)controlTextDidEndEditing:(NSNotification *)obj
 {
     NSTextField *textField = [obj object];
@@ -314,13 +331,88 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
     NSUInteger row = [self.dblistview rowForView:textField];
 
     FSNode *item = [self.dblistview itemAtRow:row];
+    
     item.nodename = newTitle;
+    if (item.type == nodeDatabase) {
+        self.tfDBName.stringValue = [NSString stringWithFormat:@"库名:%@",item.nodename];
+    }
+}
+*/
+
+- (void)controlTextDidEndEditing:(NSNotification *)obj
+{
+    NSTextField * tf = obj.object;
+    SuppressPerformSelectorLeakWarning([tf.delegate performSelector:tf.action withObject:tf]);
 }
 
-//选中
+///修改树结点
+- (void)onEditTreeName:(NSTextField *)textfield
+{
+    NSString *newTitle = [textfield stringValue];
+    
+    NSUInteger row = [self.dblistview rowForView:textfield];
+    
+    FSNode *item = [self.dblistview itemAtRow:row];
+    
+    item.nodename = newTitle;
+    if (item.type == nodeDatabase) {
+        self.tfDBName.stringValue = [NSString stringWithFormat:@"库名:%@",item.nodename];
+    }
+}
+
+#pragma mark - 选中
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
+    FSNode *nd = [self getSelectItemInList];
+    NSString *tid = @"id_none";
+    switch (nd.type) {
+        case nodeDatabase:
+        {
+            tid = @"id_database";
+            self.tfDBName.stringValue = [NSString stringWithFormat:@"库名:%@",nd.nodename];
+            
+            BOOL ischeck = ((FSDatabse *)nd).dynamic;
+            [self.btnCheckDymic setState:ischeck?NSOnState:NSOffState];
+        }
+            break;
+        case nodeTabel:
+        {
+            tid = @"id_column";
+            [self.tvMark setEditable:NO];
+            [self.fieldlistview reloadData];
+        }
+            break;
+        case nodeColumn:
+        {
+            tid = @"id_column";
+            [self.tvMark setEditable:YES];
+            [self.fieldlistview reloadData];
+            
+            NSInteger idx = [nd.parentNode indexOfNode:nd];
+            [self.fieldlistview selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
+        }
+            break;
+        case nodeIndex:
+        {
+            tid = @"id_index";
+        }
+            break;
+        case nodeView:
+        {
+            tid = @"id_view";
+        }
+            break;
+        case nodeTigger:
+        {
+            tid = @"id_trigger";
+        }
+            break;
+            
+        default:
+            break;
+    }
     
+    [self.tabview selectTabViewItemWithIdentifier:tid];
 }
 
 - (BOOL)isCanEditText:(FSNode *)item
@@ -328,7 +420,8 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
     if ([item isKindOfClass:[FSTableCategory class]] ||
     [item isKindOfClass:[FSIndexCategory class]] ||
     [item isKindOfClass:[FSViewCategory class]] ||
-    [item isKindOfClass:[FSTriggerCategory class]])
+    [item isKindOfClass:[FSTriggerCategory class]]||
+    item.type == nodeColumn)
     {
         return NO;
     }
@@ -350,6 +443,9 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
         case nodeView:
             return @"view";
             break;
+        case nodeColumn:
+            return @"column";
+            break;
         case nodeTigger:
             return @"trigger";
             break;
@@ -370,10 +466,11 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
 #pragma mark - 菜单处理
 - (void)toDoAddDatabase:(NSMenuItem *)item
 {
-    NSString *v = _dbs.count>0?[NSString stringWithFormat:@"%ld",(long)_dbs.count]:@"";
+    NSString *v = self.designer.databases.count>0?[NSString stringWithFormat:@"%ld",(long)self.designer.databases.count]:@"";
+    
     NSString *tbn = [NSString stringWithFormat:@"dbname%@",v];
-    FSDatabse *ts = [[FSDatabse alloc]initWithDatabaseName:tbn];
-    [_dbs addObject:ts];
+    
+    [self.designer addDatabaseWithName:tbn];
     
     [self.dblistview reloadData];
 }
@@ -481,6 +578,15 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
         }
         
         [self.dblistview reloadData];
+    }
+}
+
+- (IBAction)onCheckDymicClicked:(NSButton *)sender
+{
+    id selectitem = [self getSelectItemInList];
+    if ([selectitem isKindOfClass:[FSDatabse class]]) {
+        FSDatabse *sdb = (FSDatabse *)selectitem;
+        sdb.dynamic = sender.state;
     }
 }
 
