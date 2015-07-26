@@ -7,6 +7,7 @@
 //
 
 #import "FSDesignerViewController.h"
+#import "FSDesignerViewController+column.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -18,7 +19,7 @@ _Pragma("clang diagnostic pop") \
 
 @interface FSDesignerViewController ()<NSSplitViewDelegate,NSOutlineViewDataSource,
 NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSource,
-NSTextViewDelegate>
+NSTextViewDelegate,NSTabViewDelegate>
 {
     NSURL                               *_modelUrl;
 }
@@ -44,10 +45,14 @@ NSTextViewDelegate>
     self.tvMark.delegate = self;
 
     //默不显示
+    [self.fieldTabview setDelegate:self];
     [self.tabview selectTabViewItemWithIdentifier:@"id_none"];
     
-    
     [self setButtonStyle];
+    
+    [self setDefaultOptions];
+    [self setDefaultActionForDelete];
+    [self setDefaultActionForUpdate];
 }
 
 - (void)dealloc
@@ -169,19 +174,19 @@ NSTextViewDelegate>
             [self enableItemAtIndex:3];
             [self enableItemAtIndex:4];
         }
-        else if ([selectitem isKindOfClass:[FSTableCategory class]])
+        else if ([selectitem isKindOfClass:[FSTableCategory class]] || selectitem.type == nodeTabel)
         {
             [self enableItemAtIndex:1];
         }
-        else if ([selectitem isKindOfClass:[FSIndexCategory class]])
+        else if ([selectitem isKindOfClass:[FSIndexCategory class]] || selectitem.type == nodeIndex)
         {
             [self enableItemAtIndex:2];
         }
-        else if ([selectitem isKindOfClass:[FSViewCategory class]])
+        else if ([selectitem isKindOfClass:[FSViewCategory class]] || selectitem.type == nodeView )
         {
             [self enableItemAtIndex:3];
         }
-        else if ([selectitem isKindOfClass:[FSTriggerCategory class]])
+        else if ([selectitem isKindOfClass:[FSTriggerCategory class]] || selectitem.type == nodeTigger)
         {
             [self enableItemAtIndex:4];
         }
@@ -221,32 +226,44 @@ NSTextViewDelegate>
         case nodeDatabase:
         {
             ///删除库做二次确认
+            [self.designer removeDatabaseOfObject:(FSDatabse *)node];
         }
             break;
         case nodeTabel:
         {
             ///删除表
+            FSTableCategory *tbp = (id)node.parentNode;
+            [tbp removeChildrenNode:node];
         }
             break;
         case nodeView:
         {
             ///删除视图
+            FSViewCategory *vp = (id)node.parentNode;
+            [vp removeChildrenNode:node];
         }
             break;
         case nodeIndex:
         {
             ///删除索引
+            FSIndexCategory *ip = (id)node.parentNode;
+            [ip removeChildrenNode:node];
         }
             break;
         case nodeTigger:
         {
             ///删除触发器
+            FSTriggerCategory *tgp = (id)node.parentNode;
+            [tgp removeChildrenNode:node];
         }
             break;
             
         default:
+            return;
             break;
     }
+    
+    [self.dblistview reloadData];
 }
 
 #pragma mark - splitedelegate
@@ -354,10 +371,74 @@ NSTextViewDelegate>
     
     FSNode *item = [self.dblistview itemAtRow:row];
     
+    BOOL exsistsamename = NO;
+    NSString *hint = @"";
+    
+    switch (item.type) {
+        case nodeDatabase:
+        {
+            exsistsamename = [self.designer exsistDatabaseOfName:newTitle butNotInclude:(id)item];
+            hint = @"已存在相同名称的数据库";
+        }
+            break;
+        case nodeTabel:
+        {
+            exsistsamename = [item exsistNodeNameInNeighbour:newTitle];
+            hint = @"已存在相同名称的表名";
+        }
+            break;
+        case nodeIndex:
+        {
+            exsistsamename = [item exsistNodeNameInNeighbour:newTitle];
+            hint = @"已存在相同名称的索引名";
+        }
+            break;
+        case nodeView:
+        {
+            exsistsamename = [item exsistNodeNameInNeighbour:newTitle];
+            hint = @"已存在相同名称的视图名";
+        }
+            break;
+        case nodeTigger:
+        {
+            exsistsamename = [item exsistNodeNameInNeighbour:newTitle];
+            hint = @"已存在相同名称的触发器名";
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+    if (exsistsamename && hint.length > 0) {
+        //如有需要则弹窗提示
+        [self alterCheckMessage:hint reSetFocus:textfield];
+        return;
+    }
+    
     item.nodename = newTitle;
     if (item.type == nodeDatabase) {
         self.tfDBName.stringValue = [NSString stringWithFormat:@"库名:%@",item.nodename];
     }
+}
+
+- (void)alterCheckMessage:(NSString *)msg reSetFocus:(NSView *)v
+{
+
+    NSAlert *alert = [[NSAlert alloc]init];
+    [alert addButtonWithTitle:@"确定"];
+    [alert setMessageText:msg];
+    
+    [alert setAlertStyle:NSInformationalAlertStyle];
+//    NSImage *icon = [NSImage imageNamed:@"icon.png"];
+//    [alert setIcon:icon];
+    [alert layout];
+    
+    [alert beginSheetModalForWindow:[self.view window] completionHandler:^(NSModalResponse returnCode) {
+        if (v) {
+            [self setFocus:v];
+        }
+    }];
 }
 
 #pragma mark - 选中
@@ -466,13 +547,40 @@ NSTextViewDelegate>
 #pragma mark - 菜单处理
 - (void)toDoAddDatabase:(NSMenuItem *)item
 {
-    NSString *v = self.designer.databases.count>0?[NSString stringWithFormat:@"%ld",(long)self.designer.databases.count]:@"";
+    FSNode *node = [self getSelectItemInList];
+    
+    BOOL useInsert = NO;
+    NSInteger idx = -1;
+    if (node.type == nodeDatabase) {
+        idx = [self.designer indexOfDatabaseObject:(FSDatabse *)node];
+        if (idx >=0 && idx < self.designer.databases.count - 1) {
+            useInsert = YES;
+        }
+    }
+
+    NSString *v = self.designer.databases.count > 0?[NSString stringWithFormat:@"%ld",(long)self.designer.databases.count]:@"";
     
     NSString *tbn = [NSString stringWithFormat:@"dbname%@",v];
     
-    [self.designer addDatabaseWithName:tbn];
+    if ([self.designer exsistDatabaseOfName:tbn])
+    {
+        tbn = [NSString stringWithFormat:@"%@_1",v];
+    }
+    
+    FSDatabse *db = nil;
+    if (useInsert && (idx != -1)) {
+        db = [self.designer insertDatabaseWithName:tbn atIndex:idx];
+    }
+    else
+    {
+        db = [self.designer addDatabaseWithName:tbn];
+    }
     
     [self.dblistview reloadData];
+    
+    [self toDoSelectedTreeNode:db];
+    
+    [self setFocus:self.dblistview];
 }
 
 #pragma mark - 获取选中的项
@@ -481,103 +589,184 @@ NSTextViewDelegate>
     return [self.dblistview itemAtRow:[self.dblistview selectedRow]];
 }
 
+#pragma mark - 选中Tree中某个结点
+- (void)toDoSelectedTreeNode:(FSNode *)node
+{
+    if (!node) {
+        return;
+    }
+    NSInteger idx = [self.dblistview rowForItem:node];
+    
+    // -1 表示未展开
+    if (idx != -1) {
+        [self.dblistview selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
+    }
+}
+
+- (void)setFocus:(NSView *)v
+{
+    [self.view.window makeFirstResponder:v];
+}
+
+#pragma mark - 添加表
 //创建表的时候把视图，索引，触发器的固定属性加上
 - (void)toDoAddTable:(NSMenuItem *)item
 {
-    id selectitem = [self getSelectItemInList];
+    FSNode *selectitem = [self getSelectItemInList];
     if (selectitem)
     {
+        if ([selectitem isKindOfClass:[FSTable class]]) {
+            selectitem = selectitem.parentNode;
+        }
+        
+        FSTableCategory *selected = (id)selectitem;
+        FSTable *newtable = nil;
+        FSDatabse *db = nil;
         if ([selectitem isKindOfClass:[FSDatabse class]])
         {
-            NSInteger tbcount = ((FSDatabse *)selectitem).tables.count;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-
-            [((FSDatabse *)selectitem)addTable:[NSString stringWithFormat:@"tablename%@",v]];
+            db = (FSDatabse *)selectitem;
+            
+            NSString *name = [db makeUniqueTableName];
+            
+            newtable = [db addTable:name];
+            selected = db.childrens[0];
         }
         else if ([selectitem isKindOfClass:[FSTableCategory class]])
         {
-            NSInteger tbcount = ((FSTableCategory *)selectitem).childcounts;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-            FSTable *newtable = [[FSTable alloc]initWithTableName:[NSString stringWithFormat:@"tablename%@",v]];
+            NSString *name = [((FSTableCategory *)selectitem) makeUniqueTableName];
+            newtable = [[FSTable alloc]initWithTableName:name];
             [((FSTableCategory *)selectitem) addChildrenNode:newtable];
         }
         
         [self.dblistview reloadData];
+        
+        if (db) {
+            [self.dblistview expandItem:db];
+        }
+        
+        [self.dblistview expandItem:selected];
+        
+        [self toDoSelectedTreeNode:newtable];
     }
 }
 
+#pragma mark - 添加索引
 - (void)toDoAddIndex:(NSMenuItem *)item
 {
-    id selectitem = [self getSelectItemInList];
+    FSNode *selectitem = [self getSelectItemInList];
     if (selectitem)
     {
+        if ([selectitem isKindOfClass:[FSIndex class]]) {
+            selectitem = selectitem.parentNode;
+        }
+        
+        FSIndexCategory *selected = (id)selectitem;
+        FSIndex *newIndex = nil;
+        FSDatabse *db = nil;
+        
         if ([selectitem isKindOfClass:[FSDatabse class]])
         {
-            NSInteger tbcount = ((FSDatabse *)selectitem).indexObjects.count;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-            
-            [((FSDatabse *)selectitem)addIndex:[NSString stringWithFormat:@"index%@",v]];
+            db = (FSDatabse *)selectitem;
+            NSString *name = [db makeUniqueIndexName];
+            newIndex = [db addIndex:name];
+            selected = db.childrens[1];
         }
         else if ([selectitem isKindOfClass:[FSIndexCategory class]])
         {
-            NSInteger tbcount = ((FSIndexCategory *)selectitem).childcounts;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-            
-            FSIndex *newIndex = [[FSIndex alloc]initWithIndexName:[NSString stringWithFormat:@"index%@",v]];
+            NSString *name = [((FSIndexCategory *)selectitem) makeUniqueIndexName];
+            newIndex = [[FSIndex alloc]initWithIndexName:name];
             [((FSIndexCategory *)selectitem) addChildrenNode:newIndex];
         }
         
         [self.dblistview reloadData];
+        
+        if (db) {
+            [self.dblistview expandItem:db];
+        }
+        
+        [self.dblistview expandItem:selected];
+        
+        [self toDoSelectedTreeNode:newIndex];
     }
 }
 
+#pragma mark - 添加视图
 - (void)toDoAddView:(NSMenuItem *)item
 {
-    id selectitem = [self getSelectItemInList];
+    FSNode *selectitem = [self getSelectItemInList];
     if (selectitem)
     {
+        if ([selectitem isKindOfClass:[FSView class]]) {
+            selectitem = selectitem.parentNode;
+        }
+        
+        FSViewCategory *selected = (id)selectitem;
+        FSView *newView = nil;
+        FSDatabse *db = nil;
+        
         if ([selectitem isKindOfClass:[FSDatabse class]])
         {
-            NSInteger tbcount = ((FSDatabse *)selectitem).views.count;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-            
-            [((FSDatabse *)selectitem)addView:[NSString stringWithFormat:@"view%@",v]];
+            db = (FSDatabse *)selectitem;
+            NSString *name = [db makeUniqueViewName];
+            newView = [db addView:name];
+            selected = db.childrens[2];
         }
         else if ([selectitem isKindOfClass:[FSViewCategory class]])
         {
-            NSInteger tbcount = ((FSViewCategory *)selectitem).childcounts;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-            
-            FSView *newIndex = [[FSView alloc]initWithViewName:[NSString stringWithFormat:@"view%@",v]];
-            [((FSViewCategory *)selectitem) addChildrenNode:newIndex];
+            NSString *name = [((FSViewCategory *)selectitem) makeUniqueViewName];
+            newView = [[FSView alloc]initWithViewName:name];
+            [((FSViewCategory *)selectitem) addChildrenNode:newView];
         }
         
         [self.dblistview reloadData];
+        
+        if (db) {
+            [self.dblistview expandItem:db];
+        }
+        
+        [self.dblistview expandItem:selected];
+        
+        [self toDoSelectedTreeNode:newView];
     }
 }
 
+#pragma mark - 添加触发器
 - (void)toDoAddTrigger:(NSMenuItem *)item
 {
-    id selectitem = [self getSelectItemInList];
+    FSNode *selectitem = [self getSelectItemInList];
     if (selectitem)
     {
+        if ([selectitem isKindOfClass:[FSTrigger class]]) {
+            selectitem = selectitem.parentNode;
+        }
+        
+        FSViewCategory *selected = (id)selectitem;
+        FSTrigger *newTrigger = nil;
+        FSDatabse *db = nil;
+        
         if ([selectitem isKindOfClass:[FSDatabse class]])
         {
-            NSInteger tbcount = ((FSDatabse *)selectitem).triggers.count;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-            
-            [((FSDatabse *)selectitem)addTrigger:[NSString stringWithFormat:@"trigger%@",v]];
+            db = (FSDatabse *)selectitem;
+            NSString *name = [db makeUniqueTriggerName];
+            newTrigger = [((FSDatabse *)selectitem)addTrigger:name];
+            selected = db.childrens[3];
         }
         else if ([selectitem isKindOfClass:[FSTriggerCategory class]])
         {
-            NSInteger tbcount = ((FSTriggerCategory *)selectitem).childcounts;
-            NSString *v = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-            
-            FSTrigger *newIndex = [[FSTrigger alloc]initWithTriggerName:[NSString stringWithFormat:@"trigger%@",v]];
-            [((FSTriggerCategory *)selectitem) addChildrenNode:newIndex];
+            NSString *name = [((FSTriggerCategory *)selectitem) makeUniqueTriggerName];
+            newTrigger = [[FSTrigger alloc]initWithTriggerName:name];
+            [((FSTriggerCategory *)selectitem) addChildrenNode:newTrigger];
         }
         
         [self.dblistview reloadData];
+        
+        if (db) {
+            [self.dblistview expandItem:db];
+        }
+        
+        [self.dblistview expandItem:selected];
+        
+        [self toDoSelectedTreeNode:newTrigger];
     }
 }
 
@@ -588,6 +777,16 @@ NSTextViewDelegate>
         FSDatabse *sdb = (FSDatabse *)selectitem;
         sdb.dynamic = sender.state;
     }
+}
+
+- (IBAction)onMakeEntityForTables:(id)sender
+{
+    
+}
+
+- (IBAction)onExportsSql:(id)sender
+{
+    
 }
 
 @end

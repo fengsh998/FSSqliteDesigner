@@ -27,14 +27,15 @@
     FSTable *tables = [self getCurrentEditorTable];
     if (tables)
     {
-        NSInteger tbcount = tables.allColumns.count;
-        NSString *column = tbcount > 0 ? [NSString stringWithFormat:@"%ld",(long)tbcount] : @"";
-        
-        [tables addColumn:[NSString stringWithFormat:@"fieldname%@",column]];
+        NSString *uniquename = [tables makeUniqueColumnName];
+        FSColumn *last = [tables addColumn:uniquename];
         
         [self.fieldlistview reloadData];
         
-        [self.dblistview reloadItem:tables reloadChildren:NO];
+        [self.dblistview reloadItem:tables reloadChildren:YES];
+        [self.dblistview expandItem:tables];
+        
+        [self toDoSelectedTreeNode:last];
     }
 }
 
@@ -45,12 +46,101 @@
     if (idx != -1)
     {
         FSTable *tables = [self getCurrentEditorTable];
+        
+        if (!tables) { //失去焦点时就不能删除
+            return;
+        }
+        
         [tables removeColumnOfIndex:idx];
         
-        [self.fieldlistview reloadData];
-        
         [self.dblistview reloadItem:tables reloadChildren:YES];
+        [self.dblistview expandItem:tables];
+        
+        FSColumn *column = nil;
+        NSInteger validIndex = -1;
+        if (tables.allColumns.count > 0)
+        {
+            if (idx - 1 >= 0) {
+                validIndex = idx - 1;
+                column = [tables columnAtIndex:validIndex];
+            }
+            else if (idx < tables.allColumns.count)
+            {
+                validIndex = idx;
+                column = [tables columnAtIndex:validIndex];
+            }
+            
+            [self toDoSelectedTreeNode:column];
+        }
+        else
+        {
+            [self toDoSelectedTreeNode:tables];
+        }
+        
+        [self.fieldlistview reloadData];
+        if (validIndex != -1)
+        {
+            [self.fieldlistview selectRowIndexes:[NSIndexSet indexSetWithIndex:validIndex] byExtendingSelection:NO];
+        }
     }
+}
+
+- (void)setDefaultOptions
+{
+    NSArray *list = @[@"None",@"DEFERRABLE",@"DEFERRABLE INITIALLY DEFERRED",
+                      @"DEFERRABLE INITIALLY IMMEDIATE",@"NOT DEFERRABLE",
+                      @"NOT DEFERRABLE INITIALLY DEFERRED",@"NOT DEFERRABLE INITIALLY IMMEDIATE"];
+    
+    [self.popOptions removeAllItems];
+    
+    NSMenu * ms = [[NSMenu alloc]initWithTitle:@""];
+    
+    for (NSString *ftype in list) {
+        NSMenuItem *tmp = [[NSMenuItem alloc]initWithTitle:ftype action:@selector(popOptionsClicked:)
+                                             keyEquivalent:@""];
+        [tmp setTarget:self];
+        [ms addItem:tmp];
+    }
+    
+    self.popOptions.menu = ms;
+}
+
+- (void)setDefaultActionForDelete
+{
+    NSArray *list = @[@"On Delete",@"NOT ACTION",@"RESTRICT",@"SET NULL",
+                      @"SET DEFAULT ",@"CASCADE"];
+    
+    [self.popActionForDelete removeAllItems];
+    
+    NSMenu * ms = [[NSMenu alloc]initWithTitle:@""];
+    
+    for (NSString *ftype in list) {
+        NSMenuItem *tmp = [[NSMenuItem alloc]initWithTitle:ftype action:@selector(popDeleteClicked:)
+                                             keyEquivalent:@""];
+        [tmp setTarget:self];
+        [ms addItem:tmp];
+    }
+    
+    self.popActionForDelete.menu = ms;
+}
+
+- (void)setDefaultActionForUpdate
+{
+    NSArray *list = @[@"On Update",@"NOT ACTION",@"RESTRICT",@"SET NULL",
+                      @"SET DEFAULT ",@"CASCADE"];
+    
+    [self.popActionForUpdate removeAllItems];
+    
+    NSMenu * ms = [[NSMenu alloc]initWithTitle:@""];
+    
+    for (NSString *ftype in list) {
+        NSMenuItem *tmp = [[NSMenuItem alloc]initWithTitle:ftype action:@selector(popUpdateClicked:)
+                                             keyEquivalent:@""];
+        [tmp setTarget:self];
+        [ms addItem:tmp];
+    }
+    
+    self.popActionForUpdate.menu = ms;
 }
 
 #pragma mark - 获取当前操作的表
@@ -131,6 +221,31 @@
     }];
 }
 
+#pragma mark - 设置外键属性页
+
+- (void)enableForeignKeypage:(BOOL)flag
+{
+    self.chkForeignKey.enabled      = flag;
+    
+    BOOL ok = self.chkForeignKey.state;
+    
+    self.popTargetTables.enabled    = (flag && ok);
+    self.popTargetColumns.enabled   = (flag && ok);
+    self.popOptions.enabled         = (flag && ok);
+    self.popActionForDelete.enabled = (flag && ok);
+    self.popActionForUpdate.enabled = (flag && ok);
+}
+
+- (void)toDoSetForeignKeyTabBySelectedColumn:(FSColumn *)column
+{
+    [self enableForeignKeypage:NO];
+    BOOL check = column.enableForeignkey;
+    [self.chkForeignKey setState:check];
+    if (column)
+    {
+        [self enableForeignKeypage:YES];
+    }
+}
 
 #pragma mark - 获取初设长度
 - (NSArray *)getDefaultFieldLength
@@ -144,6 +259,33 @@
     [ls addObject:@"100"];
 
     return ls;
+}
+
+#pragma mark - 获取当前列对应的数据库有所有表
+- (NSArray *)getTablesByColumn:(FSColumn *)column
+{
+    FSNode *tablecategory = column.parentNode.parentNode;
+    if (tablecategory) {
+        return [tablecategory childrens];
+    }
+    return nil;
+}
+
+- (void)fillPopTargetTables:(NSArray *)tables
+{
+    [self.popTargetTables removeAllItems];
+    
+    NSMenu * ms = [[NSMenu alloc]initWithTitle:@""];
+    
+    for (FSNode *tb in tables)
+    {
+        NSMenuItem *tmp = [[NSMenuItem alloc]initWithTitle:tb.nodename action:@selector(popTargetTableClicked:)
+                                             keyEquivalent:@""];
+        [tmp setTarget:self];
+        [ms addItem:tmp];
+    }
+    
+    self.popTargetTables.menu = ms;
 }
 
 #pragma mark - tableView delegate
@@ -238,6 +380,31 @@
     return 22;
 }
 
+#pragma mark - tabView 代理
+- (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(nullable NSTabViewItem *)tabViewItem
+{
+    if ([tabViewItem.identifier isEqualToString:@"2"])
+    {
+        [self toDoSetForeignKeyTabBySelectedColumn:nil];
+        
+        NSInteger idxrow = [self fieldSelectedIndex];
+        if (idxrow != -1 && idxrow < [self getCurrentEditorTable].allColumns.count) {
+            FSColumn *columns = [[self getCurrentEditorTable].allColumns objectAtIndex:idxrow];
+            [self toDoSetForeignKeyTabBySelectedColumn:columns];
+            
+            NSArray *tbs = [self getTablesByColumn:columns];
+            if (tbs) {
+                [self fillPopTargetTables:tbs];
+            }
+        }
+    }
+}
+
+- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(nullable NSTabViewItem *)tabViewItem
+{
+    
+}
+
 #pragma mark - 选中字段行
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
@@ -249,9 +416,11 @@
         if (selectedrow != -1)
         {
             [self.tvMark setEditable:YES];
-            FSColumn *columns = [[self getCurrentEditorTable].allColumns objectAtIndex:selectedrow];
+            FSColumn *column = [[self getCurrentEditorTable].allColumns objectAtIndex:selectedrow];
             
-            self.tvMark.string = columns.mark ? columns.mark : @"";
+            self.tvMark.string = column.mark ? column.mark : @"";
+            
+            [self toDoSelectedTreeNode:column];
         }
     }
 }
@@ -260,10 +429,11 @@
 - (void)onEditColumnName:(NSTextField *)textfield
 {
     NSInteger row = textfield.tag;
-    FSColumn *columns = [[self getCurrentEditorTable].allColumns objectAtIndex:row];
-    columns.fieldName = textfield.stringValue;
+    FSColumn *column = [[self getCurrentEditorTable].allColumns objectAtIndex:row];
+    column.fieldName = textfield.stringValue;
     
-    [self.dblistview reloadItem:[self getCurrentEditorTable]];
+    [self.dblistview reloadItem:[self getCurrentEditorTable] reloadChildren:YES];
+    [self toDoSelectedTreeNode:column];
 }
 
 ///修改默认值
@@ -359,6 +529,31 @@
             columns.mark = tv.string;
         }
     }
+}
+
+- (void)popTargetTableClicked:(NSMenuItem *)item
+{
+    
+}
+
+- (void)popOptionsClicked:(NSMenuItem *)item
+{
+    
+}
+
+- (void)popDeleteClicked:(NSMenuItem *)item
+{
+    
+}
+
+- (void)popUpdateClicked:(NSMenuItem *)item
+{
+    
+}
+
+- (IBAction)onCheckForeignKey:(NSButton *)sender
+{
+    [self enableForeignKeypage:YES];
 }
 
 @end

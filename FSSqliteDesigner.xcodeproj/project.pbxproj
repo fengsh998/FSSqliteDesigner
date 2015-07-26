@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9D1F5CA21B649AF1009F30DE /* FSTabView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1F5CA11B649AF1009F30DE /* FSTabView.m */; };
 		9D42F6E71B5A215800E93336 /* images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D42F6E61B5A215800E93336 /* images.xcassets */; };
 		9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6090AF1B55593B002CF276 /* FSOutlineView.m */; };
 		9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D61D4941B4EB31500007E10 /* FSDesignerViewController.m */; };
@@ -29,6 +30,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9D1F5CA01B649AF1009F30DE /* FSTabView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSTabView.h; sourceTree = "<group>"; };
+		9D1F5CA11B649AF1009F30DE /* FSTabView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSTabView.m; sourceTree = "<group>"; };
 		9D42F6E61B5A215800E93336 /* images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = images.xcassets; sourceTree = "<group>"; };
 		9D6090AE1B55593B002CF276 /* FSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSOutlineView.h; sourceTree = "<group>"; };
 		9D6090AF1B55593B002CF276 /* FSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSOutlineView.m; sourceTree = "<group>"; };
@@ -121,6 +124,8 @@
 				9DBE62871B4BB7210054B463 /* FSDesignerView.m */,
 				9D6090AE1B55593B002CF276 /* FSOutlineView.h */,
 				9D6090AF1B55593B002CF276 /* FSOutlineView.m */,
+				9D1F5CA01B649AF1009F30DE /* FSTabView.h */,
+				9D1F5CA11B649AF1009F30DE /* FSTabView.m */,
 				9DB191B61B578F52004FF4FE /* FSDesignerViewController+column.h */,
 				9DB191B71B578F52004FF4FE /* FSDesignerViewController+column.m */,
 				9D61D4931B4EB31500007E10 /* FSDesignerViewController.h */,
@@ -269,6 +274,7 @@
 				9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */,
 				9DE2C8431B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m in Sources */,
 				9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */,
+				9D1F5CA21B649AF1009F30DE /* FSTabView.m in Sources */,
 				9DE2C8471B4CB58D0049C545 /* FSViewListModel.m in Sources */,
 				9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */,
 				9D6BB8191B51182D005630B8 /* FSDesignFileObject.m in Sources */,

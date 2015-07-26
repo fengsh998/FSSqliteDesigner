@@ -144,9 +144,45 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return _fsDatabases;
 }
 
+- (NSString *)uniqueName:(NSString *)name
+{
+    if ([self exsistDatabaseOfName:name])
+    {
+        //fieldname length = 9
+        NSString *nums = [name substringFromIndex:9];
+        if (nums.length > 0) {
+            NSInteger i = [nums integerValue];
+            return [self uniqueName:[NSString stringWithFormat:@"Database%ld",(long)i+1]];
+        }
+        else
+        {   //重置到从1开始
+            return [self uniqueName:@"Database1"];
+        }
+    }
+    
+    return name;
+}
+
+- (NSString *)makeUniqueDatabaseName
+{
+    return [self uniqueName:@"Database"];
+}
+
 - (void)addDatabase:(FSDatabse *)database
 {
     [_fsDatabases addObject:database];
+}
+
+- (void)insertDatabase:(FSDatabse *)database atIndex:(NSInteger)index
+{
+    [_fsDatabases insertObject:database atIndex:index];
+}
+
+- (FSDatabse *)insertDatabaseWithName:(NSString *)name atIndex:(NSInteger)index
+{
+    FSDatabse * db = [[FSDatabse alloc]initWithDatabaseName:name];
+    [self insertDatabase:db atIndex:index];
+    return db;
 }
 
 - (FSDatabse *)addDatabaseWithName:(NSString *)name
@@ -164,6 +200,28 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (NSInteger)indexOfDatabaseObject:(FSDatabse *)database
 {
     return [_fsDatabases indexOfObject:database];
+}
+
+- (BOOL)exsistDatabaseOfName:(NSString *)name
+{
+    for (FSDatabse *db in _fsDatabases) {
+        if ([db.dbName isEqualToString:name]) {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
+- (BOOL)exsistDatabaseOfName:(NSString *)name butNotInclude:(FSDatabse *)db
+{
+    for (FSDatabse *dbitem in _fsDatabases) {
+        if ([dbitem.dbName isEqualToString:name] && (db != dbitem))
+        {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (void)removeDatabaseAtIndex:(NSInteger)index
@@ -300,8 +358,8 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
             if (i.unique) {
                 [indexs setObject:@"UNIQUE" forKey:@"FieldIndexType"];
             }
-            [indexs setObject:i.indexTableName forKey:@"DBTableName"];
-            [indexs setObject:i.indexFieldName forKey:@"FieldName"];
+            [indexs setObject:i.indexTableName?i.indexTableName:@"" forKey:@"DBTableName"];
+            [indexs setObject:i.indexFieldName?i.indexFieldName:@"" forKey:@"FieldName"];
             
             if (i.ascFields.count > 0) {
                 [indexs setObject:[[i.ascFields componentsJoinedByString:@","] uppercaseString] forKey:@"ColumnASC"];
@@ -317,13 +375,17 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         case nodeView:
         {
             FSView *v = (FSView *)node;
-            [array addObject:v.sqls];
+            if (v.sqls.length > 0) {
+                [array addObject:v.sqls];
+            }
         }
             break;
         case nodeTigger:
         {
             FSTrigger *trigger = (FSTrigger *)node;
-            [array addObject:trigger.sqls];
+            if (trigger.sqls.length > 0) {
+                [array addObject:trigger.sqls];
+            }
         }
             break;
             
@@ -350,11 +412,14 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (void)dealloc
 {
     _parentNode = nil;
+    
+    //NSLog(@" class [%@] free",[self class]);
 }
 
 - (void)addChildrenNode:(FSNode *)children
 {
     if (!self.allowRename) {
+        //此比较是根据对象进行比较的，如果想按际自己的进行比较，则需要在子类中实现isEqual:方式来自己定制
         if (![_childrens containsObject:children]) {
             children->_parentNode = self;
             [_childrens addObject:children];
@@ -365,6 +430,67 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         children->_parentNode = self;
         [_childrens addObject:children];
     }
+}
+
+
+- (void)insertChildrenNode:(FSNode *)children atIndex:(NSInteger)index
+{
+    if (!self.allowRename) {
+        if (![_childrens containsObject:children]) {
+            children->_parentNode = self;
+            [_childrens insertObject:children atIndex:index];
+        }
+    }
+    else
+    {
+        children->_parentNode = self;
+        [_childrens insertObject:children atIndex:index];
+    }
+}
+
+- (void)replaceChildrenNode:(FSNode *)children atIndex:(NSInteger)index
+{
+    if (!self.allowRename) {
+        if (![_childrens containsObject:children]) {
+            children->_parentNode = self;
+            [_childrens replaceObjectAtIndex:index withObject:children];
+        }
+    }
+    else
+    {
+        children->_parentNode = self;
+        [_childrens replaceObjectAtIndex:index withObject:children];
+    }
+}
+
+- (BOOL)transferChildrenA:(FSNode *)childrenA toChildrenB:(FSNode *)childrenB
+{
+    NSInteger idxa = [_childrens indexOfObject:childrenA];
+    NSInteger idxb = [_childrens indexOfObject:childrenB];
+    if (idxa == -1 || idxb == -1) {
+        return NO;
+    }
+    
+    [_childrens replaceObjectAtIndex:idxa withObject:childrenB];
+    
+    [_childrens replaceObjectAtIndex:idxb withObject:childrenA];
+    
+    return YES;
+}
+
+- (BOOL)transferChildrenAAtIndex:(NSInteger)indexA toChildrenBAtIndex:(NSInteger)indexB
+{
+    FSNode *ca = [_childrens objectAtIndex:indexA];
+    FSNode *cb = [_childrens objectAtIndex:indexB];
+    if (!ca || !cb) {
+        return NO;
+    }
+    
+    [_childrens replaceObjectAtIndex:indexA withObject:cb];
+    
+    [_childrens replaceObjectAtIndex:indexB withObject:ca];
+    
+    return YES;
 }
 
 - (void)removeChildrenNode:(FSNode *)children
@@ -431,9 +557,76 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return founds.count > 0 ? founds : nil;
 }
 
+- (BOOL)hasNeighbour
+{
+    if (self.parentNode) {
+        [self.parentNode hasChildren];
+    }
+    return NO;
+}
+
+- (FSNode *)perviousNeighbour
+{
+    FSNode *p = self.parentNode;
+    if (p) {
+        NSInteger selfidx = [p indexOfNode:self];
+        selfidx--;
+        if (selfidx != -1) {
+            return [p.childrens objectAtIndex:selfidx];
+        }
+    }
+    
+    return nil;
+}
+
+- (FSNode *)nextNeighbour
+{
+    FSNode *p = self.parentNode;
+    if (p) {
+        NSInteger selfidx = [p indexOfNode:self];
+        selfidx++;
+        if (selfidx < p.childrens.count) {
+            return [p.childrens objectAtIndex:selfidx];
+        }
+    }
+    
+    return nil;
+}
+
+- (NSArray *)allNeighbours
+{
+    FSNode *p = self.parentNode;
+    if (p) {
+        NSMutableArray *nb = [NSMutableArray array];
+        for (FSNode *item in p.childrens) {
+            if (item == self) {
+                continue;
+            }
+            [nb addObject:item];
+        }
+        
+        return nb.count > 0 ? nb : nil;
+    }
+    
+    return nil;
+}
+
 - (BOOL)exsistNodeName:(NSString *)name
 {
     return [self findNodeFromChildrenOfName:name].count > 0;
+}
+
+- (BOOL)exsistNodeNameInNeighbour:(NSString *)name
+{
+    NSArray *brothers = [self allNeighbours];
+    
+    for (FSNode *brother in brothers) {
+        if ([brother.nodename isEqualToString:name]) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 - (BOOL)hasChildren
@@ -461,22 +654,76 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return [NSArray arrayWithArray:_childrens];
 }
 
+- (void)setNodename:(NSString *)name
+{
+    _nodename = name;
+}
+
+- (NSString *)nodename
+{
+    return _nodename;
+}
+
+- (NSString *)uniqueName:(NSString *)name withPrefixLength:(NSInteger)len
+{
+    if ([self exsistNodeName:name])
+    {
+        NSString *nums = [name substringFromIndex:len];
+        NSString *ps = [name substringToIndex:len];
+        if (nums.length > 0) {
+            NSInteger i = [nums integerValue];
+            return [self uniqueName:[NSString stringWithFormat:@"%@%ld",ps,(long)i+1] withPrefixLength:len];
+        }
+        else
+        {   //重置到从1开始
+            return [self uniqueName:[NSString stringWithFormat:@"%@1",ps] withPrefixLength:len];
+        }
+    }
+    
+    return name;
+}
+
+- (NSString *)uniqueName:(NSString *)name
+{
+    return [self uniqueName:name withPrefixLength:name.length];
+}
+
 @end
 
 /*************************************类目*************************************/
 @implementation FSTableCategory
 
+- (NSString *)makeUniqueTableName
+{
+    return [self uniqueName:@"tablename"];
+}
+
 @end
 
 @implementation FSIndexCategory
+
+- (NSString *)makeUniqueIndexName
+{
+    return [self uniqueName:@"indexname"];
+}
 
 @end
 
 @implementation FSViewCategory
 
+- (NSString *)makeUniqueViewName
+{
+    return [self uniqueName:@"viewname"];
+}
+
 @end
 
 @implementation FSTriggerCategory
+
+- (NSString *)makeUniqueTriggerName
+{
+    return [self uniqueName:@"triggername"];
+}
 
 @end
 
@@ -634,6 +881,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     [self removeAllChildren];
 }
 
+- (NSString *)makeUniqueColumnName
+{
+    return [self uniqueName:@"fieldname"];
+}
+
 @end
 
 /**************************************库*************************************/
@@ -662,9 +914,24 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self;
 }
 
-- (void)dealloc
+- (NSString *)makeUniqueTableName
 {
-    NSLog(@"free");
+    return [tableKind makeUniqueTableName];
+}
+
+- (NSString *)makeUniqueIndexName
+{
+    return [indexKind makeUniqueIndexName];
+}
+
+- (NSString *)makeUniqueViewName
+{
+    return [viewKind makeUniqueViewName];
+}
+
+- (NSString *)makeUniqueTriggerName
+{
+    return [triggerKind makeUniqueTriggerName];
 }
 
 - (FSTable *)addTable:(NSString *)tablName

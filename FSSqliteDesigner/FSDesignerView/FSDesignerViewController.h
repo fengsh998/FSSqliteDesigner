@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "FSDesignFileObject.h"
 #import "FSOutlineView.h"
+#import "FSTabView.h"
 
 @interface FSDesignerViewController : NSViewController
 ///sqlitemodeld包路径
@@ -37,6 +38,22 @@
 @property (weak) IBOutlet               NSButton            *btnCheckDymic;
 ///备注
 @property (unsafe_unretained) IBOutlet  NSTextView          *tvMark;
+///显示表创建语句
+@property (unsafe_unretained) IBOutlet  NSTextView          *tvCreateSql;
+///是否对某个字段开启名键
+@property (weak) IBOutlet               NSButton            *chkForeignKey;
+///列出外键对应的关联表
+@property (weak) IBOutlet               NSPopUpButton       *popTargetTables;
+///目标列
+@property (weak) IBOutlet               NSPopUpButton       *popTargetColumns;
+///属性选择
+@property (weak) IBOutlet               NSPopUpButton       *popOptions;
+///触发事件1
+@property (weak) IBOutlet               NSPopUpButton       *popActionForDelete;
+///触发事件2
+@property (weak) IBOutlet               NSPopUpButton       *popActionForUpdate;
+///表对应的字段，外键，语句tabcontrol
+@property (weak) IBOutlet               NSTabView           *fieldTabview;
 
 @property (nonatomic,strong)            FSDesignFileObject  *designer;
 
@@ -44,4 +61,9 @@
 - (void)setModelUrl:(NSURL *)modelUrl;
 ///获取选中项
 - (FSNode *)getSelectItemInList;
+///设置某个结点为选中状态
+- (void)toDoSelectedTreeNode:(FSNode *)node;
+///当outline 获取焦点时变色
+- (void)setFocus:(NSView *)v;
+
 @end

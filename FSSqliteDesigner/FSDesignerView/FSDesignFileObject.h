@@ -57,11 +57,20 @@ typedef enum
     nodeColumn                = 1 << 5
 } NodeType;
 
-@interface FSNode : NSObject
+@protocol FSNodeExtendProtocol <NSObject>
+
+@optional
+///生成唯一结点名
+- (NSString *)uniqueName:(NSString *)name;
+
+@end
+
+@interface FSNode : NSObject<FSNodeExtendProtocol>
 {
     @private
     __weak FSNode           *_parentNode;
     NSMutableArray          *_childrens;
+    NSString                *_nodename;
 }
 
 @property (nonatomic , assign) NodeType                 type;
@@ -70,41 +79,66 @@ typedef enum
 @property (nonatomic , assign , readonly) BOOL          hasChildren;
 @property (nonatomic , assign , readonly) BOOL          hasParent;
 @property (nonatomic , readonly) FSNode                 *parentNode;
-//是否允许子结点中有重名(default NO)
+///是否允许子结点中有重名(default NO)
 @property (nonatomic , assign) BOOL                     allowRename;
 @property (nonatomic , readonly) NSArray                *childrens;
 ///结点信息(上下文)
 @property (nonatomic , strong) id                       userinfo;
 
+///添加结点
 - (void)addChildrenNode:(FSNode *)children;
+///插入结点 注:当没有孩子时index不能为0
+- (void)insertChildrenNode:(FSNode *)children atIndex:(NSInteger)index;
+///替换结点
+- (void)replaceChildrenNode:(FSNode *)children atIndex:(NSInteger)index;
+///孩子结点交换
+- (BOOL)transferChildrenA:(FSNode *)childrenA toChildrenB:(FSNode *)childrenB;
+- (BOOL)transferChildrenAAtIndex:(NSInteger)indexA toChildrenBAtIndex:(NSInteger)indexB;
+///移除结点
 - (void)removeChildrenNode:(FSNode *)children;
 - (void)removeAllChildren;
 - (void)removeChildrenNodeAtIndex:(NSInteger)index;
 - (void)removeChildrenNodeOfName:(NSString *)nodename;
+///查找结点
 - (FSNode *)findNodeAtIndex:(NSInteger)index;
 - (NSInteger)indexOfNode:(FSNode *)node;
-//只在当前结点的一级子结点进行查找
+///只在当前结点的一级子结点进行查找
 - (NSArray *)findNodeFromChildrenOfName:(NSString *)name;
-//返回一个数组元素为NSIndexpath,存放找到的项索引
+///返回一个数组元素为NSIndexpath,存放找到的项索引
 - (NSArray *)findNodeIndexsFromChildrenOfName:(NSString *)name;
+///所有孩子中是否存在name
 - (BOOL)exsistNodeName:(NSString *)name;
+///自身的兄弟结点中是否存在了name
+- (BOOL)exsistNodeNameInNeighbour:(NSString *)name;
+///有兄弟
+- (BOOL)hasNeighbour;
+///上一兄弟 如果为nil说明自己是老大
+- (FSNode *)perviousNeighbour;
+///下一兄弟 如果为nil说明自己是最小
+- (FSNode *)nextNeighbour;
+///徐自己外所有兄弟(元素为FSNode)
+- (NSArray *)allNeighbours;
+
+- (void)setNodename:(NSString *)name;
+- (NSString *)nodename;
+
 @end
 
 /*************************************类目*************************************/
 @interface FSTableCategory : FSNode
-
+- (NSString *)makeUniqueTableName;
 @end
 
 @interface FSIndexCategory : FSNode
-
+- (NSString *)makeUniqueIndexName;
 @end
 
 @interface FSViewCategory : FSNode
-
+- (NSString *)makeUniqueViewName;
 @end
 
 @interface FSTriggerCategory : FSNode
-
+- (NSString *)makeUniqueTriggerName;
 @end
 
 /************************************具体类************************************/
@@ -149,7 +183,7 @@ typedef enum
 ///字段
 @interface FSColumn : FSNode
 ///约束默认值
-@property (nonatomic, copy) NSString                              *defaultvalue;
+@property (nonatomic, copy) NSString                                *defaultvalue;
 ///约束P,A,U,N
 @property (nonatomic, assign) FSFieldConstraint                     constraint;
 ///类型长度
@@ -157,9 +191,11 @@ typedef enum
 ///字段类型
 @property (nonatomic, assign) FSFieldType                           fieldtype;
 ///字段备注
-@property (nonatomic, copy) NSString                              *mark;
+@property (nonatomic, copy) NSString                                *mark;
 ///提供当前支持的字段类型
 @property (nonatomic, readonly) NSArray                             *supportFieldTypes;
+///有外键(默认default)
+@property (nonatomic, assign) BOOL                                  enableForeignkey;
 
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *fieldName;
 
@@ -178,7 +214,9 @@ typedef enum
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *tableName;
 ///记录表的语句
 @property (nonatomic, strong) NSString                          *createsqls;
+
 - (instancetype)initWithTableName:(NSString *)name;
+- (NSString *)makeUniqueColumnName;
 /**
  *  添加一个字段
  *
@@ -212,6 +250,12 @@ typedef enum
 @property (nonatomic , strong) NSString                     *maxVersion;
 @property (nonatomic , strong) NSString                     *version;
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *dbName;
+
+// /几个快捷方式，获取事先定义好的唯一名称
+- (NSString *)makeUniqueTableName;
+- (NSString *)makeUniqueIndexName;
+- (NSString *)makeUniqueViewName;
+- (NSString *)makeUniqueTriggerName;
 
 - (instancetype)initWithDatabaseName:(NSString *)dbname;
 ///添加表
@@ -311,10 +355,16 @@ typedef enum
 
 @property (nonatomic,readonly) NSArray          *databases;
 
+- (NSString *)makeUniqueDatabaseName;
 - (void)addDatabase:(FSDatabse *)database;
+- (void)insertDatabase:(FSDatabse *)database atIndex:(NSInteger)index;
+- (FSDatabse *)insertDatabaseWithName:(NSString *)name atIndex:(NSInteger)index;
 - (FSDatabse *)addDatabaseWithName:(NSString *)name;
 - (FSDatabse *)databaseOfIndex:(NSInteger)index;
 - (NSInteger)indexOfDatabaseObject:(FSDatabse *)database;
+
+- (BOOL)exsistDatabaseOfName:(NSString *)name;
+- (BOOL)exsistDatabaseOfName:(NSString *)name butNotInclude:(FSDatabse *)db;
 
 - (void)removeDatabaseAtIndex:(NSInteger)index;
 - (void)removeDatabaseOfObject:(FSDatabse *)database;
@@ -322,5 +372,7 @@ typedef enum
 
 - (void)loadFromFile:(NSURL *)filepath;
 - (void)saveToFile:(NSURL *)filepath;
+
+///导出为sqlite语句脚本
 
 @end

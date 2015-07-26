@@ -11,5 +11,7 @@
 #import "FSDesignerViewController.h"
 
 @interface FSDesignerViewController(column)<NSComboBoxDelegate>
-
+- (void)setDefaultOptions;
+- (void)setDefaultActionForDelete;
+- (void)setDefaultActionForUpdate;
 @end
