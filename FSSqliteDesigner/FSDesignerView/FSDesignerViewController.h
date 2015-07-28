@@ -12,6 +12,11 @@
 #import "FSTabView.h"
 
 @interface FSDesignerViewController : NSViewController
+{
+    @private
+    NSDictionary                    *_sqlitekeywords;
+    NSMutableString                 *_sqlitematchPattern;
+}
 ///sqlitemodeld包路径
 @property (nonatomic, copy)             NSURL               *packageUrl;
 ///sqlitemodel路径URL
@@ -56,6 +61,10 @@
 @property (weak) IBOutlet               NSTabView           *fieldTabview;
 
 @property (nonatomic,strong)            FSDesignFileObject  *designer;
+///sqlite关键词，保留字(key,color)
+@property (nonatomic,strong)            NSDictionary        *sqlitekeywords;
+///匹配模板
+@property (nonatomic,strong)            NSMutableString     *sqlitematchPattern;
 
 ///加载sqlitemodel的路径
 - (void)setModelUrl:(NSURL *)modelUrl;

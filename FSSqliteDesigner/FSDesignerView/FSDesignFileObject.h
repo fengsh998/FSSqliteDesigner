@@ -180,8 +180,34 @@ typedef enum
 - (instancetype)initWithIndexName:(NSString *)indexname;
 @end
 
+///外键
+@interface FSForeignKey : NSObject
+///目标表
+@property (nonatomic, strong)   NSString                            *targetTable;
+///目标列
+@property (nonatomic, strong)   NSString                            *targetColumn;
+///选中选项(default = -1)
+@property (nonatomic, assign)   NSInteger                           selectIndexOfOptions;
+///选中删除action(default = -1)
+@property (nonatomic, assign)   NSInteger                           selectIndexOfDeleteAction;
+///选中更新action(default = -1)
+@property (nonatomic, assign)   NSInteger                           selectIndexOfUpdateAction;
+///支持的选项
++ (NSArray *)supportOptions;
+///支持的删除触发事件
++ (NSArray *)supportActionForDelete;
+///支持的更新触发事件
++ (NSArray *)supportActionForUpdate;
+
+- (NSString *)makeSqlKeyValue;
+@end
+
 ///字段
 @interface FSColumn : FSNode
+{
+    @private
+    FSForeignKey        *_foreignKey;
+}
 ///约束默认值
 @property (nonatomic, copy) NSString                                *defaultvalue;
 ///约束P,A,U,N
@@ -196,16 +222,21 @@ typedef enum
 @property (nonatomic, readonly) NSArray                             *supportFieldTypes;
 ///有外键(默认default)
 @property (nonatomic, assign) BOOL                                  enableForeignkey;
+///外键数据
+@property (nonatomic, readonly) FSForeignKey                        *foreignKey;
 
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *fieldName;
 
 + (FSColumn *)column:(NSString *)filedName;
 + (FSColumn *)column:(NSString *)filedName ofType:(FSFieldType)fieldtype withTypeLength:(NSInteger)length;
++ (NSString *)covertFieldConstraint:(FSFieldConstraint)constraint;
 
 - (instancetype)initWithName:(NSString *)filedName;
 
 - (NSString *)covertToString:(FSFieldType)fieldtype;
 - (FSFieldType)covertToType:(NSString *)fieldstring;
+
+- (NSString *)makeSqlKeyValue;
 
 @end
 
@@ -231,6 +262,8 @@ typedef enum
 - (void)removeColumn:(FSColumn *)column;
 - (void)removeColumnOfIndex:(NSInteger)index;
 - (void)removeAllColumn;
+
+- (NSString *)makeSqlKeyValue;
 @end
 
 

@@ -87,9 +87,7 @@
 
 - (void)setDefaultOptions
 {
-    NSArray *list = @[@"None",@"DEFERRABLE",@"DEFERRABLE INITIALLY DEFERRED",
-                      @"DEFERRABLE INITIALLY IMMEDIATE",@"NOT DEFERRABLE",
-                      @"NOT DEFERRABLE INITIALLY DEFERRED",@"NOT DEFERRABLE INITIALLY IMMEDIATE"];
+    NSArray *list = [FSForeignKey supportOptions];
     
     [self.popOptions removeAllItems];
     
@@ -107,8 +105,7 @@
 
 - (void)setDefaultActionForDelete
 {
-    NSArray *list = @[@"On Delete",@"NOT ACTION",@"RESTRICT",@"SET NULL",
-                      @"SET DEFAULT ",@"CASCADE"];
+    NSArray *list = [FSForeignKey supportActionForDelete];
     
     [self.popActionForDelete removeAllItems];
     
@@ -126,8 +123,7 @@
 
 - (void)setDefaultActionForUpdate
 {
-    NSArray *list = @[@"On Update",@"NOT ACTION",@"RESTRICT",@"SET NULL",
-                      @"SET DEFAULT ",@"CASCADE"];
+    NSArray *list = [FSForeignKey supportActionForUpdate];
     
     [self.popActionForUpdate removeAllItems];
     
@@ -282,10 +278,28 @@
         NSMenuItem *tmp = [[NSMenuItem alloc]initWithTitle:tb.nodename action:@selector(popTargetTableClicked:)
                                              keyEquivalent:@""];
         [tmp setTarget:self];
+        tmp.representedObject = tb;
         [ms addItem:tmp];
     }
     
     self.popTargetTables.menu = ms;
+}
+
+- (void)todoFillColumns:(NSArray *)columns
+{
+    [self.popTargetColumns removeAllItems];
+    
+    NSMenu * ms = [[NSMenu alloc]initWithTitle:@""];
+    
+    for (FSNode *cls in columns)
+    {
+        NSMenuItem *tmp = [[NSMenuItem alloc]initWithTitle:cls.nodename action:@selector(popTargetColumnClicked:)
+                                             keyEquivalent:@""];
+        [tmp setTarget:self];
+        [ms addItem:tmp];
+    }
+    
+    self.popTargetColumns.menu = ms;
 }
 
 #pragma mark - tableView delegate
@@ -381,6 +395,17 @@
 }
 
 #pragma mark - tabView 代理
+
+- (BOOL)tabView:(NSTabView *)tabView shouldSelectTabViewItem:(nullable NSTabViewItem *)tabViewItem
+{
+    if (![tabViewItem.identifier isEqualToString:@"2"]) {
+        return YES;
+    }
+
+    NSInteger idxrow = [self fieldSelectedIndex];
+    return (idxrow != -1);
+}
+
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(nullable NSTabViewItem *)tabViewItem
 {
     if ([tabViewItem.identifier isEqualToString:@"2"])
@@ -533,7 +558,11 @@
 
 - (void)popTargetTableClicked:(NSMenuItem *)item
 {
-    
+    FSTable *tb = item.representedObject;
+    if (tb && [tb isKindOfClass:[FSTable class]])
+    {
+        [self todoFillColumns:tb.allColumns];
+    }
 }
 
 - (void)popOptionsClicked:(NSMenuItem *)item
@@ -551,9 +580,204 @@
     
 }
 
+- (void)popTargetColumnClicked:(NSMenuItem *)item
+{
+    
+}
+
 - (IBAction)onCheckForeignKey:(NSButton *)sender
 {
     [self enableForeignKeypage:YES];
 }
 
+- (IBAction)onSaveForeignkey:(id)sender
+{
+    FSTable *currenttab = [self getCurrentEditorTable];
+    if (currenttab) {
+        //只针对选中的字段进行处理外键
+        NSInteger idxrow = [self fieldSelectedIndex];
+        if (idxrow != -1 && idxrow < currenttab.allColumns.count) {
+            FSColumn *column = [currenttab.allColumns objectAtIndex:idxrow];
+            column.enableForeignkey = self.chkForeignKey.state;
+            column.foreignKey.targetTable  = self.popTargetTables.titleOfSelectedItem;
+            column.foreignKey.targetColumn = self.popTargetColumns.titleOfSelectedItem;
+            column.foreignKey.selectIndexOfOptions = self.popOptions.indexOfSelectedItem;
+            column.foreignKey.selectIndexOfDeleteAction = self.popActionForDelete.indexOfSelectedItem;
+            column.foreignKey.selectIndexOfUpdateAction = self.popActionForUpdate.indexOfSelectedItem;
+        }
+        
+        self.tvCreateSql.string = [[self getCurrentEditorTable] makeSqlKeyValue];
+        [self.fieldTabview selectTabViewItemAtIndex:2];
+    }
+}
+
+//- (void)test
+//{
+//    NSError *error = NULL;
+//    NSDataDetector *dataDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
+//    NSString *string = [self.tvCreateSql.textStorage string];
+//    NSArray *matches = [dataDetector matchesInString:string options:0 range:NSMakeRange(0, [string length])];
+//    [self.tvCreateSql.textStorage beginEditing];
+//    [self.tvCreateSql.textStorage removeAttribute:NSForegroundColorAttributeName range:NSMakeRange(0, [string length])];
+//    [self.tvCreateSql.textStorage removeAttribute:NSLinkAttributeName range:NSMakeRange(0, [string length])];
+//    for (NSTextCheckingResult *match in matches) {
+//        NSRange matchRange = [match range];
+//        if ([match resultType] == NSTextCheckingTypeLink) {
+//            NSURL *url = [match URL];
+//            [self.tvCreateSql.textStorage addAttributes:@{NSLinkAttributeName:url.absoluteString} range:matchRange];
+//        }
+//    }
+//    [self.tvCreateSql.textStorage endEditing];
+//}
+
+- (NSDictionary *)keywords
+{
+    NSBundle *bd = [NSBundle bundleForClass:self.class];
+    NSString *path = [bd pathForResource:@"keywords" ofType:@"plist"];
+    
+    NSDictionary *ws = [NSDictionary dictionaryWithContentsOfFile:path];
+    
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    
+    for (NSDictionary *item in [ws allValues]) {
+        NSColor* color = [NSColor colorWithDeviceRed:[[item objectForKey:@"color-red"] floatValue] green:[[item objectForKey:@"color-green"] floatValue] blue:[[item objectForKey:@"color-blue"] floatValue] alpha:1.0];
+        NSScanner* scanner = [NSScanner scannerWithString:[item objectForKey:@"keywords"]];
+        while (![scanner isAtEnd]) {
+            NSString* keyword;
+            [scanner scanCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:NULL];
+            if ([scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:&keyword]) {
+                [dic setObject:color forKey:keyword];
+            }
+        }
+    }
+    
+//    NSArray *keyws = [ws[@"keywords"]componentsSeparatedByString:@" "];
+//    
+//    
+//    for (NSString *key in keyws) {
+//        if (key.length > 0)
+//        {
+//            [dic setObject:[NSColor blueColor] forKey:key];
+//        }
+//    }
+    
+    return dic;
+}
+
+- (NSDictionary *)sqlitekeywords
+{
+    if (!_sqlitekeywords) {
+        _sqlitekeywords = [self keywords];
+    }
+    return _sqlitekeywords;
+}
+
+- (NSMutableString *)sqlitematchPattern
+{
+    if (!_sqlitematchPattern)
+    {
+        NSMutableString *pattern = [[NSMutableString alloc]init];
+        
+        NSArray *keys = [self.sqlitekeywords allKeys];
+        for (NSString *key in keys) {
+            [pattern appendFormat:@"\\b%@\\b|",key];
+        }
+        
+        [pattern deleteCharactersInRange:NSMakeRange(pattern.length-1, 1)];
+        _sqlitematchPattern = pattern;
+    }
+    
+    return _sqlitematchPattern;
+}
+
+- (NSDictionary<NSString *, id> *)textView:(NSTextView *)view willCheckTextInRange:(NSRange)range options:(NSDictionary<NSString *, id> *)options types:(NSTextCheckingTypes *)checkingTypes
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    if (*checkingTypes & NSTextCheckingTypeRegularExpression)
+    {
+        //return [self sqlitekeywords];
+        [dic addEntriesFromDictionary:[self sqlitekeywords]];
+    }
+    
+    if (*checkingTypes & NSTextCheckingTypeQuote)
+    {
+        NSColor* color = [NSColor colorWithDeviceRed:0.72f green:0.2f blue:0.63f alpha:1.0];
+        [dic setObject:color forKey:@"double_quote"];
+    }
+    
+    return dic;
+}
+
+- (NSArray<NSTextCheckingResult *> *)textView:(NSTextView *)view didCheckTextInRange:(NSRange)range types:(NSTextCheckingTypes)checkingTypes options:(NSDictionary<NSString *, id> *)options results:(NSArray<NSTextCheckingResult *> *)results orthography:(NSOrthography *)orthography wordCount:(NSInteger)wordCount
+{
+    @try {
+        NSMutableArray *resultarray = [NSMutableArray array];
+        
+        [view.textStorage beginEditing];
+        [view.textStorage removeAttribute:NSForegroundColorAttributeName range:range];
+        
+        if (checkingTypes & NSTextCheckingTypeRegularExpression)
+        {
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.sqlitematchPattern
+                                          //@"\\bcreate\\b|\\btaBle\\b"
+                                                                                   options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines|
+                                          NSRegularExpressionUseUnicodeWordBoundaries
+                                                                                     error:nil];
+            
+            NSArray *array = [regex matchesInString:view.string options:NSMatchingReportProgress range:range];
+            
+            for (NSTextCheckingResult *item in array)
+            {
+                if (item.range.location != NSNotFound) {
+                    
+                    NSString *keyws = [view.string substringWithRange:item.range];
+                    
+                    NSColor *cl = options[keyws];
+                    if (!cl) {
+                        cl = [NSColor blueColor];
+                    }
+                    
+                    [view.textStorage addAttributes:@{NSForegroundColorAttributeName:cl} range:item.range];
+                }
+            }
+            
+            [resultarray addObjectsFromArray:array];
+        }
+        
+        if (checkingTypes & NSTextCheckingTypeQuote)
+        {
+            if (results.count % 2 == 0) {
+                //成对引号出现
+                
+                for (NSInteger i = 0; i < results.count / 2; i++)
+                {
+                    NSTextCheckingResult *start = results[i*2];
+                    NSTextCheckingResult *end = results[i*2 + 1];
+                    
+                    if (start.range.location != NSNotFound && end.range.location != NSNotFound)
+                    {
+                        NSRange srange = NSMakeRange(start.range.location, end.range.location + end.range.length - start.range.location);
+                        
+                        NSColor *cl = options[@"double_quote"];
+                        if (!cl) {
+                            cl = [NSColor colorWithDeviceRed:0.72f green:0.2f blue:0.63f alpha:1.0];
+                        }
+                        
+                        [view.textStorage addAttributes:@{NSForegroundColorAttributeName:cl} range:srange];
+                    }
+                }
+            }
+            //NSLog(@"%@",results);
+            
+            [resultarray addObjectsFromArray:resultarray];
+        }
+        
+        [self.tvCreateSql.textStorage endEditing];
+        
+        return resultarray.count > 0 ? resultarray : nil;
+    }
+    @catch (NSException *exception) {
+        return nil;
+    }
+}
 @end

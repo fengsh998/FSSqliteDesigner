@@ -43,6 +43,8 @@ NSTextViewDelegate,NSTabViewDelegate>
     self.fieldlistview.dataSource = self;
     
     self.tvMark.delegate = self;
+    self.tvCreateSql.delegate = self;
+    self.tvCreateSql.enabledTextCheckingTypes = NSTextCheckingTypeRegularExpression | NSTextCheckingTypeQuote;
 
     //默不显示
     [self.fieldTabview setDelegate:self];
@@ -50,9 +52,20 @@ NSTextViewDelegate,NSTabViewDelegate>
     
     [self setButtonStyle];
     
+    [self clean];
+    
     [self setDefaultOptions];
     [self setDefaultActionForDelete];
     [self setDefaultActionForUpdate];
+}
+
+- (void)clean
+{
+    [self.popTargetTables removeAllItems];
+    [self.popTargetColumns removeAllItems];
+    [self.popOptions removeAllItems];
+    [self.popActionForDelete removeAllItems];
+    [self.popActionForUpdate removeAllItems];
 }
 
 - (void)dealloc
@@ -461,6 +474,7 @@ NSTextViewDelegate,NSTabViewDelegate>
             tid = @"id_column";
             [self.tvMark setEditable:NO];
             [self.fieldlistview reloadData];
+            [self.fieldTabview selectTabViewItemAtIndex:0];
         }
             break;
         case nodeColumn:
@@ -471,6 +485,8 @@ NSTextViewDelegate,NSTabViewDelegate>
             
             NSInteger idx = [nd.parentNode indexOfNode:nd];
             [self.fieldlistview selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
+            
+            [self.fieldTabview selectTabViewItemAtIndex:0];
         }
             break;
         case nodeIndex:

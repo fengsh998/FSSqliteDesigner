@@ -679,6 +679,16 @@
                                                                                 </popUpButton>
                                                                             </subviews>
                                                                         </customView>
+                                                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ygy-DC-1J7">
+                                                                            <rect key="frame" x="367" y="162" width="82" height="32"/>
+                                                                            <buttonCell key="cell" type="push" title="save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RJm-Re-gH2">
+                                                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                                <font key="font" metaFont="system"/>
+                                                                            </buttonCell>
+                                                                            <connections>
+                                                                                <action selector="onSaveForeignkey:" target="-2" id="QFF-KZ-Z7G"/>
+                                                                            </connections>
+                                                                        </button>
                                                                     </subviews>
                                                                 </view>
                                                             </tabViewItem>

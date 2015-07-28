@@ -776,6 +776,72 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 @end
 
+/**************************************外键*************************************/
+@implementation FSForeignKey
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.selectIndexOfOptions = -1;
+        self.selectIndexOfDeleteAction = -1;
+        self.selectIndexOfUpdateAction = -1;
+    }
+    return self;
+}
+
++ (NSArray *)supportOptions
+{
+    NSArray *list = @[@"None",@"DEFERRABLE",@"DEFERRABLE INITIALLY DEFERRED",
+                      @"DEFERRABLE INITIALLY IMMEDIATE",@"NOT DEFERRABLE",
+                      @"NOT DEFERRABLE INITIALLY DEFERRED",@"NOT DEFERRABLE INITIALLY IMMEDIATE"];
+    return list;
+}
+
++ (NSArray *)supportActionForDelete
+{
+    NSArray *list = @[@"On Delete",@"NOT ACTION",@"RESTRICT",@"SET NULL",
+                      @"SET DEFAULT ",@"CASCADE"];
+    return list;
+}
+
++ (NSArray *)supportActionForUpdate
+{
+    NSArray *list = @[@"On Update",@"NOT ACTION",@"RESTRICT",@"SET NULL",
+                      @"SET DEFAULT ",@"CASCADE"];
+    return list;
+}
+
+- (NSString *)makeSqlKeyValue
+{
+    NSString *fk = @"";
+    if (self.targetTable.length > 0 && self.targetColumn.length > 0)
+    {
+        fk = [NSString stringWithFormat:@" REFERENCES \"%@\" (\"%@\")",
+              [self.targetTable uppercaseString],[self.targetColumn uppercaseString]];
+    }
+    
+    if (self.selectIndexOfOptions > 0)
+    {
+        NSString *option = [[[self class] supportOptions] objectAtIndex:self.selectIndexOfOptions];
+        fk = [fk stringByAppendingString:[NSString stringWithFormat:@" %@",option]];
+    }
+    
+    if (self.selectIndexOfDeleteAction > 1) {
+        NSString *ondelete = [[[self class] supportActionForDelete] objectAtIndex:self.selectIndexOfDeleteAction];
+        fk = [fk stringByAppendingString:[NSString stringWithFormat:@" ON DELETE %@",ondelete]];
+    }
+    
+    if (self.selectIndexOfUpdateAction > 1) {
+        NSString *onupdate = [[[self class] supportActionForUpdate] objectAtIndex:self.selectIndexOfUpdateAction];
+        fk = [fk stringByAppendingString:[NSString stringWithFormat:@" ON UPDATE %@",onupdate]];
+    }
+    
+    return fk;
+}
+
+@end
+
 /**************************************字段*************************************/
 @implementation FSColumn
 
@@ -820,6 +886,63 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (FSFieldType)covertToType:(NSString *)fieldstring
 {
     return (FSFieldType)[[self supportFieldTypes]indexOfObject:fieldstring];
+}
+
+- (FSForeignKey *)foreignKey
+{
+    if (!_foreignKey)
+    {
+        _foreignKey = [[FSForeignKey alloc]init];
+    }
+    return _foreignKey;
+}
+
++ (NSString *)covertFieldConstraint:(FSFieldConstraint)constraint
+{
+    NSString *cst = @"";
+
+    if (constraint & fcPrimarykey) {
+        cst = [cst stringByAppendingString:@" PRIMARY KEY"];
+    }
+    
+    if (constraint & fcAutoIncreament) {
+        cst = [cst stringByAppendingString:@" AUTOINCREMENT"];
+    }
+    
+    if (constraint & fcNotNull) {
+        cst = [cst stringByAppendingString:@" NOT NULL"];
+    }
+    
+    if (constraint & fcUnique) {
+        cst = [cst stringByAppendingString:@" UNIQUE"];
+    }
+    
+    return cst;//[cst stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+}
+
+- (NSString *)makeSqlKeyValue
+{
+    NSString *sqlkv = [NSString stringWithFormat:@"\"%@\" %@",self.fieldName,[self covertToString:self.fieldtype]];
+    
+    NSString *constraint = [[self class]covertFieldConstraint:self.constraint];
+    
+    if (constraint.length > 0) {
+        sqlkv = [sqlkv stringByAppendingString:constraint];
+    }
+    
+    if (self.defaultvalue.length > 0) {
+        sqlkv = [sqlkv stringByAppendingString:[NSString stringWithFormat:@" DEFAULT %@",self.defaultvalue]];
+    }
+    
+    if (self.enableForeignkey)
+    {
+        NSString *fk = [self.foreignKey makeSqlKeyValue];
+        if (fk.length > 0) {
+            sqlkv = [sqlkv stringByAppendingString:fk];
+        }
+    }
+    
+    return sqlkv;
 }
 
 @end
@@ -884,6 +1007,21 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (NSString *)makeUniqueColumnName
 {
     return [self uniqueName:@"fieldname"];
+}
+
+- (NSString *)makeSqlKeyValue
+{
+    NSString *fmt = @"CREATE TABLE \"%@\" (%@)";
+    NSMutableArray *fields = [NSMutableArray array];
+    for (FSColumn *column in self.allColumns)
+    {
+        NSString *fs = [column makeSqlKeyValue];
+        
+        [fields addObject:fs];
+    }
+    
+    NSString *ctbs = [NSString stringWithFormat:fmt,self.tableName,[fields componentsJoinedByString:@","]];
+    return [ctbs uppercaseString];
 }
 
 @end
