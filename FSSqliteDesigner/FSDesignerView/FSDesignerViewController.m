@@ -8,6 +8,7 @@
 
 #import "FSDesignerViewController.h"
 #import "FSDesignerViewController+column.h"
+#import "FSDesignerViewController+index.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -49,6 +50,15 @@ NSTextViewDelegate,NSTabViewDelegate>
     //默不显示
     [self.fieldTabview setDelegate:self];
     [self.tabview selectTabViewItemWithIdentifier:@"id_none"];
+    
+    self.indexTableviewDispatcher = [[FSIndexTableViewImpl alloc]init];
+    self.indexTableview.delegate = self.indexTableviewDispatcher;
+    self.indexTableview.dataSource = self.indexTableviewDispatcher;
+    
+    self.tfIndexName.target = self;
+    self.tfIndexName.action = @selector(onIndexNameChange:);
+    self.tvIndexSql.delegate = self;
+    self.tvIndexSql.enabledTextCheckingTypes = NSTextCheckingTypeRegularExpression | NSTextCheckingTypeQuote;
     
     [self setButtonStyle];
     
@@ -277,6 +287,7 @@ NSTextViewDelegate,NSTabViewDelegate>
     }
     
     [self.dblistview reloadData];
+    [self.tabview selectTabViewItemWithIdentifier:@"id_none"];
 }
 
 #pragma mark - splitedelegate
@@ -492,6 +503,13 @@ NSTextViewDelegate,NSTabViewDelegate>
         case nodeIndex:
         {
             tid = @"id_index";
+            
+            FSNode *root = [self getRootItemOfNode:nd];
+            
+            if (root.type == nodeDatabase) {
+                FSDatabse *db = (id)root;
+                [self loadIndex:(id)nd withIndexTargetTables:[db tables]];
+            }
         }
             break;
         case nodeView:
@@ -603,6 +621,17 @@ NSTextViewDelegate,NSTabViewDelegate>
 - (FSNode *)getSelectItemInList
 {
     return [self.dblistview itemAtRow:[self.dblistview selectedRow]];
+}
+
+- (FSNode *)getRootItemOfNode:(FSNode *)selectedNode
+{
+    FSNode *parent = selectedNode;
+    
+    while (parent.parentNode) {
+        parent = parent.parentNode;
+    }
+    
+    return parent;
 }
 
 #pragma mark - 选中Tree中某个结点

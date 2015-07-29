@@ -692,26 +692,34 @@
 
 - (NSDictionary<NSString *, id> *)textView:(NSTextView *)view willCheckTextInRange:(NSRange)range options:(NSDictionary<NSString *, id> *)options types:(NSTextCheckingTypes *)checkingTypes
 {
-    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    if (*checkingTypes & NSTextCheckingTypeRegularExpression)
-    {
-        //return [self sqlitekeywords];
-        [dic addEntriesFromDictionary:[self sqlitekeywords]];
+    if (!options) {
+        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+        if (*checkingTypes & NSTextCheckingTypeRegularExpression)
+        {
+            [dic addEntriesFromDictionary:[self sqlitekeywords]];
+        }
+        
+        if (*checkingTypes & NSTextCheckingTypeQuote)
+        {
+            NSColor* color = [NSColor colorWithDeviceRed:0.72f green:0.2f blue:0.63f alpha:1.0];
+            [dic setObject:color forKey:@"double_quote"];
+        }
+        
+        return dic;
     }
-    
-    if (*checkingTypes & NSTextCheckingTypeQuote)
-    {
-        NSColor* color = [NSColor colorWithDeviceRed:0.72f green:0.2f blue:0.63f alpha:1.0];
-        [dic setObject:color forKey:@"double_quote"];
-    }
-    
-    return dic;
+
+    return options;
 }
 
 - (NSArray<NSTextCheckingResult *> *)textView:(NSTextView *)view didCheckTextInRange:(NSRange)range types:(NSTextCheckingTypes)checkingTypes options:(NSDictionary<NSString *, id> *)options results:(NSArray<NSTextCheckingResult *> *)results orthography:(NSOrthography *)orthography wordCount:(NSInteger)wordCount
 {
     @try {
-        NSMutableArray *resultarray = [NSMutableArray array];
+        
+        NSMutableArray *resultarray = nil;
+        if (!results) {
+            resultarray = [NSMutableArray array];
+        }
+        
         
         [view.textStorage beginEditing];
         [view.textStorage removeAttribute:NSForegroundColorAttributeName range:range];
@@ -720,8 +728,7 @@
         {
             NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.sqlitematchPattern
                                           //@"\\bcreate\\b|\\btaBle\\b"
-                                                                                   options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines|
-                                          NSRegularExpressionUseUnicodeWordBoundaries
+                                                                                   options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines
                                                                                      error:nil];
             
             NSArray *array = [regex matchesInString:view.string options:NSMatchingReportProgress range:range];
@@ -741,7 +748,9 @@
                 }
             }
             
-            [resultarray addObjectsFromArray:array];
+            if (resultarray) {
+                [resultarray addObjectsFromArray:array];
+            }
         }
         
         if (checkingTypes & NSTextCheckingTypeQuote)
@@ -767,14 +776,15 @@
                     }
                 }
             }
-            //NSLog(@"%@",results);
             
-            [resultarray addObjectsFromArray:resultarray];
+            if (resultarray) {
+                [resultarray addObjectsFromArray:resultarray];
+            }
         }
         
-        [self.tvCreateSql.textStorage endEditing];
+        [view.textStorage endEditing];
         
-        return resultarray.count > 0 ? resultarray : nil;
+        return resultarray.count > 0 ? resultarray : results;
     }
     @catch (NSException *exception) {
         return nil;

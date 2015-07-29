@@ -169,7 +169,7 @@ typedef enum
 ///建立的索引表名
 @property (nonatomic,copy)   NSString                                       *indexTableName;
 ///索引字段名
-@property (nonatomic,copy)   NSString                                       *indexFieldName;
+@property (nonatomic,copy)   NSArray                                        *indexFieldNames;
 ///指定一的升序字段(可选)
 @property (nonatomic,strong) NSArray                                        *ascFields;
 ///指定一的降序字段(可选)
@@ -178,6 +178,8 @@ typedef enum
 @property (nonatomic,strong) NSString                                       *indexsqls;
 
 - (instancetype)initWithIndexName:(NSString *)indexname;
+
+- (NSString *)makeSqlKeyValue;
 @end
 
 ///外键

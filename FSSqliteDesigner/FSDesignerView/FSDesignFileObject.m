@@ -359,8 +359,9 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
                 [indexs setObject:@"UNIQUE" forKey:@"FieldIndexType"];
             }
             [indexs setObject:i.indexTableName?i.indexTableName:@"" forKey:@"DBTableName"];
-            [indexs setObject:i.indexFieldName?i.indexFieldName:@"" forKey:@"FieldName"];
+            [indexs setObject:i.indexFieldNames?[i.indexFieldNames componentsJoinedByString:@","]:@"" forKey:@"FieldName"];
             
+            //后面两个是可选项
             if (i.ascFields.count > 0) {
                 [indexs setObject:[[i.ascFields componentsJoinedByString:@","] uppercaseString] forKey:@"ColumnASC"];
             }
@@ -756,6 +757,27 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         self.type = nodeIndex;
     }
     return self;
+}
+
+- (NSString *)makeSqlKeyValue
+{
+    NSString *idxsql = @"CREATE INDEX \"%@\" ON \"%@\"(%@)";
+    NSString *idxuniquesql = @"CREATE UNIQUE INDEX \"%@\" ON \"%@\"(%@)";
+    
+    NSString *tbname = self.indexTableName;
+    NSString *idxname = self.indexName;
+    NSString *fields = [self.indexFieldNames componentsJoinedByString:@","];//要加引号
+    
+    NSString *ret = @"";
+    if (self.unique) {
+        ret = [NSString stringWithFormat:idxuniquesql,idxname,tbname,fields];
+    }
+    else
+    {
+        ret = [NSString stringWithFormat:idxsql,idxname,tbname,fields];
+    }
+    
+    return [ret uppercaseString];
 }
 
 @end
