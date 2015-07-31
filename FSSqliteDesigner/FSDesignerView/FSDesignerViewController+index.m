@@ -25,6 +25,16 @@
 
 - (void)onIndexNameChange:(NSTextField *)textfield
 {
+    BOOL exsist = [[self getCurrentEditorIndex] exsistNodeNameInNeighbour:textfield.stringValue];
+    
+    if (exsist)
+    {
+        textfield.stringValue = [self getCurrentEditorIndex].indexName;
+        [self alterCheckMessage:@"存在同名索引" reSetFocus:textfield];
+        return;
+    }
+        
+    
     [self getCurrentEditorIndex].indexName = textfield.stringValue;
 
     FSNode *node = [self getSelectItemInList];
@@ -49,11 +59,30 @@
     self.popIndexTable.menu = ms;
 }
 
+- (void)cleanIndexPage
+{
+    self.tvIndexSql.string = @"";
+    self.indexTableviewDispatcher.dataSource = nil;
+    [self.indexTableview reloadData];
+}
+
 - (void)loadIndex:(FSIndex *)index withIndexTargetTables:(NSArray *)tables
 {
+    [self cleanIndexPage];
+    
     self.tfIndexName.stringValue = index.indexName;
     [self.checkIndexUnique setState:index.unique];
+    
     [self toLoadTabels:tables];
+    
+    if (index.indexTableName.length > 0)
+    {
+        [self.popIndexTable selectItemWithTitle:index.indexTableName];
+        NSMenuItem *item = [self.popIndexTable itemWithTitle:index.indexTableName];
+        if (item) {
+            [self popIndexTableClicked:item];
+        }
+    }
 }
 
 - (void)popIndexTableClicked:(NSMenuItem *)item
@@ -68,6 +97,10 @@
             NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:@{@"columns":columns}];
             if (currentselectcolums) {
                 [dictionary setObject:currentselectcolums forKey:@"selected"];
+                
+                NSString *sql = [index makeSqlKeyValue];
+                
+                self.tvIndexSql.string = sql ? sql : @"";
             }
             [self todoLoadColumns:dictionary];
         }

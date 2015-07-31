@@ -9,6 +9,7 @@
 #import "FSDesignerViewController.h"
 #import "FSDesignerViewController+column.h"
 #import "FSDesignerViewController+index.h"
+#import "FSDesignerViewController+view.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -45,12 +46,14 @@ NSTextViewDelegate,NSTabViewDelegate>
     
     self.tvMark.delegate = self;
     self.tvCreateSql.delegate = self;
-    self.tvCreateSql.enabledTextCheckingTypes = NSTextCheckingTypeRegularExpression | NSTextCheckingTypeQuote;
+    self.tvCreateSql.automaticTextReplacementEnabled = NO;
+    self.tvCreateSql.enabledTextCheckingTypes = NSTextCheckingTypeOrthography | NSTextCheckingTypeRegularExpression ;//| NSTextCheckingTypeQuote;
 
     //默不显示
     [self.fieldTabview setDelegate:self];
     [self.tabview selectTabViewItemWithIdentifier:@"id_none"];
     
+    // 索引模块
     self.indexTableviewDispatcher = [[FSIndexTableViewImpl alloc]init];
     self.indexTableview.delegate = self.indexTableviewDispatcher;
     self.indexTableview.dataSource = self.indexTableviewDispatcher;
@@ -58,7 +61,21 @@ NSTextViewDelegate,NSTabViewDelegate>
     self.tfIndexName.target = self;
     self.tfIndexName.action = @selector(onIndexNameChange:);
     self.tvIndexSql.delegate = self;
-    self.tvIndexSql.enabledTextCheckingTypes = NSTextCheckingTypeRegularExpression | NSTextCheckingTypeQuote;
+    self.tvIndexSql.automaticTextReplacementEnabled = NO;
+    self.tvIndexSql.enabledTextCheckingTypes = NSTextCheckingTypeOrthography |NSTextCheckingTypeRegularExpression ;//| NSTextCheckingTypeQuote;
+    
+    // 视图模块
+    self.tfViewName.target = self;
+    self.tfViewName.action = @selector(onViewNameChange:);
+    self.tvViewSql.delegate = self;
+    
+    self.tvViewSql.automaticQuoteSubstitutionEnabled = NO;
+    self.tvViewSql.automaticDashSubstitutionEnabled = NO;
+    //不开启自动替换
+    self.tvViewSql.automaticTextReplacementEnabled = NO;
+    
+    self.tvViewSql.enabledTextCheckingTypes = NSTextCheckingTypeOrthography |NSTextCheckingTypeRegularExpression ;//| NSTextCheckingTypeQuote;
+    
     
     [self setButtonStyle];
     

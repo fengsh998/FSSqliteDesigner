@@ -114,6 +114,7 @@
 - (void)toDoSelectedTreeNode:(FSNode *)node;
 ///当outline 获取焦点时变色
 - (void)setFocus:(NSView *)v;
-
+///弹窗提示
+- (void)alterCheckMessage:(NSString *)msg reSetFocus:(NSView *)v;
 
 @end

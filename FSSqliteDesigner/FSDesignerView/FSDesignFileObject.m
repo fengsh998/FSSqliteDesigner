@@ -796,6 +796,48 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self;
 }
 
+- (NSString *)deleteNotesForSqls:(NSString *)sqls
+{
+    if (!sqls) return nil;
+    
+    NSMutableString *msrc = [NSMutableString stringWithString:@""];
+    
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:NOTES_MATCH_FETCH
+                                                                           options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines
+                                                                             error:nil];
+    
+    NSArray *array = [regex matchesInString:sqls options:NSMatchingReportProgress range:NSMakeRange(0, sqls.length)];
+    
+    NSRange rg = NSMakeRange(0, 0);
+    
+    for (NSTextCheckingResult *item in array)
+    {
+        if (rg.length == 0 && rg.location == 0) {
+            [msrc appendString:[sqls substringToIndex:item.range.location]];
+        }
+        else
+        {
+            NSString *ds = [sqls substringWithRange:NSMakeRange(rg.location, item.range.location - rg.location)];
+            [msrc appendString:ds];
+        }
+        
+        rg = NSMakeRange(item.range.location + item.range.length, 0) ;
+    }
+    
+    return msrc;
+}
+
+- (NSString *)makeSqlKeyValue
+{
+    NSString *sql = @"CREATE VIEW \"%@\" AS %@";
+    
+    if (self.sqls) {
+        return [NSString stringWithFormat:sql,self.viewName,self.sqls];
+    }
+    
+    return nil;
+}
+
 @end
 
 /**************************************外键*************************************/

@@ -18,6 +18,13 @@
 */
 #import <Foundation/Foundation.h>
 
+//用于删除注释
+#define NOTES_MATCH_FETCH    @"--(.*)|/\\*(.|[\\r\\n])*?\\*/"
+//用于匹配注释，有哪么一小点区别就在于多行注释上
+#define NOTES_MATCH          @"--(.*)|/\\*(.|[\\r\\n])*?|\\*/"
+
+#define NOTES_QOUTES         @"\""
+
 typedef enum
 {
     ftInteger     = 0,
@@ -62,7 +69,10 @@ typedef enum
 @optional
 ///生成唯一结点名
 - (NSString *)uniqueName:(NSString *)name;
-
+///生成sql语句，特别是对视图和触发器，手动输入的可能注释
+- (NSString *)makeSqlKeyValue;
+///删除注释部分获取可执行语句(调用前需要检测是否已实现了该协议)
+- (NSString *)deleteNotesForSqls:(NSString *)sqls;
 @end
 
 @interface FSNode : NSObject<FSNodeExtendProtocol>
@@ -179,7 +189,6 @@ typedef enum
 
 - (instancetype)initWithIndexName:(NSString *)indexname;
 
-- (NSString *)makeSqlKeyValue;
 @end
 
 ///外键
@@ -238,7 +247,6 @@ typedef enum
 - (NSString *)covertToString:(FSFieldType)fieldtype;
 - (FSFieldType)covertToType:(NSString *)fieldstring;
 
-- (NSString *)makeSqlKeyValue;
 
 @end
 
@@ -265,7 +273,6 @@ typedef enum
 - (void)removeColumnOfIndex:(NSInteger)index;
 - (void)removeAllColumn;
 
-- (NSString *)makeSqlKeyValue;
 @end
 
 

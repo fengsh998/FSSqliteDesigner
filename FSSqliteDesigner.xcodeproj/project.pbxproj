@@ -20,6 +20,8 @@
 		9DD562571B67C2EF00554BD9 /* keywords.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9DD562561B67C2EF00554BD9 /* keywords.plist */; };
 		9DD5625A1B68978600554BD9 /* FSDesignerViewController+index.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD562591B68978600554BD9 /* FSDesignerViewController+index.m */; };
 		9DD5625D1B689C2A00554BD9 /* FSIndexTableViewImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD5625C1B689C2A00554BD9 /* FSIndexTableViewImpl.m */; };
+		9DD562601B69BD5800554BD9 /* FSDesignerViewController+view.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD5625F1B69BD5700554BD9 /* FSDesignerViewController+view.m */; };
+		9DD562631B6A3DA500554BD9 /* FSUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD562621B6A3DA500554BD9 /* FSUtils.m */; };
 		9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD95B211B4BA09C00D54DBA /* FSSqliteDesignerManager.m */; };
 		9DD95B2A1B4BA13900D54DBA /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD95B291B4BA13900D54DBA /* AppKit.framework */; };
 		9DD95B2C1B4BA14D00D54DBA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD95B2B1B4BA14D00D54DBA /* Foundation.framework */; };
@@ -56,6 +58,10 @@
 		9DD562591B68978600554BD9 /* FSDesignerViewController+index.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "FSDesignerViewController+index.m"; sourceTree = "<group>"; };
 		9DD5625B1B689C2A00554BD9 /* FSIndexTableViewImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSIndexTableViewImpl.h; sourceTree = "<group>"; };
 		9DD5625C1B689C2A00554BD9 /* FSIndexTableViewImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSIndexTableViewImpl.m; sourceTree = "<group>"; };
+		9DD5625E1B69BD5700554BD9 /* FSDesignerViewController+view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FSDesignerViewController+view.h"; sourceTree = "<group>"; };
+		9DD5625F1B69BD5700554BD9 /* FSDesignerViewController+view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "FSDesignerViewController+view.m"; sourceTree = "<group>"; };
+		9DD562611B6A3DA500554BD9 /* FSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSUtils.h; sourceTree = "<group>"; };
+		9DD562621B6A3DA500554BD9 /* FSUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSUtils.m; sourceTree = "<group>"; };
 		9DD95B201B4BA09C00D54DBA /* FSSqliteDesignerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSSqliteDesignerManager.h; sourceTree = "<group>"; };
 		9DD95B211B4BA09C00D54DBA /* FSSqliteDesignerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSSqliteDesignerManager.m; sourceTree = "<group>"; };
 		9DD95B291B4BA13900D54DBA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -129,6 +135,8 @@
 		9DD95B231B4BA0CC00D54DBA /* FSDesignerView */ = {
 			isa = PBXGroup;
 			children = (
+				9DD562611B6A3DA500554BD9 /* FSUtils.h */,
+				9DD562621B6A3DA500554BD9 /* FSUtils.m */,
 				9DBE62861B4BB7210054B463 /* FSDesignerView.h */,
 				9DBE62871B4BB7210054B463 /* FSDesignerView.m */,
 				9D6090AE1B55593B002CF276 /* FSOutlineView.h */,
@@ -137,6 +145,8 @@
 				9D1F5CA11B649AF1009F30DE /* FSTabView.m */,
 				9DD5625B1B689C2A00554BD9 /* FSIndexTableViewImpl.h */,
 				9DD5625C1B689C2A00554BD9 /* FSIndexTableViewImpl.m */,
+				9DD5625E1B69BD5700554BD9 /* FSDesignerViewController+view.h */,
+				9DD5625F1B69BD5700554BD9 /* FSDesignerViewController+view.m */,
 				9DD562581B68978600554BD9 /* FSDesignerViewController+index.h */,
 				9DD562591B68978600554BD9 /* FSDesignerViewController+index.m */,
 				9DB191B61B578F52004FF4FE /* FSDesignerViewController+column.h */,
@@ -288,9 +298,11 @@
 				9DD95B221B4BA09C00D54DBA /* FSSqliteDesignerManager.m in Sources */,
 				9DE2C8431B4C09DC0049C545 /* FSXcodeWindowFrameDebug.m in Sources */,
 				9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */,
+				9DD562601B69BD5800554BD9 /* FSDesignerViewController+view.m in Sources */,
 				9D1F5CA21B649AF1009F30DE /* FSTabView.m in Sources */,
 				9DE2C8471B4CB58D0049C545 /* FSViewListModel.m in Sources */,
 				9DD5625A1B68978600554BD9 /* FSDesignerViewController+index.m in Sources */,
+				9DD562631B6A3DA500554BD9 /* FSUtils.m in Sources */,
 				9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */,
 				9D6BB8191B51182D005630B8 /* FSDesignFileObject.m in Sources */,
 				9DD5625D1B689C2A00554BD9 /* FSIndexTableViewImpl.m in Sources */,

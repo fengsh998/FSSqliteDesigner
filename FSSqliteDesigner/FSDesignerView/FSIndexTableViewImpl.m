@@ -31,7 +31,7 @@
         NSButton *chk = v.subviews[0];
         [chk setState:0];
         if (selects) {
-            [chk setState:[selects containsObject:column.fieldName]];
+            [chk setState:[selects containsObject:[NSString stringWithFormat:@"\"%@\"",column.fieldName]]];
         }
     }
     else if ([tableColumn.identifier isEqualToString:@"index_2"])

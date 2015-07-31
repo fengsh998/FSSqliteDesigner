@@ -651,16 +651,6 @@
         }
     }
     
-//    NSArray *keyws = [ws[@"keywords"]componentsSeparatedByString:@" "];
-//    
-//    
-//    for (NSString *key in keyws) {
-//        if (key.length > 0)
-//        {
-//            [dic setObject:[NSColor blueColor] forKey:key];
-//        }
-//    }
-    
     return dic;
 }
 
@@ -683,11 +673,23 @@
             [pattern appendFormat:@"\\b%@\\b|",key];
         }
         
-        [pattern deleteCharactersInRange:NSMakeRange(pattern.length-1, 1)];
+        [pattern deleteCharactersInRange:NSMakeRange(pattern.length-1, 1)]; //删除最后的 |
         _sqlitematchPattern = pattern;
     }
     
     return _sqlitematchPattern;
+}
+
+// /是否匹配的是注释
+- (BOOL)isMatchNotes:(NSString *)keyworks
+{
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:NOTES_MATCH
+                                                                           options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines
+                                                                             error:nil];
+    
+    NSArray *array = [regex matchesInString:keyworks options:NSMatchingReportProgress range:NSMakeRange(0, keyworks.length)];
+    
+    return array.count > 0;
 }
 
 - (NSDictionary<NSString *, id> *)textView:(NSTextView *)view willCheckTextInRange:(NSRange)range options:(NSDictionary<NSString *, id> *)options types:(NSTextCheckingTypes *)checkingTypes
@@ -714,45 +716,123 @@
 - (NSArray<NSTextCheckingResult *> *)textView:(NSTextView *)view didCheckTextInRange:(NSRange)range types:(NSTextCheckingTypes)checkingTypes options:(NSDictionary<NSString *, id> *)options results:(NSArray<NSTextCheckingResult *> *)results orthography:(NSOrthography *)orthography wordCount:(NSInteger)wordCount
 {
     @try {
-        
-        NSMutableArray *resultarray = nil;
-        if (!results) {
-            resultarray = [NSMutableArray array];
-        }
-        
-        
+
         [view.textStorage beginEditing];
-        [view.textStorage removeAttribute:NSForegroundColorAttributeName range:range];
+        [view.textStorage removeAttribute:NSForegroundColorAttributeName range:NSMakeRange(0, view.string.length)];
         
         if (checkingTypes & NSTextCheckingTypeRegularExpression)
         {
+            
+            //匹配关键词。
             NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.sqlitematchPattern
-                                          //@"\\bcreate\\b|\\btaBle\\b"
-                                                                                   options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines
+                                                                                   options:NSRegularExpressionCaseInsensitive|
+                                          NSRegularExpressionUseUnixLineSeparators
                                                                                      error:nil];
             
-            NSArray *array = [regex matchesInString:view.string options:NSMatchingReportProgress range:range];
+            NSArray *array = [regex matchesInString:view.string options:NSMatchingReportProgress range:NSMakeRange(0, view.string.length)];
             
+            for (NSTextCheckingResult *item in array)
+            {
+                NSString *keyws = [view.string substringWithRange:item.range];
+                NSColor *cl = options[keyws];
+                
+                if (!cl) {
+                    cl = [NSColor blueColor];
+                }
+                
+                [view.textStorage addAttributes:@{NSForegroundColorAttributeName:cl} range:item.range];
+            }
+            
+            //匹配引号
+            NSRegularExpression *regexQuotes = [NSRegularExpression regularExpressionWithPattern:NOTES_QOUTES
+                                                                                        options:NSRegularExpressionCaseInsensitive|
+                                               NSRegularExpressionUseUnixLineSeparators
+                                                                                          error:nil];
+            
+            array = [regexQuotes matchesInString:view.string options:NSMatchingReportProgress range:NSMakeRange(0, view.string.length)];
+            
+            for (NSInteger i = 0; i < array.count / 2; i++)
+            {
+                //成对引号出现
+                NSTextCheckingResult *start = array[i*2];
+                NSTextCheckingResult *end = array[i*2 + 1];
+                
+                if (start.range.location != NSNotFound && end.range.location != NSNotFound)
+                {
+                    NSRange srange = NSMakeRange(start.range.location, end.range.location + end.range.length - start.range.location);
+                    
+                    NSColor *cl = options[@"double_quote"];
+                    if (!cl) {
+                        cl = [NSColor colorWithDeviceRed:0.72f green:0.2f blue:0.63f alpha:1.0];
+                    }
+                    
+                    [view.textStorage addAttributes:@{NSForegroundColorAttributeName:cl} range:srange];
+                    
+                }
+            }
+            
+            //匹配注释
+            NSRegularExpression *regexNotes = [NSRegularExpression regularExpressionWithPattern:NOTES_MATCH
+                                                                                   options:NSRegularExpressionCaseInsensitive|
+                                          NSRegularExpressionUseUnixLineSeparators
+                                                                                     error:nil];
+
+            array = [regexNotes matchesInString:view.string options:NSMatchingReportProgress range:NSMakeRange(0, view.string.length)];
+ 
             for (NSTextCheckingResult *item in array)
             {
                 if (item.range.location != NSNotFound) {
                     
-                    NSString *keyws = [view.string substringWithRange:item.range];
+                    NSRange colorrange = item.range;
+                    NSUInteger len = [view.string length];
                     
-                    NSColor *cl = options[keyws];
-                    if (!cl) {
-                        cl = [NSColor blueColor];
+                    NSString *keyws = [view.string substringWithRange:colorrange];
+                    
+                    NSColor *cl = nil;//options[keyws];
+                    
+//                    if ([self isMatchNotes:keyws])
+//                    { //匹配到注释
+                    
+                        NSString *lt = nil;
+                        
+                        if ([keyws isEqualToString:@"/*"]) {
+                            lt = [view.string substringFromIndex:(item.range.location + item.range.length)];
+                        }
+                        
+                        NSRange noterange = [lt rangeOfString:@"*/"];
+                        if (noterange.location == NSNotFound && lt.length > 0) {
+                            colorrange = NSMakeRange(item.range.location, len - item.range.location);
+                        }
+                        else if (lt.length > 0 && noterange.location != NSNotFound)
+                        {
+                            noterange = NSMakeRange(item.range.location + item.range.length + noterange.location, noterange.length);
+                            if (item.range.location < noterange.location)
+                            {
+                                colorrange = NSMakeRange(item.range.location, noterange.location + noterange.length - item.range.location);
+                            }
+                            else
+                            {
+                                colorrange = NSMakeRange(NSNotFound, 0);
+                            }
+                        }
+                        else
+                        {
+                            colorrange = item.range;//NSMakeRange(NSNotFound, 0);
+                        }
+                        
+                        cl = [NSColor colorWithDeviceRed:0.0f green:0.51f blue:0.03f alpha:1.0];
+//                    }
+                    
+                    if (colorrange.location != NSNotFound) {
+                        [view.textStorage addAttributes:@{NSForegroundColorAttributeName:cl} range:colorrange];
                     }
                     
-                    [view.textStorage addAttributes:@{NSForegroundColorAttributeName:cl} range:item.range];
                 }
             }
-            
-            if (resultarray) {
-                [resultarray addObjectsFromArray:array];
-            }
+
         }
         
+        //暂不使用系统的，因为会把英文的"变为中文的，所以不用
         if (checkingTypes & NSTextCheckingTypeQuote)
         {
             if (results.count % 2 == 0) {
@@ -773,18 +853,16 @@
                         }
                         
                         [view.textStorage addAttributes:@{NSForegroundColorAttributeName:cl} range:srange];
+                        
                     }
                 }
             }
             
-            if (resultarray) {
-                [resultarray addObjectsFromArray:resultarray];
-            }
         }
         
         [view.textStorage endEditing];
-        
-        return resultarray.count > 0 ? resultarray : results;
+
+        return results;
     }
     @catch (NSException *exception) {
         return nil;
