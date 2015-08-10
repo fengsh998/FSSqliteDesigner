@@ -20,6 +20,7 @@
 @property (nonatomic, strong) FSDesignerView                        *sqliteDesignView;
 @property (nonatomic, weak)   id                                    ideEditorController;
 @property (nonatomic, weak)   id                                    editorContextController;
+@property (nonatomic, weak)   id                                    ideEditorDocument;
 @property (nonatomic, weak)   NSSplitView                           *debuggerSplitView;
 @property (nonatomic, weak)   NSView                                *editorView;
 @property (nonatomic, weak)   NSView                                *dubagToolsView;
@@ -29,6 +30,8 @@
 @property (nonatomic, weak)   NSView                                *IDENavigatorAreaView;
 //sqliet designer view controller
 @property (nonatomic, strong) FSDesignerViewController              *designVC;
+
+@property (nonatomic, assign) BOOL                                  isSelectedSqlitemodel;
 
 @end
 
@@ -110,9 +113,16 @@
     
     [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask  handler:^NSEvent * __nullable(NSEvent * __nonnull event) {
         if((([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask) && [[event charactersIgnoringModifiers] compare:@"s"] == 0) {
-            if (self.designVC && self.designVC.designer)
+            if (self.designVC && self.designVC.designer && self.isSelectedSqlitemodel)
             {
+                [self.designVC todoSaveSetValue];
+                
                 [self.designVC.designer saveToFile:self.designVC.modelUrl];
+                //做了个投机取巧的方式
+//                NSTextView *tv = [self getSourceCodeEditorView];
+//                tv.string = @"test";
+//                NSLog(@"tv ======= %@",tv);
+                return nil;//拦截系统保存
             }
         }
         
@@ -245,6 +255,27 @@
     return nil;
 }
 
+#pragma mark - 获取sourcecode editor view
+- (NSTextView *)getSourceCodeEditorView
+{
+    self.ideEditorDocument = [[self.workspacewindow windowController] valueForKey:@"_lastObservedEditorDocument"];
+    
+    if (self.ideEditorDocument) {
+        NSMutableSet *st = [self.ideEditorDocument valueForKey:@"_documentEditors"];
+        if (st.count > 0) {
+            id editor = st.allObjects[0];
+            if ([editor isKindOfClass:[NSClassFromString(@"IDESourceCodeEditor") class]]) {
+                id view = [editor valueForKey:@"_textView"];
+                if ([view isKindOfClass:[NSTextView class]]) {
+                    return view;
+                }
+            }
+        }
+    }
+    
+    return nil;
+}
+
 #pragma mark - 获取代码或查看资源文件的编辑区
 - (NSView *)findResAndSourceTextAreaView
 {
@@ -356,6 +387,8 @@
 
             if ([ext isEqualToString:@"sqlitemodeld"] || [ext isEqualToString:@"sqlitemodel"])
             {
+                self.isSelectedSqlitemodel = YES;
+                
                 self.sqliteDesignView.hidden = NO;
                 if (self.editorView) {
                     self.editorView.hidden = !self.sqliteDesignView.hidden;
@@ -386,10 +419,14 @@
             }
             else
             {
+                self.isSelectedSqlitemodel = NO;
+                
                 self.sqliteDesignView.hidden = YES;
                 if (self.editorView) {
                     self.editorView.hidden = !self.sqliteDesignView.hidden;
                 }
+                
+                [self.designVC setModelUrl:nil];
             }
         }
     }

@@ -145,4 +145,9 @@
     [self getCurrentEditorIndex].unique = (BOOL)sender.state;
 }
 
+- (void)saveIndexSettings
+{
+    
+}
+
 @end

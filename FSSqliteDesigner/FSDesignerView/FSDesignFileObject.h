@@ -19,9 +19,9 @@
 #import <Foundation/Foundation.h>
 
 //用于删除注释
-#define NOTES_MATCH_FETCH    @"--(.*)|/\\*(.|[\\r\\n])*?\\*/"
+#define NOTES_MATCH_FETCH    @"--(.*)\\n\\b|/\\*(.|[\\r\\n])*?\\*/"
 //用于匹配注释，有哪么一小点区别就在于多行注释上
-#define NOTES_MATCH          @"--(.*)|/\\*(.|[\\r\\n])*?|\\*/"
+#define NOTES_MATCH          @"--(.*)\\n\\b|/\\*(.|[\\r\\n])*?|\\*/"
 
 #define NOTES_QOUTES         @"\""
 
@@ -64,18 +64,21 @@ typedef enum
     nodeColumn                = 1 << 5
 } NodeType;
 
-@protocol FSNodeExtendProtocol <NSObject>
+@protocol FSSqliteExtendProtocol <NSObject>
 
 @optional
 ///生成唯一结点名
 - (NSString *)uniqueName:(NSString *)name;
 ///生成sql语句，特别是对视图和触发器，手动输入的可能注释
 - (NSString *)makeSqlKeyValue;
-///删除注释部分获取可执行语句(调用前需要检测是否已实现了该协议)
+///删除注释部分获取可执行语句
 - (NSString *)deleteNotesForSqls:(NSString *)sqls;
+///获取可执行的sql语句(不带注释)(调用前需要检测是否已实现了该协议)
+- (NSString *)FetchExectureSql;
 @end
 
-@interface FSNode : NSObject<FSNodeExtendProtocol>
+/****************************************树形结构通用类*****************************************/
+@interface FSNode : NSObject<NSCopying,NSCoding>
 {
     @private
     __weak FSNode           *_parentNode;
@@ -85,7 +88,7 @@ typedef enum
 
 @property (nonatomic , assign) NodeType                 type;
 @property (nonatomic , strong) NSString                 *nodename;
-@property (nonatomic , assign) NSInteger                childcounts;
+@property (nonatomic , assign , readonly) NSInteger     childcounts;
 @property (nonatomic , assign , readonly) BOOL          hasChildren;
 @property (nonatomic , assign , readonly) BOOL          hasParent;
 @property (nonatomic , readonly) FSNode                 *parentNode;
@@ -134,45 +137,61 @@ typedef enum
 
 @end
 
+/*************************************库**************************************/
+@interface FSSqliteER : FSNode<FSSqliteExtendProtocol>
+
+@end
+
 /*************************************类目*************************************/
-@interface FSTableCategory : FSNode
+@interface FSTableCategory : FSSqliteER
 - (NSString *)makeUniqueTableName;
 @end
 
-@interface FSIndexCategory : FSNode
+@interface FSIndexCategory : FSSqliteER
 - (NSString *)makeUniqueIndexName;
 @end
 
-@interface FSViewCategory : FSNode
+@interface FSViewCategory : FSSqliteER
 - (NSString *)makeUniqueViewName;
 @end
 
-@interface FSTriggerCategory : FSNode
+@interface FSTriggerCategory : FSSqliteER
 - (NSString *)makeUniqueTriggerName;
 @end
 
 /************************************具体类************************************/
 
 ///触发器
-@interface FSTrigger : FSNode
-@property (nonatomic, setter=setNodename:,getter=nodename) NSString          *triggerName;
+@interface FSTrigger : FSSqliteER
+///触发器名称
+@property (nonatomic, setter=setNodename:,getter=nodename) NSString             *triggerName;
+///触发器事件
+@property (nonatomic, copy) NSString                                            *events;
+///触发器动作
+@property (nonatomic, copy) NSString                                            *actions;
 ///触发器语句
-@property (nonatomic, strong) NSString                                       *sqls;
+@property (nonatomic, copy) NSString                                            *sqls;
+///触发目标表
+@property (nonatomic, copy) NSString                                            *tableName;
+///字段集合
+@property (nonatomic, strong) NSArray                                           *columns;
 
++ (NSArray *)supportTriggerEvents;
++ (NSArray *)supportTriggerActions;
 - (instancetype)initWithTriggerName:(NSString *)triggerName;
 @end
 
 ///视图
-@interface FSView : FSNode
+@interface FSView : FSSqliteER
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString         *viewName;
 ///视图语句
-@property (nonatomic, strong) NSString                                      *sqls;
+@property (nonatomic, copy) NSString                                      *sqls;
 
 - (instancetype)initWithViewName:(NSString *)viewname;
 @end
 
 ///索引
-@interface FSIndex : FSNode
+@interface FSIndex : FSSqliteER
 ///是否唯一索引
 @property (nonatomic,assign) BOOL                                           unique;
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString         *indexName;
@@ -185,14 +204,14 @@ typedef enum
 ///指定一的降序字段(可选)
 @property (nonatomic,strong) NSArray                                        *descFields;
 ///索引sqls
-@property (nonatomic,strong) NSString                                       *indexsqls;
+@property (nonatomic,copy) NSString                                         *indexsqls;
 
 - (instancetype)initWithIndexName:(NSString *)indexname;
 
 @end
 
 ///外键
-@interface FSForeignKey : NSObject
+@interface FSForeignKey : NSObject<NSCopying,NSCoding>
 ///目标表
 @property (nonatomic, strong)   NSString                            *targetTable;
 ///目标列
@@ -214,7 +233,7 @@ typedef enum
 @end
 
 ///字段
-@interface FSColumn : FSNode
+@interface FSColumn : FSSqliteER
 {
     @private
     FSForeignKey        *_foreignKey;
@@ -241,6 +260,7 @@ typedef enum
 + (FSColumn *)column:(NSString *)filedName;
 + (FSColumn *)column:(NSString *)filedName ofType:(FSFieldType)fieldtype withTypeLength:(NSInteger)length;
 + (NSString *)covertFieldConstraint:(FSFieldConstraint)constraint;
++ (NSArray *)convertFieldConstraitToArray:(FSFieldConstraint)constraint;
 
 - (instancetype)initWithName:(NSString *)filedName;
 
@@ -251,10 +271,10 @@ typedef enum
 @end
 
 ///表
-@interface FSTable : FSNode
+@interface FSTable : FSSqliteER
 @property (nonatomic, setter=setNodename:,getter=nodename) NSString *tableName;
 ///记录表的语句
-@property (nonatomic, strong) NSString                          *createsqls;
+@property (nonatomic, copy) NSString                          *createsqls;
 
 - (instancetype)initWithTableName:(NSString *)name;
 - (NSString *)makeUniqueColumnName;
@@ -278,7 +298,7 @@ typedef enum
 
 
 ///库
-@interface FSDatabse : FSNode
+@interface FSDatabse : FSSqliteER
 {
     @private
     FSTableCategory                 *tableKind;
@@ -393,7 +413,7 @@ typedef enum
 
 @end
 
-@interface FSDesignFileObject : NSObject
+@interface FSDesignFileObject : NSObject<NSCoding>
 
 @property (nonatomic,readonly) NSArray          *databases;
 
@@ -412,8 +432,11 @@ typedef enum
 - (void)removeDatabaseOfObject:(FSDatabse *)database;
 - (void)removeAllDatabase;
 
-- (void)loadFromFile:(NSURL *)filepath;
++ (FSDesignFileObject *)loadFromFile:(NSURL *)filepath error:(NSError **)error;
 - (void)saveToFile:(NSURL *)filepath;
+
+///获取设计时编辑内容
+- (NSDictionary *)getNeedSaveContents;
 
 ///导出为sqlite语句脚本
 

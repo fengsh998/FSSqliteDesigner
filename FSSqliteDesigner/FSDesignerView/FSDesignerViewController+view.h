@@ -15,4 +15,6 @@
 - (void)onViewNameChange:(NSTextField *)textfield;
 
 - (void)loadView:(FSView *)view;
+
+- (void)saveViewSettings;
 @end

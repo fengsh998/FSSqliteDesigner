@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9D0931601B6B22D8008DBB87 /* FSDesignerViewController+Trigger.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D09315F1B6B22D8008DBB87 /* FSDesignerViewController+Trigger.m */; };
+		9D0931631B6B63C9008DBB87 /* FSTriggerTableViewImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0931621B6B63C9008DBB87 /* FSTriggerTableViewImpl.m */; };
 		9D1F5CA21B649AF1009F30DE /* FSTabView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1F5CA11B649AF1009F30DE /* FSTabView.m */; };
 		9D42F6E71B5A215800E93336 /* images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D42F6E61B5A215800E93336 /* images.xcassets */; };
 		9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6090AF1B55593B002CF276 /* FSOutlineView.m */; };
@@ -35,6 +37,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9D09315E1B6B22D8008DBB87 /* FSDesignerViewController+Trigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FSDesignerViewController+Trigger.h"; sourceTree = "<group>"; };
+		9D09315F1B6B22D8008DBB87 /* FSDesignerViewController+Trigger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "FSDesignerViewController+Trigger.m"; sourceTree = "<group>"; };
+		9D0931611B6B63C9008DBB87 /* FSTriggerTableViewImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSTriggerTableViewImpl.h; sourceTree = "<group>"; };
+		9D0931621B6B63C9008DBB87 /* FSTriggerTableViewImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSTriggerTableViewImpl.m; sourceTree = "<group>"; };
 		9D1F5CA01B649AF1009F30DE /* FSTabView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSTabView.h; sourceTree = "<group>"; };
 		9D1F5CA11B649AF1009F30DE /* FSTabView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSTabView.m; sourceTree = "<group>"; };
 		9D42F6E61B5A215800E93336 /* images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = images.xcassets; sourceTree = "<group>"; };
@@ -143,8 +149,12 @@
 				9D6090AF1B55593B002CF276 /* FSOutlineView.m */,
 				9D1F5CA01B649AF1009F30DE /* FSTabView.h */,
 				9D1F5CA11B649AF1009F30DE /* FSTabView.m */,
+				9D0931611B6B63C9008DBB87 /* FSTriggerTableViewImpl.h */,
+				9D0931621B6B63C9008DBB87 /* FSTriggerTableViewImpl.m */,
 				9DD5625B1B689C2A00554BD9 /* FSIndexTableViewImpl.h */,
 				9DD5625C1B689C2A00554BD9 /* FSIndexTableViewImpl.m */,
+				9D09315E1B6B22D8008DBB87 /* FSDesignerViewController+Trigger.h */,
+				9D09315F1B6B22D8008DBB87 /* FSDesignerViewController+Trigger.m */,
 				9DD5625E1B69BD5700554BD9 /* FSDesignerViewController+view.h */,
 				9DD5625F1B69BD5700554BD9 /* FSDesignerViewController+view.m */,
 				9DD562581B68978600554BD9 /* FSDesignerViewController+index.h */,
@@ -300,10 +310,12 @@
 				9DBE62881B4BB7210054B463 /* FSDesignerView.m in Sources */,
 				9DD562601B69BD5800554BD9 /* FSDesignerViewController+view.m in Sources */,
 				9D1F5CA21B649AF1009F30DE /* FSTabView.m in Sources */,
+				9D0931631B6B63C9008DBB87 /* FSTriggerTableViewImpl.m in Sources */,
 				9DE2C8471B4CB58D0049C545 /* FSViewListModel.m in Sources */,
 				9DD5625A1B68978600554BD9 /* FSDesignerViewController+index.m in Sources */,
 				9DD562631B6A3DA500554BD9 /* FSUtils.m in Sources */,
 				9D6090B01B55593B002CF276 /* FSOutlineView.m in Sources */,
+				9D0931601B6B22D8008DBB87 /* FSDesignerViewController+Trigger.m in Sources */,
 				9D6BB8191B51182D005630B8 /* FSDesignFileObject.m in Sources */,
 				9DD5625D1B689C2A00554BD9 /* FSIndexTableViewImpl.m in Sources */,
 				9D61D4961B4EB31500007E10 /* FSDesignerViewController.m in Sources */,

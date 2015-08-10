@@ -11,6 +11,7 @@
 #import "FSOutlineView.h"
 #import "FSTabView.h"
 #import "FSIndexTableViewImpl.h"
+#import "FSTriggerTableViewImpl.h"
 
 @interface FSDesignerViewController : NSViewController
 {
@@ -18,6 +19,7 @@
     NSDictionary                    *_sqlitekeywords;
     NSMutableString                 *_sqlitematchPattern;
     FSIndexTableViewImpl            *_indexTableviewDispatcher;
+    FSTriggerTableViewImpl          *_triggerTableviewDispatcher;
 }
 ///sqlitemodeld包路径
 @property (nonatomic, copy)             NSURL                   *packageUrl;
@@ -89,6 +91,7 @@
 ///视图显示的sql
 @property (unsafe_unretained) IBOutlet  NSTextView              *tvViewSql;
 //*******************************触发器模块属性对象************************************//
+@property (nonatomic,strong)            FSTriggerTableViewImpl  *triggerTableviewDispatcher;
 ///触发器名
 @property (weak) IBOutlet               NSTextField             *tfTriggerName;
 ///触发事件
@@ -116,5 +119,8 @@
 - (void)setFocus:(NSView *)v;
 ///弹窗提示
 - (void)alterCheckMessage:(NSString *)msg reSetFocus:(NSView *)v;
+
+// /当前Ctrl + s 时对界面上的修改值进行保存设置
+- (void)todoSaveSetValue;
 
 @end

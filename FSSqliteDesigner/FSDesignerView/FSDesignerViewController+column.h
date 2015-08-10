@@ -14,4 +14,5 @@
 - (void)setDefaultOptions;
 - (void)setDefaultActionForDelete;
 - (void)setDefaultActionForUpdate;
+- (void)saveTableSettings;
 @end

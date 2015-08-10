@@ -16,4 +16,5 @@
 - (void)onIndexNameChange:(NSTextField *)textfield;
 
 - (void)loadIndex:(FSIndex *)index withIndexTargetTables:(NSArray *)tables;
+- (void)saveIndexSettings;
 @end

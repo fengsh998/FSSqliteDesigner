@@ -10,6 +10,7 @@
 #import "FSDesignerViewController+column.h"
 #import "FSDesignerViewController+index.h"
 #import "FSDesignerViewController+view.h"
+#import "FSDesignerViewController+Trigger.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -21,7 +22,7 @@ _Pragma("clang diagnostic pop") \
 
 @interface FSDesignerViewController ()<NSSplitViewDelegate,NSOutlineViewDataSource,
 NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSource,
-NSTextViewDelegate,NSTabViewDelegate>
+NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
 {
     NSURL                               *_modelUrl;
 }
@@ -36,7 +37,7 @@ NSTextViewDelegate,NSTabViewDelegate>
     // Do view setup here.
     self.splitview.delegate = self;
 
-    self.designer = [[FSDesignFileObject alloc]init];
+    //self.designer = [[FSDesignFileObject alloc]init];
 
     self.dblistview.delegate = self;
     self.dblistview.dataSource = self;
@@ -45,9 +46,8 @@ NSTextViewDelegate,NSTabViewDelegate>
     self.fieldlistview.dataSource = self;
     
     self.tvMark.delegate = self;
-    self.tvCreateSql.delegate = self;
-    self.tvCreateSql.automaticTextReplacementEnabled = NO;
-    self.tvCreateSql.enabledTextCheckingTypes = NSTextCheckingTypeOrthography | NSTextCheckingTypeRegularExpression ;//| NSTextCheckingTypeQuote;
+
+    [self setTextViewStyle:self.tvCreateSql];
 
     //默不显示
     [self.fieldTabview setDelegate:self];
@@ -60,23 +60,28 @@ NSTextViewDelegate,NSTabViewDelegate>
     
     self.tfIndexName.target = self;
     self.tfIndexName.action = @selector(onIndexNameChange:);
-    self.tvIndexSql.delegate = self;
-    self.tvIndexSql.automaticTextReplacementEnabled = NO;
-    self.tvIndexSql.enabledTextCheckingTypes = NSTextCheckingTypeOrthography |NSTextCheckingTypeRegularExpression ;//| NSTextCheckingTypeQuote;
+    
+    [self setTextViewStyle:self.tvIndexSql];
     
     // 视图模块
     self.tfViewName.target = self;
     self.tfViewName.action = @selector(onViewNameChange:);
-    self.tvViewSql.delegate = self;
     
-    self.tvViewSql.automaticQuoteSubstitutionEnabled = NO;
-    self.tvViewSql.automaticDashSubstitutionEnabled = NO;
-    //不开启自动替换
-    self.tvViewSql.automaticTextReplacementEnabled = NO;
+    [self setTextViewStyle:self.tvViewSql];
     
-    self.tvViewSql.enabledTextCheckingTypes = NSTextCheckingTypeOrthography |NSTextCheckingTypeRegularExpression ;//| NSTextCheckingTypeQuote;
+    //触发器
+    self.triggerTableviewDispatcher     = [[FSTriggerTableViewImpl alloc]init];
+    self.triggerTableviewDispatcher.delegate = self;
+    self.triggerTableview.delegate      = self.triggerTableviewDispatcher;
+    self.triggerTableview.dataSource    = self.triggerTableviewDispatcher;
     
+    self.tfTriggerName.target = self;
+    self.tfTriggerName.action = @selector(onTriggerNameChange:);
+
+    [self setTextViewStyle:self.tvTriggerSqlEdit];
     
+    [self setTextViewStyle:self.tvTriggerSql];
+
     [self setButtonStyle];
     
     [self clean];
@@ -107,11 +112,26 @@ NSTextViewDelegate,NSTabViewDelegate>
 
 - (void)setModelUrl:(NSURL *)modelUrl
 {
+    if ([[_modelUrl absoluteString]isEqualToString:[modelUrl absoluteString]])
+        return;
+        
     _modelUrl = [modelUrl copy];
     
     if (_modelUrl) {
         [self loadModelFilepath:_modelUrl];
     }
+}
+
+#pragma mark - 设置textview样式
+- (void)setTextViewStyle:(NSTextView *)tv
+{
+    tv.delegate = self;
+    tv.automaticQuoteSubstitutionEnabled = NO;
+    tv.automaticDashSubstitutionEnabled = NO;
+    //不开启自动替换
+    tv.automaticTextReplacementEnabled = NO;
+    
+    tv.enabledTextCheckingTypes = NSTextCheckingTypeOrthography |NSTextCheckingTypeRegularExpression ;//| NSTextCheckingTypeQuote;
 }
 
 #pragma mark - 设置按钮样式
@@ -240,12 +260,22 @@ NSTextViewDelegate,NSTabViewDelegate>
     return img;
 }
 
-
+#pragma mark - 加载数据
 - (void)loadModelFilepath:(NSURL *)modelUrl
 {
-    NSDictionary *dic = [NSDictionary dictionaryWithContentsOfURL:modelUrl];
-    
-    NSLog(@"打开文件 = %@",dic);
+    NSString *path = [modelUrl path];
+    if ([[NSFileManager defaultManager]fileExistsAtPath:path]) {
+        NSError *err = nil;
+        self.designer = [FSDesignFileObject loadFromFile:modelUrl error:&err];
+        if (err) {
+            NSLog(@"sqlite model file data error. open failed.");
+            [self alterCheckMessage:@"sqlitemodel数据异常，请检查是否人为修改。" reSetFocus:nil];
+            return;
+        }
+        [self.dblistview reloadData];
+        
+        [self setFocus:self.dblistview];
+    }
 }
 
 - (IBAction)btnAddClicked:(id)sender
@@ -532,11 +562,18 @@ NSTextViewDelegate,NSTabViewDelegate>
         case nodeView:
         {
             tid = @"id_view";
+            [self loadView:(id)nd];
         }
             break;
         case nodeTigger:
         {
             tid = @"id_trigger";
+            FSNode *root = [self getRootItemOfNode:nd];
+            
+            if (root.type == nodeDatabase) {
+                FSDatabse *db = (id)root;
+                [self loadTriggerView:(id)nd withTables:[db tables]];
+            }
         }
             break;
             
@@ -849,6 +886,14 @@ NSTextViewDelegate,NSTabViewDelegate>
 - (IBAction)onExportsSql:(id)sender
 {
     
+}
+
+- (void)todoSaveSetValue
+{
+    [self saveTableSettings];
+    [self saveIndexSettings];
+    [self saveViewSettings];
+    [self saveTriggerSettings];
 }
 
 @end

@@ -35,14 +35,17 @@
     }
     
     [self getCurrentEditorView].viewName = textfield.stringValue;
-
+    
+    FSNode *node = [self getSelectItemInList];
+    [self.dblistview reloadItem:node.parentNode reloadChildren:YES];
+    [self toDoSelectedTreeNode:node];
 }
 
 - (void)loadView:(FSView *)view
 {
     self.tfViewName.stringValue = view.viewName;
     
-    self.tvViewSql.string = [view makeSqlKeyValue] ? [view makeSqlKeyValue] : @"";
+    self.tvViewSql.string = view.sqls ? view.sqls : @"";
 }
 
 - (IBAction)onViewSqlSaveClicked:(id)sender
@@ -55,6 +58,11 @@
         
         NSLog(@"======== %@",exesql);
     }
+}
+
+- (void)saveViewSettings
+{
+    
 }
 
 @end

@@ -139,6 +139,20 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self;
 }
 
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:_fsDatabases forKey:@"_fsDatabases"];
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super init];
+    if (self) {
+        _fsDatabases = [aDecoder decodeObjectForKey:@"_fsDatabases"];
+    }
+    return self;
+}
+
 - (NSArray *)databases
 {
     return _fsDatabases;
@@ -239,9 +253,28 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     [_fsDatabases removeAllObjects];
 }
 
-- (void)loadFromFile:(NSURL *)filepath
++ (FSDesignFileObject *)loadFromFile:(NSURL *)filepath error:(NSError **)error
 {
     //解释sqlitemodel文件
+    NSDictionary *design = [NSDictionary dictionaryWithContentsOfURL:filepath];
+    
+    NSData *designdata = design[@"DesignerData"];
+    
+    FSDesignFileObject *designer = nil;
+    if (designdata) {
+        @try {
+            designer = [NSKeyedUnarchiver unarchiveObjectWithData:designdata];
+        }
+        @catch (NSException *exception) {
+            *error = [NSError errorWithDomain:@"com.fsh.sqlitemodel.error" code:10001 userInfo:exception.userInfo];
+        }
+    }
+    else
+    {
+        designer = [[FSDesignFileObject alloc]init];
+    }
+    
+    return designer;
 }
 
 - (void)saveToFile:(NSURL *)filepath
@@ -255,11 +288,18 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
      */
     
     //保存为sqlitemodel文件
-    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-    [self parseObject:self outToNSArray:dic];
+    NSDictionary *dic = [self getNeedSaveContents];
     
     NSLog(@"fileurl %@ \n===============save === %@",filepath,dic);
-    //[dic writeToURL:filepath atomically:dic];
+    //因xc正在使用，所以使用此方法修改时会有提示。
+    [dic writeToURL:filepath atomically:NO];
+}
+
+- (NSDictionary *)getNeedSaveContents
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    [self parseObject:self outToNSArray:dic];
+    return dic;
 }
 
 - (void)parseObject:(FSDesignFileObject *)designobject outToNSArray:(NSMutableDictionary *)dic
@@ -278,6 +318,18 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         {
             [self parseNode:db toNSArray:staticdb];
         }
+        
+//        NSData *dt = [NSKeyedArchiver archivedDataWithRootObject:db];
+//        NSLog(@"dt == %@",dt);
+//        
+//        FSDatabse *ddb = [NSKeyedUnarchiver unarchiveObjectWithData:dt];
+//        NSLog(@"ddb = %@",ddb);
+    }
+    
+    NSData *designerdata = [NSKeyedArchiver archivedDataWithRootObject:designobject];
+    
+    if (designerdata) {
+        [dic setObject:designerdata forKey:@"DesignerData"];
     }
 }
 
@@ -344,9 +396,18 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
             [columns setObject:c.fieldName forKey:@"FieldName"];
             NSString *ft = [c covertToString:c.fieldtype];
             [columns setObject:ft forKey:@"FieldType"];
-            NSString *constraint = @"";//c.constraint;
-            [columns setObject:constraint forKey:@"FieldConstraint"];
-
+            NSMutableArray *cs = (NSMutableArray*)[FSColumn convertFieldConstraitToArray:c.constraint];
+            NSString *constraint = nil;
+            
+            if (c.defaultvalue.length > 0) {
+                [cs addObject:[NSString stringWithFormat:@"DEFAULT %@",c.defaultvalue]];
+            }
+            
+            constraint = [cs componentsJoinedByString:@","];
+            if (constraint) {
+                [columns setObject:constraint forKey:@"FieldConstraint"];
+            }
+            
             [array addObject:columns];
         }
             break;
@@ -359,7 +420,14 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
                 [indexs setObject:@"UNIQUE" forKey:@"FieldIndexType"];
             }
             [indexs setObject:i.indexTableName?i.indexTableName:@"" forKey:@"DBTableName"];
-            [indexs setObject:i.indexFieldNames?[i.indexFieldNames componentsJoinedByString:@","]:@"" forKey:@"FieldName"];
+            
+            NSString *fields = @"";
+            if (i.indexFieldNames) {
+                fields = [i.indexFieldNames componentsJoinedByString:@","];
+                fields = [fields stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+            }
+            
+            [indexs setObject:fields forKey:@"FieldName"];
             
             //后面两个是可选项
             if (i.ascFields.count > 0) {
@@ -376,16 +444,21 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         case nodeView:
         {
             FSView *v = (FSView *)node;
-            if (v.sqls.length > 0) {
-                [array addObject:v.sqls];
+            
+            NSString *exesql = [v FetchExectureSql];
+            if (exesql.length > 0) {
+                [array addObject:exesql];
             }
         }
             break;
         case nodeTigger:
         {
             FSTrigger *trigger = (FSTrigger *)node;
-            if (trigger.sqls.length > 0) {
-                [array addObject:trigger.sqls];
+            
+            NSString *exesql = [trigger FetchExectureSql];
+            
+            if (exesql.length > 0) {
+                [array addObject:exesql];
             }
         }
             break;
@@ -665,6 +738,117 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return _nodename;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSNode *copynode            = [[self class]allocWithZone:zone];
+    copynode.type               = self.type;
+    copynode.nodename           = [self.nodename copy];
+    copynode.allowRename        = self.allowRename;
+    copynode->_parentNode       = self->_parentNode;
+    copynode->_childrens        = [self->_childrens copy];
+    
+    return copynode;
+}
+
+//NSKeyedArchiver archivedDataWithRootObject 触发
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:@(self.type) forKey:@"type"];
+    
+    if (self.nodename) {
+        [aCoder encodeObject:self.nodename forKey:@"nodename"];
+    }
+    
+    [aCoder encodeObject:@(self.allowRename) forKey:@"allowRename"];
+    
+    if (self.userinfo) {
+        [aCoder encodeObject:self.userinfo forKey:@"userinfo"];
+    }
+    
+    if (_parentNode) {
+        [aCoder encodeObject:_parentNode forKey:@"_parentNode"];
+    }
+    
+    if (_childrens) {
+        [aCoder encodeObject:_childrens forKey:@"_childrens"];
+    }
+}
+
+//NSKeyedUnarchiver unarchiveObjectWithData触发
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super init];
+    if (self) {
+        self.type               = (NodeType)[[aDecoder decodeObjectForKey:@"type"]integerValue];
+        self.nodename           = [aDecoder decodeObjectForKey:@"nodename"];
+        self.allowRename        = [[aDecoder decodeObjectForKey:@"allowRename"]boolValue];
+        self.userinfo           = [aDecoder decodeObjectForKey:@"userinfo"];
+        self->_parentNode       = [aDecoder decodeObjectForKey:@"_parentNode"];
+        self->_childrens        = [aDecoder decodeObjectForKey:@"_childrens"];
+    }
+    return self;
+}
+
+@end
+
+/*************************************库**************************************/
+@implementation FSSqliteER
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    return [super copyWithZone:zone];
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [super encodeWithCoder:aCoder];
+}
+
+- (NSString *)deleteNotesForSqls:(NSString *)sqls
+{
+    if (!sqls) return nil;
+    
+    NSMutableString *msrc = [NSMutableString stringWithString:@""];
+    
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:NOTES_MATCH_FETCH
+                                                                           options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines
+                                                                             error:nil];
+    
+    NSArray *array = [regex matchesInString:sqls options:NSMatchingReportProgress range:NSMakeRange(0, sqls.length)];
+    
+    NSRange rg = NSMakeRange(0, 0);
+    
+    for (NSTextCheckingResult *item in array)
+    {
+        if (rg.length == 0 && rg.location == 0) {
+            [msrc appendString:[sqls substringToIndex:item.range.location]];
+        }
+        else
+        {
+            NSString *ds = [sqls substringWithRange:NSMakeRange(rg.location, item.range.location - rg.location)];
+            [msrc appendString:ds];
+        }
+        
+        rg = NSMakeRange(item.range.location + item.range.length, 0) ;
+    }
+    
+    if (rg.location < sqls.length) {
+        [msrc appendString:[sqls substringFromIndex:rg.location]];
+    }
+    
+    return msrc.length > 0 ? msrc : sqls;
+}
+
 - (NSString *)uniqueName:(NSString *)name withPrefixLength:(NSInteger)len
 {
     if ([self exsistNodeName:name])
@@ -687,6 +871,18 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (NSString *)uniqueName:(NSString *)name
 {
     return [self uniqueName:name withPrefixLength:name.length];
+}
+
+- (NSString *)makeSqlKeyValue
+{
+    //TODO : sub class.
+    return nil;
+}
+
+- (NSString *)FetchExectureSql
+{
+    //TODO : sub class.
+    return nil;
 }
 
 @end
@@ -732,6 +928,16 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 /**************************************触发器*************************************/
 @implementation FSTrigger
 
++ (NSArray *)supportTriggerEvents
+{
+    return [NSArray arrayWithObjects:@"INSERT",@"DELETE",@"UPDATE",@"UPDATE OF", nil];
+}
+
++ (NSArray *)supportTriggerActions
+{
+    return [NSArray arrayWithObjects:@"BEFORE",@"AFTER",@"INSTEAD OF", nil];
+}
+
 - (instancetype)initWithTriggerName:(NSString *)triggerName
 {
     self = [super init];
@@ -739,8 +945,88 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         self.nodename = triggerName;
         self.type = nodeTigger;
         self.allowRename = NO;
+        self.sqls = @"BEGIN\n-- write your trigger action here\nEND;";
     }
     return self;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.events             = [aDecoder decodeObjectForKey:@"events"];
+        self.actions            = [aDecoder decodeObjectForKey:@"actions"];
+        self.sqls               = [aDecoder decodeObjectForKey:@"sqls"];
+        self.tableName          = [aDecoder decodeObjectForKey:@"tableName"];
+        self.columns            = [aDecoder decodeObjectForKey:@"columns"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    
+    [aCoder encodeObject:self.events forKey:@"events"];
+    [aCoder encodeObject:self.actions forKey:@"actions"];
+    [aCoder encodeObject:self.sqls forKey:@"sqls"];
+    [aCoder encodeObject:self.tableName forKey:@"tableName"];
+    [aCoder encodeObject:self.columns forKey:@"columns"];
+}
+
+- (NSString *)makeSqlKeyValue
+{
+    NSString *sqlfmt = nil;
+    
+    if (!self.tableName) {
+        return nil;
+    }
+    
+    if ([self.events isEqualToString:@"UPDATE OF"]) {
+        sqlfmt = @"CREATE TRIGGER \"%@\" %@ %@ %@ ON \"%@\"\n%@";
+        
+        NSMutableString *cls = [NSMutableString stringWithString:@""];
+        
+        [self.columns enumerateObjectsUsingBlock:^(id  __nonnull obj, NSUInteger idx, BOOL * __nonnull stop) {
+            [cls appendFormat:@"\"%@\",",obj];
+        }];
+        
+        if (cls.length > 0) {
+            [cls deleteCharactersInRange:NSMakeRange(cls.length - 1, 1)];
+        }
+        
+        sqlfmt = [NSString stringWithFormat:sqlfmt,self.triggerName,self.actions,self.events,
+                  cls,self.tableName,self.sqls];
+    }
+    else
+    {
+        sqlfmt = @"CREATE TRIGGER \"%@\" %@ %@ ON \"%@\"\n%@";
+        sqlfmt = [NSString stringWithFormat:sqlfmt,self.triggerName,self.actions,self.events,
+                  self.tableName,self.sqls];
+    }
+
+    
+    return sqlfmt;
+}
+
+- (NSString *)FetchExectureSql
+{
+    NSString *notessql = [self makeSqlKeyValue];
+    return [self deleteNotesForSqls:notessql];
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSTrigger *copytrigger      = [super copyWithZone:zone];
+    copytrigger.triggerName     = [self.triggerName copy];
+    copytrigger.events          = self.events;
+    copytrigger.actions         = self.actions;
+    copytrigger.sqls            = self.sqls;
+    copytrigger.tableName       = self.tableName;
+    copytrigger.columns         = [self.columns copy];
+    
+    return copytrigger;
 }
 
 @end
@@ -757,6 +1043,34 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         self.type = nodeIndex;
     }
     return self;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.unique             = [[aDecoder decodeObjectForKey:@"unique"]boolValue];
+        self.indexTableName     = [aDecoder decodeObjectForKey:@"indexTableName"];
+        self.indexFieldNames    = [aDecoder decodeObjectForKey:@"indexFieldNames"];
+        self.ascFields          = [aDecoder decodeObjectForKey:@"ascFields"];
+        self.descFields         = [aDecoder decodeObjectForKey:@"descFields"];
+        self.indexsqls          = [aDecoder decodeObjectForKey:@"indexsqls"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    
+    [aCoder encodeObject:@(self.unique) forKey:@"unique"];
+    [aCoder encodeObject:self.indexTableName forKey:@"indexTableName"];
+    [aCoder encodeObject:self.indexFieldNames forKey:@"indexFieldNames"];
+    [aCoder encodeObject:self.ascFields forKey:@"ascFields"];
+    [aCoder encodeObject:self.descFields forKey:@"descFields"];
+    [aCoder encodeObject:self.indexsqls forKey:@"indexsqls"];
+
 }
 
 - (NSString *)makeSqlKeyValue
@@ -780,6 +1094,25 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return [ret uppercaseString];
 }
 
+- (NSString *)FetchExectureSql
+{
+    return [self makeSqlKeyValue];
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSIndex *copyindex      = [super copyWithZone:zone];
+    copyindex.unique        = self.unique;
+    copyindex.indexName     = [self.indexName copy];
+    copyindex.indexsqls     = self.indexsqls;
+    copyindex.indexTableName    = [self.indexTableName copy];
+    copyindex.indexFieldNames   = [self.indexFieldNames copy];
+    copyindex.ascFields         = [self.ascFields copy];
+    copyindex.descFields        = [self.descFields copy];
+    
+    return copyindex;
+}
+
 @end
 
 /**************************************视图*************************************/
@@ -796,35 +1129,20 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self;
 }
 
-- (NSString *)deleteNotesForSqls:(NSString *)sqls
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
 {
-    if (!sqls) return nil;
-    
-    NSMutableString *msrc = [NSMutableString stringWithString:@""];
-    
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:NOTES_MATCH_FETCH
-                                                                           options:NSRegularExpressionCaseInsensitive|NSRegularExpressionAnchorsMatchLines
-                                                                             error:nil];
-    
-    NSArray *array = [regex matchesInString:sqls options:NSMatchingReportProgress range:NSMakeRange(0, sqls.length)];
-    
-    NSRange rg = NSMakeRange(0, 0);
-    
-    for (NSTextCheckingResult *item in array)
-    {
-        if (rg.length == 0 && rg.location == 0) {
-            [msrc appendString:[sqls substringToIndex:item.range.location]];
-        }
-        else
-        {
-            NSString *ds = [sqls substringWithRange:NSMakeRange(rg.location, item.range.location - rg.location)];
-            [msrc appendString:ds];
-        }
-        
-        rg = NSMakeRange(item.range.location + item.range.length, 0) ;
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.sqls = [aDecoder decodeObjectForKey:@"sqls"];
     }
     
-    return msrc;
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    [aCoder encodeObject:self.sqls forKey:@"sqls"];
 }
 
 - (NSString *)makeSqlKeyValue
@@ -838,6 +1156,20 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return nil;
 }
 
+- (NSString *)FetchExectureSql
+{
+    NSString *notessql = [self makeSqlKeyValue];
+    return [self deleteNotesForSqls:notessql];
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSView *copyview    = [super copyWithZone:zone];
+    copyview.viewName   = [self.viewName copy];
+    copyview.sqls       = self.sqls;
+    
+    return copyview;
+}
 @end
 
 /**************************************外键*************************************/
@@ -902,6 +1234,40 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     }
     
     return fk;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSForeignKey *copyfk = [[self class]allocWithZone:zone];
+    copyfk.targetColumn = [self.targetColumn copy];
+    copyfk.targetTable  = [self.targetTable copy];
+    copyfk.selectIndexOfDeleteAction = self.selectIndexOfDeleteAction;
+    copyfk.selectIndexOfOptions = self.selectIndexOfOptions;
+    copyfk.selectIndexOfUpdateAction = self.selectIndexOfUpdateAction;
+    
+    return copyfk;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:self.targetTable forKey:@"targetTable"];
+    [aCoder encodeObject:self.targetColumn forKey:@"targetColumn"];
+    [aCoder encodeObject:@(self.selectIndexOfOptions) forKey:@"selectIndexOfOptions"];
+    [aCoder encodeObject:@(self.selectIndexOfDeleteAction) forKey:@"selectIndexOfDeleteAction"];
+    [aCoder encodeObject:@(self.selectIndexOfUpdateAction) forKey:@"selectIndexOfUpdateAction"];
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super init];
+    if (self) {
+        self.targetTable                = [aDecoder decodeObjectForKey:@"targetTable"];
+        self.targetColumn               = [aDecoder decodeObjectForKey:@"targetColumn"];
+        self.selectIndexOfOptions       = [[aDecoder decodeObjectForKey:@"selectIndexOfOptions"]integerValue];
+        self.selectIndexOfDeleteAction  = [[aDecoder decodeObjectForKey:@"selectIndexOfDeleteAction"]integerValue];
+        self.selectIndexOfUpdateAction  = [[aDecoder decodeObjectForKey:@"selectIndexOfUpdateAction"]integerValue];
+    }
+    return self;
 }
 
 @end
@@ -984,6 +1350,28 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return cst;//[cst stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
++ (NSArray *)convertFieldConstraitToArray:(FSFieldConstraint)constraint
+{
+    NSMutableArray *arr = [NSMutableArray array];
+    
+    if (constraint & fcPrimarykey) {
+        [arr addObject:@"PRIMARY KEY"];
+    }
+    
+    if (constraint & fcAutoIncreament) {
+        [arr addObject:@"AUTOINCREMENT"];
+    }
+    
+    if (constraint & fcNotNull) {
+        [arr addObject:@"NOT NULL"];
+    }
+    
+    if (constraint & fcUnique) {
+        [arr addObject:@"UNIQUE"];
+    }
+    return arr;
+}
+
 - (NSString *)makeSqlKeyValue
 {
     NSString *sqlkv = [NSString stringWithFormat:@"\"%@\" %@",self.fieldName,[self covertToString:self.fieldtype]];
@@ -1007,6 +1395,51 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     }
     
     return sqlkv;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSColumn *copycolumn = [super copyWithZone:zone];
+    copycolumn.defaultvalue = self.defaultvalue;
+    copycolumn.constraint   = self.constraint;
+    copycolumn.typeLength   = self.typeLength;
+    copycolumn.fieldtype    = self.fieldtype;
+    copycolumn.mark         = self.mark;
+    copycolumn.enableForeignkey = self.enableForeignkey;
+    copycolumn->_foreignKey = [self->_foreignKey copy];
+    copycolumn.fieldName    = [self.fieldName copy];
+
+    return copycolumn;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.defaultvalue       = [aDecoder decodeObjectForKey:@"defaultvalue"];
+        self.constraint         = (FSFieldConstraint)[[aDecoder decodeObjectForKey:@"constraint"]integerValue];
+        self.typeLength         = [[aDecoder decodeObjectForKey:@"typeLength"]integerValue];
+        self.fieldtype          = (FSFieldType)[[aDecoder decodeObjectForKey:@"fieldtype"]integerValue];
+        self.mark               = [aDecoder decodeObjectForKey:@"mark"];
+        self.enableForeignkey   = [[aDecoder decodeObjectForKey:@"enableForeignkey"]boolValue];
+        _foreignKey             = [aDecoder decodeObjectForKey:@"_foreignKey"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    
+    [aCoder encodeObject:self.defaultvalue forKey:@"defaultvalue"];
+    [aCoder encodeObject:@(self.constraint) forKey:@"constraint"];
+    [aCoder encodeObject:@(self.typeLength) forKey:@"typeLength"];
+    [aCoder encodeObject:@(self.fieldtype) forKey:@"fieldtype"];
+    [aCoder encodeObject:self.mark forKey:@"mark"];
+    [aCoder encodeObject:@(self.enableForeignkey) forKey:@"enableForeignkey"];
+    [aCoder encodeObject:_foreignKey forKey:@"_foreignKey"];
+
 }
 
 @end
@@ -1088,6 +1521,35 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return [ctbs uppercaseString];
 }
 
+- (NSString *)FetchExectureSql
+{
+    return [self makeSqlKeyValue];
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSTable *copytb = [super copyWithZone:zone];
+    copytb.tableName = [self.tableName copy];
+    copytb.createsqls = self.createsqls;
+    return copytb;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.createsqls = [aDecoder decodeObjectForKey:@"createsqls"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    [aCoder encodeObject:self.createsqls forKey:@"createsqls"];
+}
+
 @end
 
 /**************************************库*************************************/
@@ -1114,6 +1576,39 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         [self addChildrenNode:triggerKind];
     }
     return self;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.dynamic                = [[aDecoder decodeObjectForKey:@"dynamic"]boolValue];
+        self.minVersion             = [aDecoder decodeObjectForKey:@"minVersion"];
+        self.maxVersion             = [aDecoder decodeObjectForKey:@"maxVersion"];
+        self.version                = [aDecoder decodeObjectForKey:@"version"];
+        
+        tableKind                   = [aDecoder decodeObjectForKey:@"tableKind"];
+        indexKind                   = [aDecoder decodeObjectForKey:@"indexKind"];
+        viewKind                    = [aDecoder decodeObjectForKey:@"viewKind"];
+        triggerKind                 = [aDecoder decodeObjectForKey:@"triggerKind"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    
+    [aCoder encodeObject:@(self.dynamic) forKey:@"dynamic"];
+    [aCoder encodeObject:self.minVersion forKey:@"minVersion"];
+    [aCoder encodeObject:self.maxVersion forKey:@"maxVersion"];
+    [aCoder encodeObject:self.version forKey:@"version"];
+    
+    [aCoder encodeObject:tableKind forKey:@"tableKind"];
+    [aCoder encodeObject:indexKind forKey:@"indexKind"];
+    [aCoder encodeObject:viewKind forKey:@"viewKind"];
+    [aCoder encodeObject:triggerKind forKey:@"triggerKind"];
+    
 }
 
 - (NSString *)makeUniqueTableName
@@ -1411,6 +1906,23 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (FSTrigger *)triggerAtIndex:(NSInteger)index
 {
     return (FSTrigger *)[triggerKind findNodeAtIndex:index];
+}
+
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    FSDatabse *copydb = [super copyWithZone:zone];
+    copydb.version = [self.version copy];
+    copydb.dbName = [self.dbName copy];
+    copydb.dynamic = self.dynamic;
+    copydb.minVersion = [self.minVersion copy];
+    copydb.maxVersion = [self.maxVersion copy];
+    copydb->tableKind = [self->tableKind copy];
+    copydb->indexKind = [self->indexKind copy];
+    copydb->triggerKind = [self->triggerKind copy];
+    copydb->viewKind = [self->viewKind copy];
+    
+    return copydb;
 }
 
 @end

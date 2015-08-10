@@ -590,6 +590,13 @@
     [self enableForeignKeypage:YES];
 }
 
+#pragma mark - 保存表设置页的数据
+- (void)saveTableSettings
+{
+    
+}
+
+#pragma mark - 外键保存
 - (IBAction)onSaveForeignkey:(id)sender
 {
     FSTable *currenttab = [self getCurrentEditorTable];
@@ -611,25 +618,7 @@
     }
 }
 
-//- (void)test
-//{
-//    NSError *error = NULL;
-//    NSDataDetector *dataDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
-//    NSString *string = [self.tvCreateSql.textStorage string];
-//    NSArray *matches = [dataDetector matchesInString:string options:0 range:NSMakeRange(0, [string length])];
-//    [self.tvCreateSql.textStorage beginEditing];
-//    [self.tvCreateSql.textStorage removeAttribute:NSForegroundColorAttributeName range:NSMakeRange(0, [string length])];
-//    [self.tvCreateSql.textStorage removeAttribute:NSLinkAttributeName range:NSMakeRange(0, [string length])];
-//    for (NSTextCheckingResult *match in matches) {
-//        NSRange matchRange = [match range];
-//        if ([match resultType] == NSTextCheckingTypeLink) {
-//            NSURL *url = [match URL];
-//            [self.tvCreateSql.textStorage addAttributes:@{NSLinkAttributeName:url.absoluteString} range:matchRange];
-//        }
-//    }
-//    [self.tvCreateSql.textStorage endEditing];
-//}
-
+#pragma mark - 高亮处理
 - (NSDictionary *)keywords
 {
     NSBundle *bd = [NSBundle bundleForClass:self.class];
