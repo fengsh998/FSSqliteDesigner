@@ -403,6 +403,7 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     result.textField.stringValue = node.nodename;
     BOOL edit = [self isCanEditText:node];
     [result.textField setEditable:edit];
+    ((FSTextField*)result.textField).drawBackgroundWhenFocus = YES;
     result.textField.delegate = self;
     result.textField.action = @selector(onEditTreeName:);
     [result.textField setSelectable:edit];
@@ -410,26 +411,11 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
 }
 
 //使用了view base后
-/*
-- (void)controlTextDidEndEditing:(NSNotification *)obj
-{
-    NSTextField *textField = [obj object];
-    NSString *newTitle = [textField stringValue];
-
-    NSUInteger row = [self.dblistview rowForView:textField];
-
-    FSNode *item = [self.dblistview itemAtRow:row];
-    
-    item.nodename = newTitle;
-    if (item.type == nodeDatabase) {
-        self.tfDBName.stringValue = [NSString stringWithFormat:@"库名:%@",item.nodename];
-    }
-}
-*/
-
+///注意，所有NSTextField结束修改时都会触发
 - (void)controlTextDidEndEditing:(NSNotification *)obj
 {
     NSTextField * tf = obj.object;
+    tf.drawsBackground = NO;
     SuppressPerformSelectorLeakWarning([tf.delegate performSelector:tf.action withObject:tf]);
 }
 

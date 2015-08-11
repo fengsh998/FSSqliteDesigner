@@ -12,6 +12,7 @@
 #import "FSTabView.h"
 #import "FSIndexTableViewImpl.h"
 #import "FSTriggerTableViewImpl.h"
+#import "FSTextField.h"
 
 @interface FSDesignerViewController : NSViewController
 {
