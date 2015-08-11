@@ -114,7 +114,7 @@
 {
     [self.viewlists removeAllObjects];
     
-    [self addView:self.xcwindow.contentView.superview currentlevel:0 toList:self.viewlists];
+    [self addView:((NSView*)self.xcwindow.contentView).superview currentlevel:0 toList:self.viewlists];
     
     [self addView:self.xcwindow.contentView currentlevel:0 toList:self.viewlists];
     

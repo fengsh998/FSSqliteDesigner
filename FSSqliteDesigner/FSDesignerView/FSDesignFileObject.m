@@ -121,6 +121,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 */
 
 #import "FSDesignFileObject.h"
+#import "FSUtils.h"
 
 @interface FSDesignFileObject ()
 {
@@ -279,6 +280,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (void)saveToFile:(NSURL *)filepath
 {
+    //可以试试使用NSFileHandle
     
     /*
      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -290,7 +292,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     //保存为sqlitemodel文件
     NSDictionary *dic = [self getNeedSaveContents];
     
-    NSLog(@"fileurl %@ \n===============save === %@",filepath,dic);
+    //NSLog(@"fileurl %@ \n===============save === %@",filepath,dic);
     //因xc正在使用，所以使用此方法修改时会有提示。
     [dic writeToURL:filepath atomically:NO];
 }
@@ -313,17 +315,37 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     {
         if (db.dynamic) {
             [self parseNode:db toNSArray:dynamicdb];
+            
+            for (NSMutableDictionary *dbdic in dynamicdb) {
+                if ([dbdic[@"DBName"]isEqualToString:db.dbName]) {
+                    
+                    NSUInteger v = [FSUtils stringArrayOrDictionaryConvert2hashvalue:dbdic deleteSpaceAndNewline:YES];
+                    if (v != NSNotFound) {
+                        
+                        NSString *version = [FSUtils ToHex:v];
+                        //NSLog(@"version == %@",version);
+                        [dbdic setObject:version forKey:@"DBVersion"];
+                    }
+                }
+            }
         }
         else
         {
             [self parseNode:db toNSArray:staticdb];
+            
+            for (NSMutableDictionary *dbdic in staticdb) {
+                if ([dbdic[@"DBName"]isEqualToString:db.dbName]) {
+                    
+                    NSUInteger v = [FSUtils stringArrayOrDictionaryConvert2hashvalue:dbdic deleteSpaceAndNewline:YES];
+                    if (v != NSNotFound) {
+                        
+                        NSString *version = [FSUtils ToHex:v];
+                        //NSLog(@"version == %@",version);
+                        [dbdic setObject:version forKey:@"DBVersion"];
+                    }
+                }
+            }
         }
-        
-//        NSData *dt = [NSKeyedArchiver archivedDataWithRootObject:db];
-//        NSLog(@"dt == %@",dt);
-//        
-//        FSDatabse *ddb = [NSKeyedUnarchiver unarchiveObjectWithData:dt];
-//        NSLog(@"ddb = %@",ddb);
     }
     
     NSData *designerdata = [NSKeyedArchiver archivedDataWithRootObject:designobject];
@@ -340,7 +362,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         {
             NSMutableDictionary *db = [NSMutableDictionary dictionary];
             [db setObject:node.nodename forKey:@"DBName"];
-            [db setObject:@"1.0" forKey:@"DBVersion"];
+            //[db setObject:@"1.0" forKey:@"DBVersion"];
             [array addObject:db];
             
             NSMutableArray *tmp = [NSMutableArray array];

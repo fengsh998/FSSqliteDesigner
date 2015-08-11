@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>73873D33-7544-4698-AEE3-B0E381CC98B2</string>
+	<key>IDESourceControlProjectName</key>
+	<string>FSSqliteDesigner</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>7125187BEBDB54C372063A27F86D0B075929965F</key>
+		<string>https://github.com/fengsh998/FSSqliteDesigner.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>FSSqliteDesigner.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>7125187BEBDB54C372063A27F86D0B075929965F</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/fengsh998/FSSqliteDesigner.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>7125187BEBDB54C372063A27F86D0B075929965F</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>7125187BEBDB54C372063A27F86D0B075929965F</string>
+			<key>IDESourceControlWCCName</key>
+			<string>FSSqliteDesigner</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -19,9 +19,9 @@
 #import <Foundation/Foundation.h>
 
 //用于删除注释
-#define NOTES_MATCH_FETCH    @"--(.*)\\n\\b|/\\*(.|[\\r\\n])*?\\*/"
+#define NOTES_MATCH_FETCH    @"--(.*)|/\\*(.|[\\r\\n])*?\\*/"
 //用于匹配注释，有哪么一小点区别就在于多行注释上
-#define NOTES_MATCH          @"--(.*)\\n\\b|/\\*(.|[\\r\\n])*?|\\*/"
+#define NOTES_MATCH          @"--(.*)|/\\*(.|[\\r\\n])*?|\\*/"
 
 #define NOTES_QOUTES         @"\""
 

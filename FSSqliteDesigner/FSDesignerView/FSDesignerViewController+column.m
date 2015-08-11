@@ -180,7 +180,11 @@
 - (void)popItemClicked:(NSMenuItem*)item
 {
     //根据选中的项来判断是否要设置size (在sqlite中不需要size)
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_10_3
     [self.fieldlistview enumerateAvailableRowViewsUsingBlock:^(__kindof NSTableRowView * __nonnull rowView, NSInteger row) {
+#else
+    [self.fieldlistview enumerateAvailableRowViewsUsingBlock:^(NSTableRowView *rowView, NSInteger row) {
+#endif
         NSTableCellView *cv = [self.fieldlistview viewAtColumn:1 row:row makeIfNecessary:NO];
         
         NSPopUpButton *popup = cv.subviews[0];
@@ -202,7 +206,11 @@
 {
     NSComboBox *cbx = notification.object;
     
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_10_3
     [self.fieldlistview enumerateAvailableRowViewsUsingBlock:^(__kindof NSTableRowView * __nonnull rowView, NSInteger row) {
+#else
+    [self.fieldlistview enumerateAvailableRowViewsUsingBlock:^(NSTableRowView *rowView, NSInteger row) {
+#endif
         NSTableCellView *cv = [self.fieldlistview viewAtColumn:2 row:row makeIfNecessary:NO];
         
         NSComboBox *vcbx = cv.subviews[0];
@@ -414,12 +422,38 @@
         
         NSInteger idxrow = [self fieldSelectedIndex];
         if (idxrow != -1 && idxrow < [self getCurrentEditorTable].allColumns.count) {
-            FSColumn *columns = [[self getCurrentEditorTable].allColumns objectAtIndex:idxrow];
-            [self toDoSetForeignKeyTabBySelectedColumn:columns];
+            FSColumn *column = [[self getCurrentEditorTable].allColumns objectAtIndex:idxrow];
+            [self toDoSetForeignKeyTabBySelectedColumn:column];
             
-            NSArray *tbs = [self getTablesByColumn:columns];
+            NSArray *tbs = [self getTablesByColumn:column];
             if (tbs) {
                 [self fillPopTargetTables:tbs];
+            }
+            
+            if (column && column.foreignKey.targetTable.length > 0)
+            {
+                [self.popTargetTables selectItemWithTitle:column.foreignKey.targetTable];
+                
+                NSMenuItem *item = [self.popTargetTables itemWithTitle:column.foreignKey.targetTable];
+                
+                if (item)
+                {
+                    [self popTargetTableClicked:item];
+                    
+                    [self.popTargetColumns selectItemWithTitle:column.foreignKey.targetColumn];
+                }
+            }
+            
+            if (column.foreignKey.selectIndexOfOptions != -1) {
+                [self.popOptions selectItemAtIndex:column.foreignKey.selectIndexOfOptions];
+            }
+            
+            if (column.foreignKey.selectIndexOfDeleteAction != -1) {
+                [self.popActionForDelete selectItemAtIndex:column.foreignKey.selectIndexOfDeleteAction];
+            }
+            
+            if (column.foreignKey.selectIndexOfUpdateAction != -1) {
+                [self.popActionForUpdate selectItemAtIndex:column.foreignKey.selectIndexOfUpdateAction];
             }
         }
     }
@@ -681,7 +715,11 @@
     return array.count > 0;
 }
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_10_3
 - (NSDictionary<NSString *, id> *)textView:(NSTextView *)view willCheckTextInRange:(NSRange)range options:(NSDictionary<NSString *, id> *)options types:(NSTextCheckingTypes *)checkingTypes
+#else
+- (NSDictionary *)textView:(NSTextView *)view willCheckTextInRange:(NSRange)range options:(NSDictionary *)options types:(NSTextCheckingTypes *)checkingTypes
+#endif
 {
     if (!options) {
         NSMutableDictionary *dic = [NSMutableDictionary dictionary];
@@ -702,7 +740,11 @@
     return options;
 }
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_10_3
 - (NSArray<NSTextCheckingResult *> *)textView:(NSTextView *)view didCheckTextInRange:(NSRange)range types:(NSTextCheckingTypes)checkingTypes options:(NSDictionary<NSString *, id> *)options results:(NSArray<NSTextCheckingResult *> *)results orthography:(NSOrthography *)orthography wordCount:(NSInteger)wordCount
+#else
+- (NSArray *)textView:(NSTextView *)view didCheckTextInRange:(NSRange)range types:(NSTextCheckingTypes)checkingTypes options:(NSDictionary *)options results:(NSArray *)results orthography:(NSOrthography *)orthography wordCount:(NSInteger)wordCount
+#endif
 {
     @try {
 
