@@ -238,14 +238,14 @@
 {
     @try {
         if (self.IDENavigatorAreaView) {
-            if (!self.navStructureView) {
+//            if (!self.navStructureView) { //当切换时
                 id navAreacontroller = [self.IDENavigatorAreaView valueForKey:@"_installedViewController"];
                 id repView = [navAreacontroller valueForKey:@"_replacementView"];
                 id structureNav = [repView valueForKey:@"_installedViewController"];
 
                 NSOutlineView *olv = [structureNav valueForKey:@"_outlineView"];
                 self.navStructureView = olv;
-            }
+//            }
             return self.navStructureView;
         }
     }
@@ -375,6 +375,7 @@
 
 - (void)outlineSelectChange:(NSNotification *)notification
 {
+    NSLog(@"change = %@",notification);
     @try {
         NSOutlineView *outlineview = notification.object;
         if (outlineview == [self findNavSourceArea]) {
@@ -392,6 +393,23 @@
                 self.sqliteDesignView.hidden = NO;
                 if (self.editorView) {
                     self.editorView.hidden = !self.sqliteDesignView.hidden;
+                }
+                
+                //当打开时,第一次点击sqlitemodel，可能会为nil这里做一个补救
+                if (!fileUrl)
+                {
+                    id parentitem = [outlineview parentForItem:selectedItem];
+                    NSArray *fileitem = [parentitem valueForKey:@"_subitems"];
+                    for (id filereference in fileitem)
+                    {
+                        id dvfilepath = [filereference valueForKey:@"_watchedFilePath"];
+                        NSURL *tmp = [dvfilepath valueForKey:@"_fileURL"];
+                        if (tmp && [[tmp lastPathComponent]isEqualToString:name])
+                        {
+                            fileUrl = tmp;
+                            break;
+                        }
+                    }
                 }
                 
                 NSURL *loadFileUrl = [fileUrl copy];
@@ -419,18 +437,31 @@
             }
             else
             {
+                //当未选中，且在编辑时则不让切换
+                if (!selectedItem && !self.sqliteDesignView.hidden) {
+                    return;
+                }
+                
                 self.isSelectedSqlitemodel = NO;
                 
-                self.sqliteDesignView.hidden = YES;
                 if (self.editorView) {
-                    self.editorView.hidden = !self.sqliteDesignView.hidden;
+                    self.editorView.hidden = NO;
                 }
+                
+                //处理切换时有闪烁问题
+                [self performSelector:@selector(delayHidden) withObject:nil afterDelay:0.5];
+                //self.sqliteDesignView.hidden = YES;
                 
                 [self.designVC setModelUrl:nil];
             }
         }
     }
     @catch (NSException *exception) { }
+}
+
+- (void)delayHidden
+{
+    self.sqliteDesignView.hidden = YES;
 }
 
 

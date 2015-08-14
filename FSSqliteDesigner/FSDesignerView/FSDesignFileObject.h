@@ -285,9 +285,10 @@ typedef enum
  *  @param fieldtype 字段类型
  *  @param length    字段长度
  */
-- (FSColumn *)addColumn:(NSString *)filedName;
+- (FSColumn *)addColumn:(NSString *)fieldName;
+- (FSColumn *)insertColumn:(NSString *)fieldName AtIndex:(NSInteger)position;
 - (NSArray *)allColumns;
-- (FSColumn *)findColumn:(NSString *)filedName;
+- (FSColumn *)findColumn:(NSString *)fieldName;
 - (FSColumn *)columnAtIndex:(NSInteger)index;
 - (void)removeColumn:(FSColumn *)column;
 - (void)removeColumnOfIndex:(NSInteger)index;

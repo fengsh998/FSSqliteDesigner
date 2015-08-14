@@ -22,20 +22,60 @@
 
 @implementation FSDesignerViewController(column)
 
+// 返回YES 则add ,否则insert
+- (BOOL)shouldAddOrInsert
+{
+    NSInteger idx = self.fieldlistview.selectedRow;
+    
+    if (idx != -1)
+    {
+        NSInteger total = self.fieldlistview.numberOfRows;
+        
+        if (idx < total -1 || (total - 1 == 0)) {
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
 - (IBAction)btnAddColumnClicked:(id)sender
 {
     FSTable *tables = [self getCurrentEditorTable];
     if (tables)
     {
         NSString *uniquename = [tables makeUniqueColumnName];
-        FSColumn *last = [tables addColumn:uniquename];
+        
+        NSInteger idx = self.fieldlistview.selectedRow;
+        
+        BOOL isAdd = [self shouldAddOrInsert];
+        
+        FSColumn *last = nil;
+        if (isAdd) {
+            last = [tables addColumn:uniquename];
+        }
+        else
+        {
+            
+            last = [tables insertColumn:uniquename AtIndex:idx];
+        }
         
         [self.fieldlistview reloadData];
         
         [self.dblistview reloadItem:tables reloadChildren:YES];
         [self.dblistview expandItem:tables];
         
-        [self toDoSelectedTreeNode:last];
+        if ([self.dblistview isExpandable:tables])
+        {
+            [self toDoSelectedTreeNode:last];
+        }
+        else
+        {
+            if (idx != -1)
+            {
+                [self.fieldlistview selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
+            }
+        }
     }
 }
 

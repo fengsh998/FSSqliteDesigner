@@ -362,6 +362,12 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     if (!item) {
         return self.designer.databases.count;
     }
+    
+    //不显示列，只需要显示到表即可
+    if (((FSNode*)item).type == nodeTabel) {
+        return 0;
+    }
+    
     return ((FSNode*)item).childcounts;
 }
 
@@ -378,6 +384,12 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     if (!item) {
         return NO;//无item內容时代表无孩子
     }
+    
+    //不显示列，只需要显示到表即可
+    if (((FSNode*)item).type == nodeTabel) {
+        return NO;
+    }
+    
     return ((FSNode*)item).childcounts > 0;
 }
 

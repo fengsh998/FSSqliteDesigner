@@ -1480,15 +1480,30 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self;
 }
 
-- (FSColumn *)addColumn:(NSString *)filedName
+- (FSColumn *)addColumn:(NSString *)fieldName
 {
-    if ([self exsistNodeName:filedName])
+    if ([self exsistNodeName:fieldName])
     {
-        NSLog(@"field name [%@] is exsisted.",filedName);
+        NSLog(@"field name [%@] is exsisted.",fieldName);
         return nil;
     }
-    FSColumn *fc = [FSColumn column:filedName];
+    FSColumn *fc = [FSColumn column:fieldName];
     [self addChildrenNode:fc];
+    return fc;
+}
+
+- (FSColumn *)insertColumn:(NSString *)fieldName AtIndex:(NSInteger)position
+{
+    if ([self exsistNodeName:fieldName])
+    {
+        NSLog(@"field name [%@] is exsisted.",fieldName);
+        return nil;
+    }
+    
+    FSColumn *fc = [FSColumn column:fieldName];
+    
+    [self insertChildrenNode:fc atIndex:position];
+    
     return fc;
 }
 
@@ -1497,9 +1512,9 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self.childrens;
 }
 
-- (FSColumn *)findColumn:(NSString *)filedName
+- (FSColumn *)findColumn:(NSString *)fieldName
 {
-    NSArray *columns = [self findNodeFromChildrenOfName:filedName];
+    NSArray *columns = [self findNodeFromChildrenOfName:fieldName];
     return columns.count > 0 ? columns[0] : nil;
 }
 
