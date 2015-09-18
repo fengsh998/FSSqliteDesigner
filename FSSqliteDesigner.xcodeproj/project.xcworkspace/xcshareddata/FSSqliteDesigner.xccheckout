@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>73873D33-7544-4698-AEE3-B0E381CC98B2</string>
 	<key>IDESourceControlProjectName</key>
-	<string>FSSqliteDesigner</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>7125187BEBDB54C372063A27F86D0B075929965F</key>
 		<string>https://github.com/fengsh998/FSSqliteDesigner.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>FSSqliteDesigner.xcodeproj</string>
+	<string>FSSqliteDesigner.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>7125187BEBDB54C372063A27F86D0B075929965F</key>
