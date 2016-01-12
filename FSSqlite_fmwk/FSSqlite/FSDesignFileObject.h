@@ -119,6 +119,8 @@ typedef enum
 - (NSArray *)findNodeFromChildrenOfName:(NSString *)name;
 ///返回一个数组元素为NSIndexpath,存放找到的项索引
 - (NSArray *)findNodeIndexsFromChildrenOfName:(NSString *)name;
+///获取所有孩子的结点名
+- (NSArray *)allChildrensNodeName;
 ///所有孩子中是否存在name
 - (BOOL)exsistNodeName:(NSString *)name;
 ///自身的兄弟结点中是否存在了name
@@ -139,6 +141,13 @@ typedef enum
 
 /*************************************库**************************************/
 @interface FSSqliteER : FSNode<FSSqliteExtendProtocol>
+{
+    NSUInteger          _hashkey;
+}
+
+- (void)setHashKey:(NSUInteger)key;
+
+- (NSUInteger)hashkey;
 
 @end
 
@@ -288,6 +297,7 @@ typedef enum
 - (FSColumn *)addColumn:(NSString *)fieldName;
 - (FSColumn *)insertColumn:(NSString *)fieldName AtIndex:(NSInteger)position;
 - (NSArray *)allColumns;
+- (NSArray *)allColumnsName;
 - (FSColumn *)findColumn:(NSString *)fieldName;
 - (FSColumn *)columnAtIndex:(NSInteger)index;
 - (void)removeColumn:(FSColumn *)column;
@@ -368,6 +378,8 @@ typedef enum
  *  当前所有表
  */
 - (NSArray *)tables;
+///所有表名
+- (NSArray *)tableNames;
 /**
  *  获取表
  */
@@ -387,6 +399,8 @@ typedef enum
 - (NSArray *)indexObjects;
 - (FSIndex *)indexObjectOfName:(NSString *)indexName;
 - (FSIndex *)indexOjbectAtIndex:(NSInteger)index;
+///所有视图名
+- (NSArray *)indexNames;
 
 // ******************************  视图  *******************************//
 
@@ -399,6 +413,8 @@ typedef enum
 - (NSArray *)views;
 - (FSView *)viewOfName:(NSString *)viewName;
 - (FSView *)viewAtIndex:(NSInteger)index;
+//所有视图名
+- (NSArray *)viewNames;
 
 // ******************************  触发器  *******************************//
 
@@ -411,12 +427,18 @@ typedef enum
 - (NSArray *)triggers;
 - (FSTrigger *)triggerOfName:(NSString *)triggerName;
 - (FSTrigger *)triggerAtIndex:(NSInteger)index;
+//所有触发器名
+- (NSArray *)triggerNames;
 
 @end
 
 @interface FSDesignFileObject : NSObject<NSCoding>
-
+///所有库
 @property (nonatomic,readonly) NSArray          *databases;
+///模版名称
+@property (nonatomic,copy)     NSString         *modelname;
+///模板版本号
+@property (nonatomic,copy)     NSString         *modelVersion;
 
 - (NSString *)makeUniqueDatabaseName;
 - (void)addDatabase:(FSDatabse *)database;
@@ -424,6 +446,7 @@ typedef enum
 - (FSDatabse *)insertDatabaseWithName:(NSString *)name atIndex:(NSInteger)index;
 - (FSDatabse *)addDatabaseWithName:(NSString *)name;
 - (FSDatabse *)databaseOfIndex:(NSInteger)index;
+- (FSDatabse *)databaseOfName:(NSString *)name;
 - (NSInteger)indexOfDatabaseObject:(FSDatabse *)database;
 
 - (BOOL)exsistDatabaseOfName:(NSString *)name;
@@ -432,12 +455,17 @@ typedef enum
 - (void)removeDatabaseAtIndex:(NSInteger)index;
 - (void)removeDatabaseOfObject:(FSDatabse *)database;
 - (void)removeAllDatabase;
+//按库名称排序
+- (NSArray *)sortDatabase;
+//获取库名
+- (NSArray *)allDatabaseOfName;
 
 + (FSDesignFileObject *)loadFromFile:(NSURL *)filepath error:(NSError **)error;
++ (FSDesignFileObject *)loadFromFileData:(NSData *)fileData error:(NSError **)error;
 - (void)saveToFile:(NSURL *)filepath;
-
+- (NSData *)saveToData;
 ///获取设计时编辑内容
-- (NSDictionary *)getNeedSaveContents;
+- (NSMutableDictionary *)getNeedSaveContents;
 
 ///导出为sqlite语句脚本
 

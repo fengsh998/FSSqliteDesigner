@@ -13,7 +13,23 @@
 		9D33DB0D1C3D23DF00E8E80F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D33DB0B1C3D23DF00E8E80F /* Main.storyboard */; };
 		9D33DB0F1C3D23DF00E8E80F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D33DB0E1C3D23DF00E8E80F /* Assets.xcassets */; };
 		9D33DB121C3D23DF00E8E80F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D33DB101C3D23DF00E8E80F /* LaunchScreen.storyboard */; };
+		9DC1086F1C3F507D0036390D /* FSSqlite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC1086E1C3F507D0036390D /* FSSqlite.framework */; };
+		9DC108701C3F507D0036390D /* FSSqlite.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC1086E1C3F507D0036390D /* FSSqlite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9DC108711C3F507D0036390D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9DC108701C3F507D0036390D /* FSSqlite.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		9D33DAFF1C3D23DF00E8E80F /* FSSqliteDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSSqliteDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -26,6 +42,7 @@
 		9D33DB0E1C3D23DF00E8E80F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9D33DB111C3D23DF00E8E80F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D33DB131C3D23DF00E8E80F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9DC1086E1C3F507D0036390D /* FSSqlite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FSSqlite.framework; path = "../../../../Library/Developer/Xcode/DerivedData/FSSqliteDesignerWorkSpace-diludsskozlghrbjxovscrtxwweb/Build/Products/Debug-iphonesimulator/FSSqlite.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DC1086F1C3F507D0036390D /* FSSqlite.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +60,7 @@
 		9D33DAF61C3D23DF00E8E80F = {
 			isa = PBXGroup;
 			children = (
+				9DC1086E1C3F507D0036390D /* FSSqlite.framework */,
 				9D33DB011C3D23DF00E8E80F /* FSSqliteDemo */,
 				9D33DB001C3D23DF00E8E80F /* Products */,
 			);
@@ -89,6 +108,7 @@
 				9D33DAFB1C3D23DF00E8E80F /* Sources */,
 				9D33DAFC1C3D23DF00E8E80F /* Frameworks */,
 				9D33DAFD1C3D23DF00E8E80F /* Resources */,
+				9DC108711C3F507D0036390D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -298,6 +318,7 @@
 				9D33DB181C3D23DF00E8E80F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -122,6 +122,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 #import "FSDesignFileObject.h"
 #import "FSUtils.h"
+#import "FSSqliteDDL.h"
 
 @interface FSDesignFileObject ()
 {
@@ -129,6 +130,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 }
 @end
 
+#pragma mark - FSDesignFileObject
 @implementation FSDesignFileObject
 
 - (instancetype)init
@@ -143,6 +145,17 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [aCoder encodeObject:_fsDatabases forKey:@"_fsDatabases"];
+    
+    NSData *dbsdata = [NSKeyedArchiver archivedDataWithRootObject:_fsDatabases];
+    NSString *sdata = [dbsdata base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithCarriageReturn];
+    if (sdata.length > 0) {
+        sdata = [FSUtils md5:sdata];
+        NSUInteger hs = [sdata hash];
+        _modelVersion = [FSUtils ToHex:hs];
+    }
+    
+    [aCoder encodeObject:_modelname forKey:@"_modelname"];
+    [aCoder encodeObject:_modelVersion forKey:@"_modelversion"];
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)aDecoder
@@ -150,6 +163,8 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     self = [super init];
     if (self) {
         _fsDatabases = [aDecoder decodeObjectForKey:@"_fsDatabases"];
+        _modelname   = [aDecoder decodeObjectForKey:@"_modelname"];
+        _modelVersion = [aDecoder decodeObjectForKey:@"_modelversion"];
     }
     return self;
 }
@@ -212,6 +227,18 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return [_fsDatabases objectAtIndex:index];
 }
 
+- (FSDatabse *)databaseOfName:(NSString *)name
+{
+    FSDatabse *ret = nil;
+    for (FSDatabse *db in _fsDatabases) {
+        if ([db.dbName isEqualToString:name]) {
+            ret = db;
+            break;
+        }
+    }
+    return ret;
+}
+
 - (NSInteger)indexOfDatabaseObject:(FSDatabse *)database
 {
     return [_fsDatabases indexOfObject:database];
@@ -254,13 +281,27 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     [_fsDatabases removeAllObjects];
 }
 
-+ (FSDesignFileObject *)loadFromFile:(NSURL *)filepath error:(NSError **)error
+- (NSArray *)sortDatabase
 {
-    //解释sqlitemodel文件
-    NSDictionary *design = [NSDictionary dictionaryWithContentsOfURL:filepath];
+    return [self.databases sortedArrayWithOptions:NSSortConcurrent usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        NSString *a = ((FSDatabse *)obj1).dbName;
+        NSString *b = ((FSDatabse *)obj2).dbName;
+        return [a compare:b];
+    }];
+}
+
+- (NSArray *)allDatabaseOfName
+{
+    NSMutableArray *arrs = self.databases.count > 0 ? [NSMutableArray array] : nil;
+    for (FSDatabse *db in self.databases) {
+        [arrs addObject:db.dbName];
+    }
     
-    NSData *designdata = design[@"DesignerData"];
-    
+    return arrs;
+}
+
++ (FSDesignFileObject *)parseData:(NSData *)designdata error:(NSError **)error
+{
     FSDesignFileObject *designer = nil;
     if (designdata) {
         @try {
@@ -278,26 +319,66 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return designer;
 }
 
-- (void)saveToFile:(NSURL *)filepath
++ (FSDesignFileObject *)loadFromFile:(NSURL *)filepath error:(NSError **)error
 {
-    //可以试试使用NSFileHandle
+    //解释sqlitemodel文件
+//    NSDictionary *design = [NSKeyedUnarchiver unarchiveObjectWithFile:[filepath path]];
+//    
+//    NSData *designdata = design[@"DesignerData"];
+//    
+//    return [self parseData:designdata error:error];
     
+    NSData *dt = [NSData dataWithContentsOfURL:filepath];
+    FSDesignFileObject *ret = [self loadFromFileData:dt error:error];
+    ret.modelname = [filepath lastPathComponent];
+    return ret;
+}
+
++ (FSDesignFileObject *)loadFromFileData:(NSData *)fileData error:(NSError **)error
+{
+    NSDictionary *design = [NSKeyedUnarchiver unarchiveObjectWithData:fileData];
+    
+    NSData *designdata = design[@"DesignerData"];
+    
+    return [self parseData:designdata error:error];
+}
+
+- (NSDictionary *)saveForDictionary
+{
     /*
      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
      <model name="Test1.sqlitemodel" userDefinedModelVersionIdentifier="" type="com.apple.fshSqlite.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
      <elements/>
      </model>
      */
-    
+
     //保存为sqlitemodel文件
-    NSDictionary *dic = [self getNeedSaveContents];
+    NSMutableDictionary *dic = [self getNeedSaveContents];
     
-    //NSLog(@"fileurl %@ \n===============save === %@",filepath,dic);
-    //因xc正在使用，所以使用此方法修改时会有提示。
-    [dic writeToURL:filepath atomically:NO];
+    NSString *mdname = self.modelname;
+    NSString *version = self.modelVersion;
+    NSDictionary *versionInfo = @{@"modelname":mdname,@"modelversion":version};
+    
+    [dic setObject:versionInfo forKey:@"SQLiteModelVersion"];
+    
+    return dic;
 }
 
-- (NSDictionary *)getNeedSaveContents
+- (void)saveToFile:(NSURL *)filepath
+{
+    NSDictionary *dic = [self saveForDictionary];
+    
+    [NSKeyedArchiver archiveRootObject:dic toFile:[filepath path]];
+}
+
+- (NSData *)saveToData
+{
+    NSDictionary *dic = [self saveForDictionary];
+
+    return [NSKeyedArchiver archivedDataWithRootObject:dic];
+}
+
+- (NSMutableDictionary *)getNeedSaveContents
 {
     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
     [self parseObject:self outToNSArray:dic];
@@ -492,6 +573,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 @end
 
+#pragma mark - FSNode
 @implementation FSNode
 
 - (instancetype)init
@@ -651,6 +733,21 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     }
     
     return founds.count > 0 ? founds : nil;
+}
+
+- (NSArray *)allChildrensNodeName
+{
+    if (_childrens.count == 0) {
+        return nil;
+    }
+    
+    NSMutableArray *founds = [NSMutableArray array];
+    
+    for (FSNode *item in _childrens) {
+        [founds addObject:item.nodename];
+    }
+    
+    return founds;
 }
 
 - (BOOL)hasNeighbour
@@ -813,6 +910,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 @end
 
+#pragma mark - FSSqliteER
 /*************************************库**************************************/
 @implementation FSSqliteER
 
@@ -825,7 +923,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        
+        _hashkey = -1;
     }
     
     return self;
@@ -834,6 +932,16 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [super encodeWithCoder:aCoder];
+}
+
+- (NSUInteger)hashkey
+{
+    return _hashkey;
+}
+
+- (void)setHashKey:(NSUInteger)key
+{
+    _hashkey = key;
 }
 
 - (NSString *)deleteNotesForSqls:(NSString *)sqls
@@ -909,6 +1017,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 @end
 
+#pragma mark - 类目
 /*************************************类目*************************************/
 @implementation FSTableCategory
 
@@ -946,7 +1055,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 @end
 
-
+#pragma mark - 触发器
 /**************************************触发器*************************************/
 @implementation FSTrigger
 
@@ -981,6 +1090,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         self.sqls               = [aDecoder decodeObjectForKey:@"sqls"];
         self.tableName          = [aDecoder decodeObjectForKey:@"tableName"];
         self.columns            = [aDecoder decodeObjectForKey:@"columns"];
+        
+        NSString *fs = [self makeSqlKeyValue];
+        if (fs.length > 0) {
+            NSString *rs = [FSUtils md5:fs];
+            NSUInteger key = [rs hash];
+            [self setHashKey:key];
+        }
     }
     
     return self;
@@ -995,6 +1111,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     [aCoder encodeObject:self.sqls forKey:@"sqls"];
     [aCoder encodeObject:self.tableName forKey:@"tableName"];
     [aCoder encodeObject:self.columns forKey:@"columns"];
+    
+    NSString *fs = [self makeSqlKeyValue];
+    if (fs.length > 0) {
+        NSString *rs = [FSUtils md5:fs];
+        NSUInteger key = [rs hash];
+        [self setHashKey:key];
+    }
 }
 
 - (NSString *)makeSqlKeyValue
@@ -1006,7 +1129,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     }
     
     if ([self.events isEqualToString:@"UPDATE OF"]) {
-        sqlfmt = @"CREATE TRIGGER \"%@\" %@ %@ %@ ON \"%@\"\n%@";
+        sqlfmt = @"CREATE TRIGGER IF NOT EXISTS \"%@\" %@ %@ %@ ON \"%@\"\n%@";
         
         NSMutableString *cls = [NSMutableString stringWithString:@""];
         
@@ -1023,7 +1146,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     }
     else
     {
-        sqlfmt = @"CREATE TRIGGER \"%@\" %@ %@ ON \"%@\"\n%@";
+        sqlfmt = @"CREATE TRIGGER IF NOT EXISTS \"%@\" %@ %@ ON \"%@\"\n%@";
         sqlfmt = [NSString stringWithFormat:sqlfmt,self.triggerName,self.actions,self.events,
                   self.tableName,self.sqls];
     }
@@ -1047,12 +1170,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     copytrigger.sqls            = self.sqls;
     copytrigger.tableName       = self.tableName;
     copytrigger.columns         = [self.columns copy];
-    
+    [copytrigger setHashKey:self.hashkey];
     return copytrigger;
 }
 
 @end
 
+#pragma mark - 索引
 /**************************************索引*************************************/
 @implementation FSIndex
 
@@ -1077,6 +1201,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         self.ascFields          = [aDecoder decodeObjectForKey:@"ascFields"];
         self.descFields         = [aDecoder decodeObjectForKey:@"descFields"];
         self.indexsqls          = [aDecoder decodeObjectForKey:@"indexsqls"];
+        
+        NSString *fs = [self makeSqlKeyValue];
+        if (fs.length > 0) {
+            NSString *rs = [FSUtils md5:fs];
+            NSUInteger key = [rs hash];
+            [self setHashKey:key];
+        }
     }
     
     return self;
@@ -1093,24 +1224,32 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     [aCoder encodeObject:self.descFields forKey:@"descFields"];
     [aCoder encodeObject:self.indexsqls forKey:@"indexsqls"];
 
+    NSString *fs = [self makeSqlKeyValue];
+    if (fs.length > 0) {
+        NSString *rs = [FSUtils md5:fs];
+        NSUInteger key = [rs hash];
+        [self setHashKey:key];
+    }
 }
 
 - (NSString *)makeSqlKeyValue
 {
-    NSString *idxsql = @"CREATE INDEX \"%@\" ON \"%@\"(%@)";
-    NSString *idxuniquesql = @"CREATE UNIQUE INDEX \"%@\" ON \"%@\"(%@)";
-    
+    //NSString *idxsql = @"CREATE INDEX \"%@\" ON \"%@\"(%@)";
+    //NSString *idxuniquesql = @"CREATE UNIQUE INDEX \"%@\" ON \"%@\"(%@)";
+    NSString *idxsqlfmt = CREATE_INDEX_FMT_SQL;
     NSString *tbname = self.indexTableName;
     NSString *idxname = self.indexName;
     NSString *fields = [self.indexFieldNames componentsJoinedByString:@","];//要加引号
     
     NSString *ret = @"";
     if (self.unique) {
-        ret = [NSString stringWithFormat:idxuniquesql,idxname,tbname,fields];
+        //ret = [NSString stringWithFormat:idxuniquesql,idxname,tbname,fields];
+        ret = [NSString stringWithFormat:idxsqlfmt,@"UNIQUE",idxname,tbname,fields];
     }
     else
     {
-        ret = [NSString stringWithFormat:idxsql,idxname,tbname,fields];
+        //ret = [NSString stringWithFormat:idxsql,idxname,tbname,fields];
+        ret = [NSString stringWithFormat:idxsqlfmt,@"",idxname,tbname,fields];
     }
     
     return [ret uppercaseString];
@@ -1131,12 +1270,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     copyindex.indexFieldNames   = [self.indexFieldNames copy];
     copyindex.ascFields         = [self.ascFields copy];
     copyindex.descFields        = [self.descFields copy];
-    
+    [copyindex setHashKey:self.hashkey];
     return copyindex;
 }
 
 @end
 
+#pragma mark - 视图
 /**************************************视图*************************************/
 @implementation FSView
 
@@ -1156,6 +1296,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     self = [super initWithCoder:aDecoder];
     if (self) {
         self.sqls = [aDecoder decodeObjectForKey:@"sqls"];
+        if (self.sqls.length > 0) {
+            NSString *rs = [FSUtils md5:self.sqls];
+            NSUInteger key = [rs hash];
+            [self setHashKey:key];
+        }
     }
     
     return self;
@@ -1164,12 +1309,19 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [super encodeWithCoder:aCoder];
+    
+    self.sqls = [self makeSqlKeyValue];
+    if (self.sqls.length > 0) {
+        NSString *rs = [FSUtils md5:self.sqls];
+        NSUInteger key = [rs hash];
+        [self setHashKey:key];
+    }
     [aCoder encodeObject:self.sqls forKey:@"sqls"];
 }
 
 - (NSString *)makeSqlKeyValue
 {
-    NSString *sql = @"CREATE VIEW \"%@\" AS %@";
+    NSString *sql = CREATE_VIEW_FMT_SQL;//@"CREATE VIEW \"%@\" AS %@";
     
     if (self.sqls) {
         return [NSString stringWithFormat:sql,self.viewName,self.sqls];
@@ -1189,7 +1341,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     FSView *copyview    = [super copyWithZone:zone];
     copyview.viewName   = [self.viewName copy];
     copyview.sqls       = self.sqls;
-    
+    [copyview setHashKey:self.hashkey];
     return copyview;
 }
 @end
@@ -1294,6 +1446,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 @end
 
+#pragma mark - 字段
 /**************************************字段*************************************/
 @implementation FSColumn
 
@@ -1430,7 +1583,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     copycolumn.enableForeignkey = self.enableForeignkey;
     copycolumn->_foreignKey = [self->_foreignKey copy];
     copycolumn.fieldName    = [self.fieldName copy];
-
+    [copycolumn setHashKey:self.hashkey];
     return copycolumn;
 }
 
@@ -1445,6 +1598,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         self.mark               = [aDecoder decodeObjectForKey:@"mark"];
         self.enableForeignkey   = [[aDecoder decodeObjectForKey:@"enableForeignkey"]boolValue];
         _foreignKey             = [aDecoder decodeObjectForKey:@"_foreignKey"];
+        
+        NSString *fs = [self makeSqlKeyValue];
+        if (fs.length > 0) {
+            NSString *rs = [FSUtils md5:fs];
+            NSUInteger key = [rs hash];
+            [self setHashKey:key];
+        }
     }
     
     return self;
@@ -1462,10 +1622,17 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     [aCoder encodeObject:@(self.enableForeignkey) forKey:@"enableForeignkey"];
     [aCoder encodeObject:_foreignKey forKey:@"_foreignKey"];
 
+    NSString *fs = [self makeSqlKeyValue];
+    if (fs.length > 0) {
+        NSString *rs = [FSUtils md5:fs];
+        NSUInteger key = [rs hash];
+        [self setHashKey:key];
+    }
 }
 
 @end
 
+#pragma mark - 表
 /**************************************表*************************************/
 @implementation FSTable
 
@@ -1512,6 +1679,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return self.childrens;
 }
 
+- (NSArray *)allColumnsName
+{
+    return [self allChildrensNodeName];
+}
+
 - (FSColumn *)findColumn:(NSString *)fieldName
 {
     NSArray *columns = [self findNodeFromChildrenOfName:fieldName];
@@ -1545,7 +1717,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (NSString *)makeSqlKeyValue
 {
-    NSString *fmt = @"CREATE TABLE \"%@\" (%@)";
+    NSString *fmt = CREATE_TABLE_FMT_SQL;//@"CREATE TABLE \"%@\" (%@)";
     NSMutableArray *fields = [NSMutableArray array];
     for (FSColumn *column in self.allColumns)
     {
@@ -1568,6 +1740,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     FSTable *copytb = [super copyWithZone:zone];
     copytb.tableName = [self.tableName copy];
     copytb.createsqls = self.createsqls;
+    [copytb setHashKey:self.hashkey];
     return copytb;
 }
 
@@ -1576,6 +1749,12 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     self = [super initWithCoder:aDecoder];
     if (self) {
         self.createsqls = [aDecoder decodeObjectForKey:@"createsqls"];
+        
+        if (self.createsqls.length > 0) {
+            NSString *rs = [FSUtils md5:self.createsqls];
+            NSUInteger key = [rs hash];
+            [self setHashKey:key];
+        }
     }
     
     return self;
@@ -1584,11 +1763,21 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [super encodeWithCoder:aCoder];
+    
+    self.createsqls = [self makeSqlKeyValue];
+    
+    if (self.createsqls.length > 0) {
+        NSString *rs = [FSUtils md5:self.createsqls];
+        NSUInteger key = [rs hash];
+        [self setHashKey:key];
+    }
+    
     [aCoder encodeObject:self.createsqls forKey:@"createsqls"];
 }
 
 @end
 
+#pragma mark - 库
 /**************************************库*************************************/
 @implementation FSDatabse
 
@@ -1771,6 +1960,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return [tableKind childrens];
 }
 
+- (NSArray *)tableNames
+{
+    return [tableKind allChildrensNodeName];
+}
+
 - (FSTable *)tableOfName:(NSString *)tableName
 {
     NSArray *tbs = [tableKind findNodeFromChildrenOfName:tableName];
@@ -1835,6 +2029,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return (FSIndex *)[indexKind findNodeAtIndex:index];
 }
 
+- (NSArray *)indexNames
+{
+    return [indexKind allChildrensNodeName];
+}
+
 // ******************************  视图  *******************************//
 - (void)removeViewOfName:(NSString *)viewName
 {
@@ -1888,6 +2087,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (FSView *)viewAtIndex:(NSInteger)index
 {
     return (FSView *)[viewKind findNodeAtIndex:index];
+}
+
+- (NSArray *)viewNames
+{
+    return [viewKind allChildrensNodeName];
 }
 
 // ******************************  触发器  *******************************//
@@ -1945,6 +2149,10 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return (FSTrigger *)[triggerKind findNodeAtIndex:index];
 }
 
+- (NSArray *)triggerNames
+{
+    return [triggerKind allChildrensNodeName];
+}
 
 - (id)copyWithZone:(nullable NSZone *)zone
 {

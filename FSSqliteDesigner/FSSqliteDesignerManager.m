@@ -375,7 +375,7 @@
 
 - (void)outlineSelectChange:(NSNotification *)notification
 {
-    NSLog(@"change = %@",notification);
+    //NSLog(@"change = %@",notification);
     @try {
         NSOutlineView *outlineview = notification.object;
         if (outlineview == [self findNavSourceArea]) {

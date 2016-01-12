@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0720"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9DCF1A3B1B4B926C000E114A"
-               BuildableName = "FSSqliteDesigner.xcplugin"
-               BlueprintName = "FSSqliteDesigner"
-               ReferencedContainer = "container:FSSqliteDesigner.xcodeproj">
+               BlueprintIdentifier = "9D33DB2F1C3DFE5E00E8E80F"
+               BuildableName = "FSSqlite.framework"
+               BlueprintName = "FSSqlite"
+               ReferencedContainer = "container:FSSqlite.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,15 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9D33DAFE1C3D23DF00E8E80F"
-            BuildableName = "FSSqliteDemo.app"
-            BlueprintName = "FSSqliteDemo"
-            ReferencedContainer = "container:FSSqliteDemo/FSSqliteDemo.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -50,12 +41,16 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
-      allowLocationSimulation = "YES"
-      viewDebuggingEnabled = "No">
-      <PathRunnable
-         runnableDebuggingMode = "0"
-         FilePath = "/Applications/Xcode.app">
-      </PathRunnable>
+      allowLocationSimulation = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "9D33DB2F1C3DFE5E00E8E80F"
+            BuildableName = "FSSqlite.framework"
+            BlueprintName = "FSSqlite"
+            ReferencedContainer = "container:FSSqlite.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -68,10 +63,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9DCF1A3B1B4B926C000E114A"
-            BuildableName = "FSSqliteDesigner.xcplugin"
-            BlueprintName = "FSSqliteDesigner"
-            ReferencedContainer = "container:FSSqliteDesigner.xcodeproj">
+            BlueprintIdentifier = "9D33DB2F1C3DFE5E00E8E80F"
+            BuildableName = "FSSqlite.framework"
+            BlueprintName = "FSSqlite"
+            ReferencedContainer = "container:FSSqlite.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
