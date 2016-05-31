@@ -75,6 +75,8 @@ typedef enum
 - (NSString *)deleteNotesForSqls:(NSString *)sqls;
 ///获取可执行的sql语句(不带注释)(调用前需要检测是否已实现了该协议)
 - (NSString *)FetchExectureSql;
+///返回前缀(表名，索引名，字段名，触发器名)默认为"Z" 主要避免有些字段与关键字冲突
+- (NSString *)prefixKey;
 @end
 
 /****************************************树形结构通用类*****************************************/

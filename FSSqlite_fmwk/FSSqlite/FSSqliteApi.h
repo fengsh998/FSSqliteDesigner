@@ -27,9 +27,23 @@ typedef void(^ParseElements)(id obj,NSString *deeppath,ElementType type,BOOL *st
 
 @protocol FSSqliteProtocol <NSObject>
 
+/**
+ *  通过.sqlitemodeld中的plist的currentModelName 来加载数据库结构
+ *
+ *  @param .sqlitemodeld 文件夹
+ *
+ *  @return 目前最新版本的数据结构
+ */
+- (NSData *)loadFileMainVersionDBFromSqlitemodeld:(NSString *)filepath;
+
 @optional
-//通过文件获取到NSData
-+ (NSData *)loadFileFromSqliteModel:(NSString *)filepath;
+/**
+ *
+ *  通过.sqlitemodel文件获取到NSData
+ *
+ *  @return 数据结构
+ */
+- (NSData *)loadFileFromSqliteModel:(NSString *)filepath;
 
 /**
  *  比较两个sqlitemodel

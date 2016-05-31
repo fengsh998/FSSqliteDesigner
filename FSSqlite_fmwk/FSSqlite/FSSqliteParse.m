@@ -12,6 +12,10 @@
 
 @implementation FSSqliteParse
 
+- (NSData *)loadFileMainVersionDBFromSqlitemodeld:(NSString *)filepath
+{
+    return nil;
+}
 
 @end
 
@@ -26,9 +30,26 @@
 
 @implementation FSSqliteParseImpl
 
-+ (NSData *)loadFileFromSqliteModel:(NSString *)filepath
+- (NSData *)loadFileMainVersionDBFromSqlitemodeld:(NSString *)filepath
 {
-    return [NSData dataWithContentsOfFile:filepath];
+    NSString *vms = [filepath stringByAppendingPathComponent:@"version-model.plist"];
+    
+    NSDictionary *vm = [NSDictionary dictionaryWithContentsOfFile:vms];
+    vms =  vm[@"currentModelName"];
+    
+    vms = [filepath stringByAppendingPathComponent:vms];
+    
+    return  [self loadFileFromSqliteModel:vms];
+}
+
+- (NSData *)loadFileFromSqliteModel:(NSString *)filepath
+{
+    NSURL *furl = [NSURL fileURLWithPath:filepath];
+    if (furl) {
+        return [NSData dataWithContentsOfURL:furl];
+    }
+    
+    return nil;
 }
 
 ///从数组a,b中取出相同的元素

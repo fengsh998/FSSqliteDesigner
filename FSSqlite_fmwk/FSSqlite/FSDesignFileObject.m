@@ -322,12 +322,6 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 + (FSDesignFileObject *)loadFromFile:(NSURL *)filepath error:(NSError **)error
 {
     //解释sqlitemodel文件
-//    NSDictionary *design = [NSKeyedUnarchiver unarchiveObjectWithFile:[filepath path]];
-//    
-//    NSData *designdata = design[@"DesignerData"];
-//    
-//    return [self parseData:designdata error:error];
-    
     NSData *dt = [NSData dataWithContentsOfURL:filepath];
     FSDesignFileObject *ret = [self loadFromFileData:dt error:error];
     ret.modelname = [filepath lastPathComponent];
@@ -1015,6 +1009,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return nil;
 }
 
+- (NSString *)prefixKey
+{
+    return @"Z";
+}
+
 @end
 
 #pragma mark - 类目
@@ -1151,7 +1150,6 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
                   self.tableName,self.sqls];
     }
 
-    
     return sqlfmt;
 }
 
@@ -1234,8 +1232,6 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (NSString *)makeSqlKeyValue
 {
-    //NSString *idxsql = @"CREATE INDEX \"%@\" ON \"%@\"(%@)";
-    //NSString *idxuniquesql = @"CREATE UNIQUE INDEX \"%@\" ON \"%@\"(%@)";
     NSString *idxsqlfmt = CREATE_INDEX_FMT_SQL;
     NSString *tbname = self.indexTableName;
     NSString *idxname = self.indexName;
@@ -1243,12 +1239,10 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     
     NSString *ret = @"";
     if (self.unique) {
-        //ret = [NSString stringWithFormat:idxuniquesql,idxname,tbname,fields];
         ret = [NSString stringWithFormat:idxsqlfmt,@"UNIQUE",idxname,tbname,fields];
     }
     else
     {
-        //ret = [NSString stringWithFormat:idxsql,idxname,tbname,fields];
         ret = [NSString stringWithFormat:idxsqlfmt,@"",idxname,tbname,fields];
     }
     
@@ -1321,7 +1315,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (NSString *)makeSqlKeyValue
 {
-    NSString *sql = CREATE_VIEW_FMT_SQL;//@"CREATE VIEW \"%@\" AS %@";
+    NSString *sql = CREATE_VIEW_FMT_SQL;
     
     if (self.sqls) {
         return [NSString stringWithFormat:sql,self.viewName,self.sqls];
@@ -1717,7 +1711,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (NSString *)makeSqlKeyValue
 {
-    NSString *fmt = CREATE_TABLE_FMT_SQL;//@"CREATE TABLE \"%@\" (%@)";
+    NSString *fmt = CREATE_TABLE_FMT_SQL;
     NSMutableArray *fields = [NSMutableArray array];
     for (FSColumn *column in self.allColumns)
     {
