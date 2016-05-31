@@ -21,13 +21,22 @@
     NSLog(@"NSSSS ==== %@",NSTemporaryDirectory());
     // Do any additional setup after loading the view, typically from a nib.
     
-    NSString *p = [[NSBundle mainBundle]pathForResource:@"db1.sqlitemodeld/db1" ofType:@"sqlitemodel"];
-    NSString *p2 = [[NSBundle mainBundle]pathForResource:@"db2.sqlitemodeld/db2" ofType:@"sqlitemodel"];
+//    NSString *p = [[NSBundle mainBundle]pathForResource:@"demodb.sqlitemodeld/db1" ofType:@"sqlitemodel"];
+//    NSString *p2 = [[NSBundle mainBundle]pathForResource:@"db2.sqlitemodeld/db2" ofType:@"sqlitemodel"];
     
     FSSqliteEngine *fg = [[FSSqliteEngine alloc]init];
     id<FSSqliteProtocol> obj = [fg defalutSqliteParse];
-    NSData *pd = [NSData dataWithContentsOfFile:p];
-    NSData *pd2 = [NSData dataWithContentsOfFile:p2];
+    
+    
+   // NSString *tes = [[NSBundle mainBundle]pathForResource:@"demodb.sqlitemodeld/demodb" ofType:@"sqlitemodel"];
+    NSString *p = [[NSBundle mainBundle]pathForResource:@"demodb" ofType:@"sqlitemodeld"];
+    NSString *p2 = [[NSBundle mainBundle]pathForResource:@"demodb2" ofType:@"sqlitemodeld"];
+    
+//    NSData *pd = [NSData dataWithContentsOfFile:p];
+//    NSData *pd2 = [NSData dataWithContentsOfFile:p2];
+    NSData *pd = [obj loadFileMainVersionDBFromSqlitemodeld:p];
+    NSData *pd2 = [obj loadFileMainVersionDBFromSqlitemodeld:p2];
+    
     NSArray *arr = [obj compareSqliteModel:pd andNewSqliteModel:pd2];
     NSLog(@"%@",arr);
 }
