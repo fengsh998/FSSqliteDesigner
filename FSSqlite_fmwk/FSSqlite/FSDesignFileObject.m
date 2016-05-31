@@ -398,7 +398,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
                     if (v != NSNotFound) {
                         
                         NSString *version = [FSUtils ToHex:v];
-                        //NSLog(@"version == %@",version);
+                        
                         [dbdic setObject:version forKey:@"DBVersion"];
                     }
                 }
@@ -415,7 +415,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
                     if (v != NSNotFound) {
                         
                         NSString *version = [FSUtils ToHex:v];
-                        //NSLog(@"version == %@",version);
+                        
                         [dbdic setObject:version forKey:@"DBVersion"];
                     }
                 }
@@ -437,7 +437,6 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
         {
             NSMutableDictionary *db = [NSMutableDictionary dictionary];
             [db setObject:node.nodename forKey:@"DBName"];
-            //[db setObject:@"1.0" forKey:@"DBVersion"];
             [array addObject:db];
             
             NSMutableArray *tmp = [NSMutableArray array];
@@ -585,7 +584,6 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 {
     _parentNode = nil;
     
-    //NSLog(@" class [%@] free",[self class]);
 }
 
 - (void)addChildrenNode:(FSNode *)children
@@ -1009,6 +1007,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return nil;
 }
 
+//暂未实现
 - (NSString *)prefixKey
 {
     return @"Z";

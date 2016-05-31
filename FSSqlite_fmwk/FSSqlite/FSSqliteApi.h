@@ -56,20 +56,14 @@ typedef void(^ParseElements)(id obj,NSString *deeppath,ElementType type,BOOL *st
 - (NSArray<NSDictionary *> *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata;
 
 - (NSArray<NSDictionary *> *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata withDBName:(NSString *)dbname;
-/**
- *  解释model
- *
- *  @param filepath
- *  @param block
- */
-- (void)parseSqliteModel:(NSString *)filepath withBlock:(ParseElements)block;
-
-- (void)parseSqliteModelOfData:(NSData *)data withBlock:(ParseElements)block;
 
 @end
 
+
 @interface FSSqliteEngine : NSObject
+
 - (id<FSSqliteProtocol>)defalutSqliteParse;
+
 @end
 
 #endif /* FSSqliteApi_h */

@@ -400,14 +400,5 @@
 
 }
 
-- (void)parseSqliteModel:(NSString *)filepath withBlock:(ParseElements)block
-{
-    
-}
-
-- (void)parseSqliteModelOfData:(NSData *)data withBlock:(ParseElements)block
-{
-    
-}
 
 @end
