@@ -1,0 +1,6 @@
+framework module FSSqlite {
+  umbrella header "FSSqlite.h"
+
+  export *
+  module * { export * }
+}

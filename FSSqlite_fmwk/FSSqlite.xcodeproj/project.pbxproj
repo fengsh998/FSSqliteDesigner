@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		9DF235681D6C37B300159A47 /* alltarget */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 9DF2356B1D6C37B300159A47 /* Build configuration list for PBXAggregateTarget "alltarget" */;
+			buildPhases = (
+				9DF2356C1D6C37B800159A47 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = alltarget;
+			productName = alltarget;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		9D0EDA171C43587000051FE8 /* FSSqliteDDL.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D0EDA161C43587000051FE8 /* FSSqliteDDL.h */; };
 		9D33DB341C3DFE5E00E8E80F /* FSSqlite.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D33DB331C3DFE5E00E8E80F /* FSSqlite.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -125,6 +139,9 @@
 					9D33DB2F1C3DFE5E00E8E80F = {
 						CreatedOnToolsVersion = 7.2;
 					};
+					9DF235681D6C37B300159A47 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 				};
 			};
 			buildConfigurationList = 9D33DB2A1C3DFE5E00E8E80F /* Build configuration list for PBXProject "FSSqlite" */;
@@ -140,6 +157,7 @@
 			projectRoot = "";
 			targets = (
 				9D33DB2F1C3DFE5E00E8E80F /* FSSqlite */,
+				9DF235681D6C37B300159A47 /* alltarget */,
 			);
 		};
 /* End PBXProject section */
@@ -153,6 +171,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9DF2356C1D6C37B800159A47 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Sets the target folders and the final framework product.\n# 如果工程名称和Framework的Target名称不一样的话，要自定义FMKNAME\n# 例如: FMK_NAME = \"MyFramework\"\nFMK_NAME=${PROJECT_NAME}\n# framework的输出位置目录\n# 设置为当前工程的根目录下的/products文件夹里\nINSTALL_DIR=${SRCROOT}/../Products/${FMK_NAME}.framework\n# Working dir will be deleted after the framework creation.\nWRK_DIR=build\n#真机framework\nDEVICE_DIR=${WRK_DIR}/Release-iphoneos/${FMK_NAME}.framework\n#模拟器framework\nSIMULATOR_DIR=${WRK_DIR}/Release-iphonesimulator/${FMK_NAME}.framework\n# -configuration ${CONFIGURATION}\n# Clean and Building both architectures.\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphoneos clean build\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphonesimulator clean build\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]\nthen\nrm -rf \"${INSTALL_DIR}\"\nfi\nmkdir -p \"${INSTALL_DIR}\"\ncp -R \"${DEVICE_DIR}/\" \"${INSTALL_DIR}/\"\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${FMK_NAME}\" \"${SIMULATOR_DIR}/${FMK_NAME}\" -output \"${INSTALL_DIR}/${FMK_NAME}\"\n#移除临时build目录\nrm -r \"${WRK_DIR}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		9D33DB2B1C3DFE5E00E8E80F /* Sources */ = {
@@ -288,6 +322,20 @@
 			};
 			name = Release;
 		};
+		9DF235691D6C37B300159A47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		9DF2356A1D6C37B300159A47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -308,6 +356,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		9DF2356B1D6C37B300159A47 /* Build configuration list for PBXAggregateTarget "alltarget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9DF235691D6C37B300159A47 /* Debug */,
+				9DF2356A1D6C37B300159A47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
