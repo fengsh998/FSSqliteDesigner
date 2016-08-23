@@ -425,6 +425,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     
     NSData *designerdata = [NSKeyedArchiver archivedDataWithRootObject:designobject];
     
+    //自定义的数据结构
     if (designerdata) {
         [dic setObject:designerdata forKey:@"DesignerData"];
     }
