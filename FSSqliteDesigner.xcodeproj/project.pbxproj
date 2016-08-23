@@ -306,7 +306,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd FSSqliteDesigner && sh install_templates.sh";
+			shellScript = "#当前工程按装脚本\n#cd FSSqliteDesigner && sh install_templates.sh";
 		};
 /* End PBXShellScriptBuildPhase section */
 

@@ -82,14 +82,82 @@
          _successImage = [bundle imageForResource:@"XCBuildSuccessIcon"];
          */
         
+        [self setupXCtemplateToOthers];
     }
     
     return self;
 }
 
+//按装模板到new->file->other 中会有SqliteModel
+- (void)setupXCtemplateToOthers
+{
+    NSArray *path = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *developer = [path[0] stringByAppendingPathComponent:@"Developer"];
+    NSString *xcode = [developer stringByAppendingPathComponent:@"Xcode"];
+    NSString *Templates = [xcode stringByAppendingPathComponent:@"Templates"];
+    NSString *fileTemplates = [Templates stringByAppendingPathComponent:@"File Templates"];
+    
+    NSString *xctempdir = [fileTemplates stringByAppendingPathComponent:@"SqliteModel/Sqlite Model Object.xctemplate"];
+    NSString *modeldir = [xctempdir stringByAppendingPathComponent:@"___FILEBASENAME___.sqlitemodeld"];
+    
+    //创建模板所有的目录
+    NSError *error = nil;
+    BOOL ok = [[NSFileManager defaultManager]createDirectoryAtPath:modeldir withIntermediateDirectories:YES attributes:nil error:&error];
+    if (!ok || error) {
+        NSLog(@"模板路径创建失败。");
+    }
+    else
+    {
+        NSBundle *bundle = [NSBundle bundleForClass:self.class];
+        //xctemp下的资源
+        NSURL *icns = [bundle URLForResource:@"TemplateIcon" withExtension:@"icns"];
+        NSURL *plist = [bundle URLForResource:@"TemplateInfo" withExtension:@"plist"];
+        
+        NSURL *desicns = [NSURL fileURLWithPath:[xctempdir stringByAppendingPathComponent:[icns lastPathComponent]]];
+        NSURL *desplist = [NSURL fileURLWithPath:[xctempdir stringByAppendingPathComponent:[plist lastPathComponent]]];
+        
+        if (![[NSFileManager defaultManager]fileExistsAtPath:desicns.path])
+        {
+            ok = [[NSFileManager defaultManager]copyItemAtURL:icns toURL:desicns error:&error];
+            if (!ok || error) {
+                NSLog(@"copy 资源文件出错! error = %@",error);
+            }
+        }
+        
+        if (![[NSFileManager defaultManager]fileExistsAtPath:desplist.path]) {
+            ok = [[NSFileManager defaultManager]copyItemAtURL:plist toURL:desplist error:&error];
+            if (!ok || error) {
+                NSLog(@"copy 资源文件出错! error = %@",error);
+            }
+        }
+        
+        //sqlitemodeld下的资源
+        NSURL *model = [bundle URLForResource:@"___FILEBASENAME___" withExtension:@"sqlitemodel"];
+        NSURL *modelplist = [bundle URLForResource:@"version-model" withExtension:@"plist"];
+        
+        NSURL *desmodel = [NSURL fileURLWithPath:[modeldir stringByAppendingPathComponent:[model lastPathComponent]]];
+        NSURL *desmodelpist = [NSURL fileURLWithPath:[modeldir stringByAppendingPathComponent:[modelplist lastPathComponent]]];
+        
+        if (![[NSFileManager defaultManager]fileExistsAtPath:desmodel.path])
+        {
+            ok = [[NSFileManager defaultManager]copyItemAtURL:model toURL:desmodel error:&error];
+            if (!ok || error) {
+                NSLog(@"copy 资源文件出错! error = %@",error);
+            }
+        }
+        
+        if (![[NSFileManager defaultManager]fileExistsAtPath:desmodelpist.path]) {
+            ok = [[NSFileManager defaultManager]copyItemAtURL:modelplist toURL:desmodelpist error:&error];
+            if (!ok || error) {
+                NSLog(@"copy 资源文件出错! error = %@",error);
+            }
+        }
+    }
+}
+
 - (void)FSDesigerSettings:(NSMenuItem *)item
 {
-
+    
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
