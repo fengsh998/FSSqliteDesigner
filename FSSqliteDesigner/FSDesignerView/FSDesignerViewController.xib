@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="6000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="FSDesignerViewController">
@@ -487,11 +487,11 @@
                                                                                 <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="drd-3c-afN">
                                                                                     <rect key="frame" x="37" y="6" width="437" height="68"/>
                                                                                     <clipView key="contentView" id="zhP-8F-0fR">
-                                                                                        <rect key="frame" x="1" y="1" width="398" height="34"/>
+                                                                                        <rect key="frame" x="1" y="1" width="435" height="66"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                         <subviews>
                                                                                             <textView importsGraphics="NO" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="13p-DX-PyX">
-                                                                                                <rect key="frame" x="0.0" y="0.0" width="398" height="66"/>
+                                                                                                <rect key="frame" x="0.0" y="0.0" width="435" height="66"/>
                                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                                                                 <size key="minSize" width="435" height="66"/>
@@ -727,11 +727,11 @@
                                                                         <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b9r-HA-PWi">
                                                                             <rect key="frame" x="0.0" y="0.0" width="480" height="361"/>
                                                                             <clipView key="contentView" id="2CN-mD-eI0">
-                                                                                <rect key="frame" x="1" y="1" width="457" height="334"/>
+                                                                                <rect key="frame" x="1" y="1" width="478" height="359"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                 <subviews>
                                                                                     <textView importsGraphics="NO" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="kV5-O8-NHQ">
-                                                                                        <rect key="frame" x="0.0" y="0.0" width="465" height="359"/>
+                                                                                        <rect key="frame" x="0.0" y="0.0" width="486" height="359"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                                                         <size key="minSize" width="478" height="359"/>
@@ -884,11 +884,11 @@
                                                                         <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yD9-9e-ffC">
                                                                             <rect key="frame" x="9" y="5" width="468" height="275"/>
                                                                             <clipView key="contentView" id="Oa4-un-QSj">
-                                                                                <rect key="frame" x="1" y="1" width="423" height="236"/>
+                                                                                <rect key="frame" x="1" y="1" width="466" height="273"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                 <subviews>
                                                                                     <textView importsGraphics="NO" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="UEI-TQ-NMh">
-                                                                                        <rect key="frame" x="0.0" y="0.0" width="426" height="273"/>
+                                                                                        <rect key="frame" x="0.0" y="0.0" width="469" height="273"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                                                         <size key="minSize" width="466" height="273"/>
