@@ -381,6 +381,8 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (void)parseObject:(FSDesignFileObject *)designobject outToNSArray:(NSMutableDictionary *)dic
 {
+// 如果有需要再开放这个自定义的plist结构
+#if Coustom
     NSMutableArray *staticdb = [NSMutableArray array];
     NSMutableArray *dynamicdb = [NSMutableArray array];
     [dic setObject:staticdb forKey:@"StaticDBList"];
@@ -422,6 +424,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
             }
         }
     }
+#endif
     
     NSData *designerdata = [NSKeyedArchiver archivedDataWithRootObject:designobject];
     
