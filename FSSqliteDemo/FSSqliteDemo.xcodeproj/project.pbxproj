@@ -17,6 +17,7 @@
 		9DB735D21CFD577000124CEA /* demodb2.sqlitemodeld in Resources */ = {isa = PBXBuildFile; fileRef = 9DB735D11CFD577000124CEA /* demodb2.sqlitemodeld */; };
 		9DC1086F1C3F507D0036390D /* FSSqlite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC1086E1C3F507D0036390D /* FSSqlite.framework */; };
 		9DC108701C3F507D0036390D /* FSSqlite.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9DC1086E1C3F507D0036390D /* FSSqlite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9DDA184D1D7AC2AE00780F06 /* qw.sqlitemodeld in Resources */ = {isa = PBXBuildFile; fileRef = 9DDA184C1D7AC2AE00780F06 /* qw.sqlitemodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -47,6 +48,7 @@
 		9DB735CA1CFD2D3F00124CEA /* demodb.sqlitemodeld */ = {isa = PBXFileReference; lastKnownFileType = folder; path = demodb.sqlitemodeld; sourceTree = "<group>"; };
 		9DB735D11CFD577000124CEA /* demodb2.sqlitemodeld */ = {isa = PBXFileReference; lastKnownFileType = folder; path = demodb2.sqlitemodeld; sourceTree = "<group>"; };
 		9DC1086E1C3F507D0036390D /* FSSqlite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FSSqlite.framework; path = "../../../../Library/Developer/Xcode/DerivedData/FSSqliteDesignerWorkSpace-diludsskozlghrbjxovscrtxwweb/Build/Products/Debug-iphonesimulator/FSSqlite.framework"; sourceTree = "<group>"; };
+		9DDA184C1D7AC2AE00780F06 /* qw.sqlitemodeld */ = {isa = PBXFileReference; lastKnownFileType = folder; path = qw.sqlitemodeld; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 		9D33DB011C3D23DF00E8E80F /* FSSqliteDemo */ = {
 			isa = PBXGroup;
 			children = (
+				9DDA184C1D7AC2AE00780F06 /* qw.sqlitemodeld */,
 				9DB735D11CFD577000124CEA /* demodb2.sqlitemodeld */,
 				9D33DB051C3D23DF00E8E80F /* AppDelegate.h */,
 				9D33DB061C3D23DF00E8E80F /* AppDelegate.m */,
@@ -164,6 +167,7 @@
 			files = (
 				9DB735D21CFD577000124CEA /* demodb2.sqlitemodeld in Resources */,
 				9D33DB121C3D23DF00E8E80F /* LaunchScreen.storyboard in Resources */,
+				9DDA184D1D7AC2AE00780F06 /* qw.sqlitemodeld in Resources */,
 				9D33DB0F1C3D23DF00E8E80F /* Assets.xcassets in Resources */,
 				9D33DB0D1C3D23DF00E8E80F /* Main.storyboard in Resources */,
 				9DB735CB1CFD2D3F00124CEA /* demodb.sqlitemodeld in Resources */,

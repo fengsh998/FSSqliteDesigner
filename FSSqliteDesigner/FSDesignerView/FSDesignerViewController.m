@@ -37,8 +37,6 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     // Do view setup here.
     self.splitview.delegate = self;
 
-    //self.designer = [[FSDesignFileObject alloc]init];
-
     self.dblistview.delegate = self;
     self.dblistview.dataSource = self;
     
@@ -272,7 +270,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
             [self alterCheckMessage:@"sqlitemodel数据异常，请检查是否人为修改。" reSetFocus:nil];
             return;
         }
-        [self.dblistview reloadData];
+        
+        [self refreshOutlineTable];
         
         [self setFocus:self.dblistview];
     }
@@ -296,35 +295,67 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
         case nodeDatabase:
         {
             ///删除库做二次确认
-            [self.designer removeDatabaseOfObject:(FSDatabse *)node];
+            
+            [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]库结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
+                if (returnCode == 1000) {
+                    [self.designer removeDatabaseOfObject:(FSDatabse *)node];
+                    [self refreshOutlineTable];
+                }
+            }];
         }
             break;
         case nodeTabel:
         {
             ///删除表
             FSTableCategory *tbp = (id)node.parentNode;
-            [tbp removeChildrenNode:node];
+            
+            [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该表结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
+                if (returnCode == 1000) {
+                    [tbp removeChildrenNode:node];
+                    [self refreshOutlineTable];
+                }
+            }];
+            
         }
             break;
         case nodeView:
         {
             ///删除视图
             FSViewCategory *vp = (id)node.parentNode;
-            [vp removeChildrenNode:node];
+            
+            [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该视图结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
+                if (returnCode == 1000) {
+                    [vp removeChildrenNode:node];
+                    [self refreshOutlineTable];
+                }
+            }];
+            
         }
             break;
         case nodeIndex:
         {
             ///删除索引
             FSIndexCategory *ip = (id)node.parentNode;
-            [ip removeChildrenNode:node];
+            [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该索引结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
+                if (returnCode == 1000) {
+                    [ip removeChildrenNode:node];
+                    [self refreshOutlineTable];
+                }
+            }];
+            
         }
             break;
         case nodeTigger:
         {
             ///删除触发器
             FSTriggerCategory *tgp = (id)node.parentNode;
-            [tgp removeChildrenNode:node];
+            [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该触发器结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
+                if (returnCode == 1000) {
+                    [tgp removeChildrenNode:node];
+                    
+                    [self refreshOutlineTable];
+                }
+            }];
         }
             break;
             
@@ -332,7 +363,10 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
             return;
             break;
     }
-    
+}
+
+- (void)refreshOutlineTable
+{
     [self.dblistview reloadData];
     [self.tabview selectTabViewItemWithIdentifier:@"id_none"];
 }
@@ -491,19 +525,30 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     }
 }
 
-- (void)alterCheckMessage:(NSString *)msg reSetFocus:(NSView *)v
+- (void)alterWarning:(NSString *)msg withOK:(NSString *)ok withCancel:(NSString *)cancel withCompletion:(void (^ __nullable)(NSModalResponse returnCode))handler
 {
-
     NSAlert *alert = [[NSAlert alloc]init];
-    [alert addButtonWithTitle:@"确定"];
+    if (ok) {
+        [alert addButtonWithTitle:ok];
+    }
+    
+    if (cancel) {
+        [alert addButtonWithTitle:cancel];
+    }
+    
     [alert setMessageText:msg];
     
     [alert setAlertStyle:NSInformationalAlertStyle];
-//    NSImage *icon = [NSImage imageNamed:@"icon.png"];
-//    [alert setIcon:icon];
+    //    NSImage *icon = [NSImage imageNamed:@"icon.png"];
+    //    [alert setIcon:icon];
     [alert layout];
     
-    [alert beginSheetModalForWindow:[self.view window] completionHandler:^(NSModalResponse returnCode) {
+    [alert beginSheetModalForWindow:[self.view window] completionHandler:handler];
+}
+
+- (void)alterCheckMessage:(NSString *)msg reSetFocus:(NSView *)v
+{
+    [self alterWarning:msg withOK:@"确定" withCancel:nil withCompletion:^(NSModalResponse returnCode) {
         if (v) {
             [self setFocus:v];
         }

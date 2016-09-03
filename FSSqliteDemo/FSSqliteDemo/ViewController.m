@@ -29,16 +29,20 @@
     
     
    // NSString *tes = [[NSBundle mainBundle]pathForResource:@"demodb.sqlitemodeld/demodb" ofType:@"sqlitemodel"];
-    NSString *p = [[NSBundle mainBundle]pathForResource:@"demodb" ofType:@"sqlitemodeld"];
-    NSString *p2 = [[NSBundle mainBundle]pathForResource:@"demodb2" ofType:@"sqlitemodeld"];
+//    NSString *p = [[NSBundle mainBundle]pathForResource:@"demodb" ofType:@"sqlitemodeld"];
+//    NSString *p2 = [[NSBundle mainBundle]pathForResource:@"demodb2" ofType:@"sqlitemodeld"];
+//    
+//    NSData *pd = [obj loadFileMainVersionDBFromSqlitemodeld:p];
+//    NSData *pd2 = [obj loadFileMainVersionDBFromSqlitemodeld:p2];
     
-    NSData *pd = [obj loadFileMainVersionDBFromSqlitemodeld:p];
-    NSData *pd2 = [obj loadFileMainVersionDBFromSqlitemodeld:p2];
+    NSString *qw = [[NSBundle mainBundle]pathForResource:@"qw" ofType:@"sqlitemodeld"];
     
-    [obj makeDBSqlForDescriptionModel:pd2];
+    NSData *qwd = [obj loadFileMainVersionDBFromSqlitemodeld:qw];
     
-    NSArray *arr = [obj compareSqliteModel:pd andNewSqliteModel:pd2];
-    NSLog(@"%@",arr);
+    [obj makeDBSqlForDescriptionModel:qwd];
+    
+//    NSArray *arr = [obj compareSqliteModel:pd andNewSqliteModel:pd2];
+//    NSLog(@"%@",arr);
     
     
 }

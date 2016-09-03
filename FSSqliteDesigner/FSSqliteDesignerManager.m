@@ -190,6 +190,7 @@
 //                NSTextView *tv = [self getSourceCodeEditorView];
 //                tv.string = @"test";
 //                NSLog(@"tv ======= %@",tv);
+                
                 return nil;//拦截系统保存
             }
         }
