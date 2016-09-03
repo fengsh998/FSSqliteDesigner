@@ -89,13 +89,13 @@
     
     FSDesignFileObject *A = [FSDesignFileObject loadFromFileData:modeldata error:&error];
     if (error) {
-        NSLog(@"params modeldata <%p> %@",error);
+        NSLog(@"params modeldata <%p> %@",modeldata,error);
         return nil;
     }
     
     FSDesignFileObject *B = [FSDesignFileObject loadFromFileData:newmodeldata error:&error];
     if (error) {
-        NSLog(@"params newmodeldata <%p> %@",error);
+        NSLog(@"params newmodeldata <%p> %@",newmodeldata,error);
         return nil;
     }
 
@@ -148,12 +148,12 @@
     NSError *error = nil;
     FSDesignFileObject *A = [FSDesignFileObject loadFromFileData:modeldata error:&error];
     if (error) {
-        NSLog(@"params modeldata <%p> %@",error);
+        NSLog(@"params modeldata <%p> %@",modeldata,error);
         return nil;
     }
     FSDesignFileObject *B = [FSDesignFileObject loadFromFileData:newmodeldata error:&error];
     if (error) {
-        NSLog(@"params newmodeldata <%p> %@",error);
+        NSLog(@"params newmodeldata <%p> %@",newmodeldata,error);
         return nil;
     }
     
