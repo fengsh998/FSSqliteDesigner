@@ -25,6 +25,7 @@ NSOutlineViewDelegate,NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSou
 NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
 {
     NSURL                               *_modelUrl;
+    BOOL                                _isChangedForDesigner;
 }
 
 @property (nonatomic, strong)               NSMenu                      *popMenu;
@@ -35,6 +36,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do view setup here.
+    _isChangedForDesigner = NO;
+    
     self.splitview.delegate = self;
 
     self.dblistview.delegate = self;
@@ -299,6 +302,7 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
             [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]库结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
                 if (returnCode == 1000) {
                     [self.designer removeDatabaseOfObject:(FSDatabse *)node];
+                    [self setIsChangedStruct:YES];
                     [self refreshOutlineTable];
                 }
             }];
@@ -312,6 +316,7 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
             [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该表结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
                 if (returnCode == 1000) {
                     [tbp removeChildrenNode:node];
+                    [self setIsChangedStruct:YES];
                     [self refreshOutlineTable];
                 }
             }];
@@ -326,6 +331,7 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
             [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该视图结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
                 if (returnCode == 1000) {
                     [vp removeChildrenNode:node];
+                    [self setIsChangedStruct:YES];
                     [self refreshOutlineTable];
                 }
             }];
@@ -339,6 +345,7 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
             [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该索引结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
                 if (returnCode == 1000) {
                     [ip removeChildrenNode:node];
+                    [self setIsChangedStruct:YES];
                     [self refreshOutlineTable];
                 }
             }];
@@ -352,7 +359,7 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
             [self alterWarning:[NSString stringWithFormat:@"您确定要删除[%@]该触发器结构吗？\n删除后不可愎复!",node.nodename] withOK:@"确定" withCancel:@"取消" withCompletion:^(NSModalResponse returnCode) {
                 if (returnCode == 1000) {
                     [tgp removeChildrenNode:node];
-                    
+                    [self setIsChangedStruct:YES];
                     [self refreshOutlineTable];
                 }
             }];
@@ -523,6 +530,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     if (item.type == nodeDatabase) {
         self.tfDBName.stringValue = [NSString stringWithFormat:@"库名:%@",item.nodename];
     }
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)alterWarning:(NSString *)msg withOK:(NSString *)ok withCancel:(NSString *)cancel withCompletion:(void (^ __nullable)(NSModalResponse returnCode))handler
@@ -712,6 +721,9 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     [self toDoSelectedTreeNode:db];
     
     [self setFocus:self.dblistview];
+    
+    //结构有变化
+    [self setIsChangedStruct:YES];
 }
 
 #pragma mark - 获取选中的项
@@ -789,6 +801,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
         [self.dblistview expandItem:selected];
         
         [self toDoSelectedTreeNode:newtable];
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -829,6 +843,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
         [self.dblistview expandItem:selected];
         
         [self toDoSelectedTreeNode:newIndex];
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -869,6 +885,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
         [self.dblistview expandItem:selected];
         
         [self toDoSelectedTreeNode:newView];
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -909,6 +927,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
         [self.dblistview expandItem:selected];
         
         [self toDoSelectedTreeNode:newTrigger];
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -918,6 +938,8 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     if ([selectitem isKindOfClass:[FSDatabse class]]) {
         FSDatabse *sdb = (FSDatabse *)selectitem;
         sdb.dynamic = sender.state;
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -937,6 +959,16 @@ NSTextViewDelegate,NSTabViewDelegate,NSTextDelegate>
     [self saveIndexSettings];
     [self saveViewSettings];
     [self saveTriggerSettings];
+}
+
+- (BOOL)structIsChanged
+{
+    return _isChangedForDesigner;
+}
+
+- (void)setIsChangedStruct:(BOOL)flag
+{
+    _isChangedForDesigner = flag;
 }
 
 @end

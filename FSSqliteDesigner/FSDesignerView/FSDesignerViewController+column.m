@@ -528,11 +528,29 @@
 - (void)onEditColumnName:(NSTextField *)textfield
 {
     NSInteger row = textfield.tag;
+    
+    FSColumn *exsist = [[self getCurrentEditorTable]findColumn:textfield.stringValue];
+    
+    NSInteger exsistrow = [[self getCurrentEditorTable]indexOfColumn:exsist];
+    
+    if (exsist)
+    {
+        if (exsistrow != row)
+        {
+            // 提示有同名字段了
+            [self alterCheckMessage:@"已存在相同的字段" reSetFocus:textfield];
+            
+            return;
+        }
+    }
+    
     FSColumn *column = [[self getCurrentEditorTable].allColumns objectAtIndex:row];
     column.fieldName = textfield.stringValue;
     
     [self.dblistview reloadItem:[self getCurrentEditorTable] reloadChildren:YES];
     [self toDoSelectedTreeNode:column];
+    
+    [self setIsChangedStruct:YES];
 }
 
 ///修改默认值
@@ -541,6 +559,8 @@
     NSInteger row = textfield.tag;
     FSColumn *columns = [[self getCurrentEditorTable].allColumns objectAtIndex:row];
     columns.defaultvalue = textfield.stringValue;
+    
+    [self setIsChangedStruct:YES];
 }
 
 ///修改主键选择
@@ -556,6 +576,8 @@
     {
         columns.constraint = columns.constraint ^ fcPrimarykey;
     }
+    
+    [self setIsChangedStruct:YES];
 }
 
 // /修改自增选择
@@ -572,6 +594,8 @@
     {
         columns.constraint = columns.constraint ^ fcAutoIncreament;
     }
+    
+    [self setIsChangedStruct:YES];
 }
 
 ///修改非空选择
@@ -587,6 +611,8 @@
     {
         columns.constraint = columns.constraint ^ fcNotNull;
     }
+    
+    [self setIsChangedStruct:YES];
 }
 
 ///修改唯一选择
@@ -602,6 +628,8 @@
     {
         columns.constraint = columns.constraint ^ fcUnique;
     }
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)textDidChange:(NSNotification *)notification

@@ -1726,6 +1726,10 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (FSColumn *)findColumn:(NSString *)fieldName
 {
+    if (!fieldName) {
+        return nil;
+    }
+    
     NSArray *columns = [self findNodeFromChildrenOfName:fieldName];
     return columns.count > 0 ? columns[0] : nil;
 }
@@ -1733,6 +1737,21 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 - (FSColumn *)columnAtIndex:(NSInteger)index
 {
     return (FSColumn *)[self findNodeAtIndex:index];
+}
+
+- (NSInteger)indexOfColumn:(FSColumn *)column
+{
+    NSInteger ret = -1;
+    for (FSColumn *item in self.childrens) {
+        
+        ret++;
+        
+        if (column == item) {
+            return ret;
+        }
+    }
+    
+    return NSNotFound;
 }
 
 - (void)removeColumn:(FSColumn *)column
@@ -1757,6 +1776,11 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (NSString *)makeSqlKeyValue
 {
+    //无字段的表为无意议表
+    if (self.allColumns.count == 0) {
+        return nil;
+    }
+    
     NSString *fmt = CREATE_TABLE_FMT_SQL;
     NSMutableArray *fields = [NSMutableArray array];
     for (FSColumn *column in self.allColumns)

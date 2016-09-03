@@ -183,9 +183,8 @@
         if((([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask) && [[event charactersIgnoringModifiers] compare:@"s"] == 0) {
             if (self.designVC && self.designVC.designer && self.isSelectedSqlitemodel)
             {
-                [self.designVC todoSaveSetValue];
                 
-                [self.designVC.designer saveToFile:self.designVC.modelUrl];
+                [self saveToDisk];
                 //做了个投机取巧的方式
 //                NSTextView *tv = [self getSourceCodeEditorView];
 //                tv.string = @"test";
@@ -197,7 +196,15 @@
         
         return event;
     }];
+}
 
+- (void)saveToDisk
+{
+    if (self.designVC.structIsChanged) {
+        [self.designVC todoSaveSetValue];
+        [self.designVC.designer saveToFile:self.designVC.modelUrl];
+        [self.designVC setIsChangedStruct:NO];
+    }
 }
 
 #pragma mark - 菜单处理
@@ -506,6 +513,9 @@
             }
             else
             {
+                ///有切换则先保存一下设置
+                [self saveToDisk];
+                
                 //当未选中，且在编辑时则不让切换
                 if (!selectedItem && !self.sqliteDesignView.hidden) {
                     return;

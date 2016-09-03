@@ -302,6 +302,7 @@ typedef enum
 - (NSArray *)allColumnsName;
 - (FSColumn *)findColumn:(NSString *)fieldName;
 - (FSColumn *)columnAtIndex:(NSInteger)index;
+- (NSInteger)indexOfColumn:(FSColumn *)column;
 - (void)removeColumn:(FSColumn *)column;
 - (void)removeColumnOfIndex:(NSInteger)index;
 - (void)removeAllColumn;

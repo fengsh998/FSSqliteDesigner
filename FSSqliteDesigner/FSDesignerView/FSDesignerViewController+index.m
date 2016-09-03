@@ -40,6 +40,8 @@
     FSNode *node = [self getSelectItemInList];
     [self.dblistview reloadItem:node.parentNode reloadChildren:YES];
     [self toDoSelectedTreeNode:node];
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)toLoadTabels:(NSArray *)tables
@@ -138,11 +140,15 @@
     
     [self.tvIndexSql setString:sql];
     
+    [self setIsChangedStruct:YES];
+    
 }
 
 - (IBAction)onCheckIndexUnique:(NSButton *)sender
 {
     [self getCurrentEditorIndex].unique = (BOOL)sender.state;
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)saveIndexSettings

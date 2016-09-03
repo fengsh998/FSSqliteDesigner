@@ -39,6 +39,8 @@
     FSNode *node = [self getSelectItemInList];
     [self.dblistview reloadItem:node.parentNode reloadChildren:YES];
     [self toDoSelectedTreeNode:node];
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)loadView:(FSView *)view

@@ -202,6 +202,8 @@
     [self toDoSelectedTreeNode:node];
     
     [self todoRefreshSqlOutput];
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)popTriggerActionClicked:(NSMenuItem *)item
@@ -221,6 +223,8 @@
 {
     NSString *s = [[self getCurrentEditorTrigger]makeSqlKeyValue];
     self.tvTriggerSql.string = s ? s : @"";
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)textDidChange:(NSNotification *)notification
@@ -234,6 +238,8 @@
         tg.sqls = tv.string;
         
         [self todoRefreshSqlOutput];
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -253,6 +259,8 @@
     [self getCurrentEditorTrigger].columns = ma;
     
     [self todoRefreshSqlOutput];
+    
+    [self setIsChangedStruct:YES];
 }
 
 @end

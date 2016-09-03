@@ -107,7 +107,8 @@
 @property (unsafe_unretained) IBOutlet  NSTextView              *tvTriggerSqlEdit;
 ///触发器sql显示
 @property (unsafe_unretained) IBOutlet  NSTextView              *tvTriggerSql;
-
+///结构是否变化
+@property (nonatomic, assign, readonly) BOOL                    structIsChanged;
 ///加载sqlitemodel的路径
 - (void)setModelUrl:(NSURL *)modelUrl;
 ///获取选中项
@@ -120,7 +121,8 @@
 - (void)setFocus:(NSView *)v;
 ///弹窗提示
 - (void)alterCheckMessage:(NSString *)msg reSetFocus:(NSView *)v;
-
+///设置是否结构有改变(后面根据这个来判断是否需要保存结构)
+- (void)setIsChangedStruct:(BOOL)flag;
 // /当前Ctrl + s 时对界面上的修改值进行保存设置
 - (void)todoSaveSetValue;
 
