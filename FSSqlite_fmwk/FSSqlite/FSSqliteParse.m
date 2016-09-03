@@ -17,6 +17,11 @@
     return nil;
 }
 
+- (NSDictionary *)makeDBSqlForDescriptionModel:(NSData *)modeldata
+{
+    return nil;
+}
+
 @end
 
 @implementation FSSqliteEngine
@@ -52,6 +57,15 @@
     return nil;
 }
 
+- (NSDictionary *)makeDBSqlForDescriptionModel:(NSData *)modeldata
+{
+    FSDesignFileObject *dbfile = [FSDesignFileObject loadFromFileData:modeldata error:nil];
+    
+    NSDictionary *dbStructure = [dbfile exportSqls];
+    
+    return dbStructure;
+}
+
 ///从数组a,b中取出相同的元素
 - (NSArray *)same:(NSArray *)a with:(NSArray *)b
 {
@@ -71,9 +85,20 @@
 
 - (NSDictionary *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata
 {
-    FSDesignFileObject *A = [FSDesignFileObject loadFromFileData:modeldata error:nil];
-    FSDesignFileObject *B = [FSDesignFileObject loadFromFileData:newmodeldata error:nil];
+    NSError *error = nil;
     
+    FSDesignFileObject *A = [FSDesignFileObject loadFromFileData:modeldata error:&error];
+    if (error) {
+        NSLog(@"params modeldata <%p> %@",error);
+        return nil;
+    }
+    
+    FSDesignFileObject *B = [FSDesignFileObject loadFromFileData:newmodeldata error:&error];
+    if (error) {
+        NSLog(@"params newmodeldata <%p> %@",error);
+        return nil;
+    }
+
     //A,B的版本号相同，就直接返回
     if ([A.modelVersion isEqualToString:B.modelVersion]) {
         return nil;
@@ -118,24 +143,30 @@
     return sqlsdic.count > 0 ? sqlsdic : nil;
 }
 
-- (NSDictionary *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata withDBName:(NSString *)dbname
+- (NSArray <NSString *> *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata withDBName:(NSString *)dbname
 {
-    FSDesignFileObject *A = [FSDesignFileObject loadFromFileData:modeldata error:nil];
-    FSDesignFileObject *B = [FSDesignFileObject loadFromFileData:newmodeldata error:nil];
+    NSError *error = nil;
+    FSDesignFileObject *A = [FSDesignFileObject loadFromFileData:modeldata error:&error];
+    if (error) {
+        NSLog(@"params modeldata <%p> %@",error);
+        return nil;
+    }
+    FSDesignFileObject *B = [FSDesignFileObject loadFromFileData:newmodeldata error:&error];
+    if (error) {
+        NSLog(@"params newmodeldata <%p> %@",error);
+        return nil;
+    }
     
     FSDatabse *fda =[A databaseOfName:dbname];
     FSDatabse *fdb = [B databaseOfName:dbname];
     
-    NSMutableDictionary *sqlsdic = [NSMutableDictionary dictionary];
-    
     if (fda && fdb) {
         NSArray *comsqls = [self compareDatabase:fda withnewDB:fdb];
-        if (comsqls.count > 0) {
-            [sqlsdic setObject:comsqls forKey:dbname];
-        }
+        
+        return comsqls;
     }
     
-    return sqlsdic.count > 0 ? sqlsdic : nil;
+    return nil;
 }
 
 - (NSArray *)compareDatabase:(FSDatabse *)adb withnewDB:(FSDatabse *)bdb

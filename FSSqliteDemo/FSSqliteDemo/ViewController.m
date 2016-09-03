@@ -32,13 +32,15 @@
     NSString *p = [[NSBundle mainBundle]pathForResource:@"demodb" ofType:@"sqlitemodeld"];
     NSString *p2 = [[NSBundle mainBundle]pathForResource:@"demodb2" ofType:@"sqlitemodeld"];
     
-//    NSData *pd = [NSData dataWithContentsOfFile:p];
-//    NSData *pd2 = [NSData dataWithContentsOfFile:p2];
     NSData *pd = [obj loadFileMainVersionDBFromSqlitemodeld:p];
     NSData *pd2 = [obj loadFileMainVersionDBFromSqlitemodeld:p2];
     
+    [obj makeDBSqlForDescriptionModel:pd2];
+    
     NSArray *arr = [obj compareSqliteModel:pd andNewSqliteModel:pd2];
     NSLog(@"%@",arr);
+    
+    
 }
 
 - (void)didReceiveMemoryWarning {

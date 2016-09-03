@@ -379,6 +379,49 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
     return dic;
 }
 
+- (NSDictionary <NSString *,NSArray*>*)exportSqls
+{
+    NSMutableDictionary *dbsqls = [NSMutableDictionary dictionary];
+    
+    for (FSDatabse *db in self.databases) {
+        NSString *dbname = db.dbName;
+        NSMutableArray *sqls = [NSMutableArray array];
+        for (FSTable *table in db.tables) {
+            NSString *sql = [table FetchExectureSql];
+            if (sql) {
+                [sqls addObject:sql];
+            }
+        }
+        
+        for (FSIndex *index in db.indexObjects) {
+            NSString *sql = [index FetchExectureSql];
+            if (sql) {
+                [sqls addObject:sql];
+            }
+        }
+        
+        for (FSView *view in db.views)
+        {
+            NSString *sql = [view FetchExectureSql];
+            if (sql) {
+                [sqls addObject:sql];
+            }
+        }
+        
+        for (FSTrigger *trigger in db.triggers)
+        {
+            NSString *sql = [trigger FetchExectureSql];
+            if (sql) {
+                [sqls addObject:sql];
+            }
+        }
+        
+        [dbsqls setObject:sqls forKey:dbname];
+    }
+    
+    return dbsqls;
+}
+
 - (void)parseObject:(FSDesignFileObject *)designobject outToNSArray:(NSMutableDictionary *)dic
 {
 // 如果有需要再开放这个自定义的plist结构

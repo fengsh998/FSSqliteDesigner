@@ -47,7 +47,6 @@
 		9D1F5CA11B649AF1009F30DE /* FSTabView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSTabView.m; sourceTree = "<group>"; };
 		9D32F40C1B79F3DA00A2F699 /* FSTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSTextField.h; sourceTree = "<group>"; };
 		9D32F40D1B79F3DA00A2F699 /* FSTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSTextField.m; sourceTree = "<group>"; };
-		9D40106C1C3E23AB001A9CB7 /* FSSqlite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FSSqlite.framework; path = "FSSqlite_fmwk/build/Debug-iphoneos/FSSqlite.framework"; sourceTree = "<group>"; };
 		9D40106E1C3E2406001A9CB7 /* FSSqlite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FSSqlite.framework; path = "FSSqlite_fmwk/build/Debug-iphoneos/FSSqlite.framework"; sourceTree = "<group>"; };
 		9D4010701C3E243F001A9CB7 /* FSDesignFileObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSDesignFileObject.h; path = FSSqlite_fmwk/FSSqlite/FSDesignFileObject.h; sourceTree = SOURCE_ROOT; };
 		9D4010711C3E243F001A9CB7 /* FSDesignFileObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSDesignFileObject.m; path = FSSqlite_fmwk/FSSqlite/FSDesignFileObject.m; sourceTree = SOURCE_ROOT; };
@@ -183,7 +182,6 @@
 			isa = PBXGroup;
 			children = (
 				9D40106E1C3E2406001A9CB7 /* FSSqlite.framework */,
-				9D40106C1C3E23AB001A9CB7 /* FSSqlite.framework */,
 				9DD95B2D1B4BA15900D54DBA /* Cocoa.framework */,
 				9DD95B2B1B4BA14D00D54DBA /* Foundation.framework */,
 				9DD95B291B4BA13900D54DBA /* AppKit.framework */,

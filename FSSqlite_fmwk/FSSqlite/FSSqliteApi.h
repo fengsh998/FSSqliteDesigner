@@ -11,20 +11,6 @@
 
 #import <UIKit/UIKit.h>
 
-extern NSString *FSDatabaseNameKey;
-extern NSString *FSDatabaseUpdateSqls;
-
-typedef NS_ENUM(NSInteger,ElementType) {
-    elementTypeNone                     ,
-    elementTypeDB                       ,//库
-    elementTypeTable                    ,//表
-    elementTypeView                     ,//视图
-    elementTypeIndex                    ,//索引
-    elementTypeTrigger
-};
-
-typedef void(^ParseElements)(id obj,NSString *deeppath,ElementType type,BOOL *stop);
-
 @protocol FSSqliteProtocol <NSObject>
 
 /**
@@ -35,6 +21,12 @@ typedef void(^ParseElements)(id obj,NSString *deeppath,ElementType type,BOOL *st
  *  @return 目前最新版本的数据结构
  */
 - (NSData *)loadFileMainVersionDBFromSqlitemodeld:(NSString *)filepath;
+
+/**
+ *          生成数据结构脚本
+ *
+ */
+- (NSDictionary *)makeDBSqlForDescriptionModel:(NSData *)modeldata;
 
 @optional
 /**
@@ -55,7 +47,8 @@ typedef void(^ParseElements)(id obj,NSString *deeppath,ElementType type,BOOL *st
  */
 - (NSArray<NSDictionary *> *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata;
 
-- (NSArray<NSDictionary *> *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata withDBName:(NSString *)dbname;
+- (NSArray<NSString *> *)compareSqliteModel:(NSData *)modeldata andNewSqliteModel:(NSData *)newmodeldata withDBName:(NSString *)dbname;
+
 
 @end
 

@@ -470,5 +470,6 @@ typedef enum
 - (NSMutableDictionary *)getNeedSaveContents;
 
 ///导出为sqlite语句脚本
+- (NSDictionary <NSString *,NSArray*>*)exportSqls;
 
 @end
