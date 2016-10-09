@@ -9,7 +9,8 @@
 #import <Cocoa/Cocoa.h>
 
 @interface FSExplorer : NSWindowController
-@property (nonatomic, copy) NSURL               *pathURL;
-@property (weak) IBOutlet   NSTextField         *tfSaveName;
-
+@property (nonatomic, copy)     NSURL               *pathURL;
+@property (weak) IBOutlet       NSTextField         *tfSaveName;
+@property (nonatomic, assign)   BOOL                isCreate;
+@property (weak) IBOutlet       NSTextField         *lbName;
 @end

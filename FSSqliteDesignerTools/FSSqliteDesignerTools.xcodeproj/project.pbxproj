@@ -34,6 +34,7 @@
 		9D9B7F401D963A5A00190C12 /* PreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D9B7F3D1D963A5A00190C12 /* PreviewViewController.m */; };
 		9D9B7F421D963B6200190C12 /* PreviewView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D9B7F411D963B6200190C12 /* PreviewView.xib */; };
 		9D9B7F441D963BA100190C12 /* HeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D9B7F431D963BA100190C12 /* HeaderView.xib */; };
+		9D9B7FC61D992E3800190C12 /* ubs.sqlitemodeld in Resources */ = {isa = PBXBuildFile; fileRef = 9D9B7FC51D992E3800190C12 /* ubs.sqlitemodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -85,6 +86,7 @@
 		9D9B7F3D1D963A5A00190C12 /* PreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewViewController.m; sourceTree = "<group>"; };
 		9D9B7F411D963B6200190C12 /* PreviewView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreviewView.xib; sourceTree = "<group>"; };
 		9D9B7F431D963BA100190C12 /* HeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HeaderView.xib; sourceTree = "<group>"; };
+		9D9B7FC51D992E3800190C12 /* ubs.sqlitemodeld */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ubs.sqlitemodeld; path = ../../../../../Desktop/db/ubs.sqlitemodeld; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 				9D3A9DB91D9540C500830B1A /* FSExplorer.xib */,
 				9D392D321D94D9CB00AE52CB /* ViewController.h */,
 				9D392D331D94D9CB00AE52CB /* ViewController.m */,
+				9D9B7FC51D992E3800190C12 /* ubs.sqlitemodeld */,
 				9D392D351D94D9CB00AE52CB /* Assets.xcassets */,
 				9D392D371D94D9CB00AE52CB /* Main.storyboard */,
 				9D392D3A1D94D9CB00AE52CB /* Info.plist */,
@@ -250,6 +253,7 @@
 				9D392D391D94D9CB00AE52CB /* Main.storyboard in Resources */,
 				9D9B7F421D963B6200190C12 /* PreviewView.xib in Resources */,
 				9D9B7F441D963BA100190C12 /* HeaderView.xib in Resources */,
+				9D9B7FC61D992E3800190C12 /* ubs.sqlitemodeld in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

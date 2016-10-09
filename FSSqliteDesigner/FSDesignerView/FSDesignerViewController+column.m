@@ -76,6 +76,8 @@
                 [self.fieldlistview selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
             }
         }
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -122,6 +124,8 @@
         {
             [self.fieldlistview selectRowIndexes:[NSIndexSet indexSetWithIndex:validIndex] byExtendingSelection:NO];
         }
+        
+        [self setIsChangedStruct:YES];
     }
 }
 
@@ -239,6 +243,8 @@
             c.fieldtype = [c covertToType:item.title];
         }
     }];
+    
+    [self setIsChangedStruct:YES];
 }
 
 #pragma mark - 选择长度
@@ -263,6 +269,8 @@
             c.typeLength = [value integerValue];
         }
     }];
+        
+    [self setIsChangedStruct:YES];
 }
 
 #pragma mark - 设置外键属性页
@@ -278,6 +286,8 @@
     self.popOptions.enabled         = (flag && ok);
     self.popActionForDelete.enabled = (flag && ok);
     self.popActionForUpdate.enabled = (flag && ok);
+    
+    [self setIsChangedStruct:YES];
 }
 
 - (void)toDoSetForeignKeyTabBySelectedColumn:(FSColumn *)column
@@ -289,6 +299,8 @@
     {
         [self enableForeignKeypage:YES];
     }
+    
+    [self setIsChangedStruct:YES];
 }
 
 #pragma mark - 获取初设长度

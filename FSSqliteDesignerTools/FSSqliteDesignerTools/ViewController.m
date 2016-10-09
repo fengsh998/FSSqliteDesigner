@@ -15,9 +15,9 @@
 
 @interface ViewController()
 @property (nonatomic, strong)  FSDesignerViewController               *designVC;
-@property (nonatomic, strong) FSDesignerView                          *sqliteDesignView;
-@property (nonatomic, strong) FSExplorer                              *explorer;
-
+@property (nonatomic, strong)  FSDesignerView                         *sqliteDesignView;
+@property (nonatomic, strong)  FSExplorer                             *explorer;
+@property (nonatomic, copy)    NSString                               *smtitle;
 @end
 
 @implementation ViewController
@@ -25,6 +25,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+//    NSKeyedArchiver
     // Do any additional setup after loading the view.
     
     NSBundle *bd = [NSBundle bundleForClass:self.class];
@@ -38,7 +39,9 @@
                                                  name:NSWindowDidResizeNotification
                                                object:nil];
     
-    NSApp.windows[0].title = [NSString stringWithFormat:@"%@",NSApp.windows[0].title];
+    self.smtitle = NSApp.windows[0].title;
+    
+    [self toListenAppEvent];
 }
 
 - (void)dealloc
@@ -75,19 +78,37 @@
 
 - (IBAction)onNewClicked:(id)sender {
     self.explorer = [[FSExplorer alloc]initWithWindowNibName:@"FSExplorer"];
+    self.explorer.isCreate = YES;
+    [self toPickPathView];
+}
+
+- (IBAction)onOpenClicked:(id)sender {
+    self.explorer = [[FSExplorer alloc]initWithWindowNibName:@"FSExplorer"];
+    self.explorer.isCreate = NO;
+    [self toPickPathView];
+}
+
+- (void)toPickPathView
+{
     [self.view.window beginSheet:self.explorer.window completionHandler:^(NSModalResponse returnCode) {
         switch (returnCode) {
             case NSModalResponseOK:
             {
-                NSURL *url = [self.explorer.pathURL URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.sqlitemodeld",self.explorer.tfSaveName.stringValue]];
-                [self toCreateDBModel:url.path];
-                self.lbpath.stringValue = url.path;
-                NSLog(@"Done button tapped in Custom Sheet %@",url.path);
+                if (self.explorer.isCreate) {
+                    NSURL *url = [self.explorer.pathURL URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.sqlitemodeld",self.explorer.tfSaveName.stringValue]];
+                    [self toCreateDBModel:url.path];
+                    self.lbpath.stringValue = url.path;
+                    self.smtitle = [url.path.lastPathComponent stringByDeletingPathExtension];
+                } else {
+                    self.smtitle = [[self.explorer.pathURL.path lastPathComponent]stringByDeletingPathExtension];
+                    self.lbpath.stringValue = self.explorer.pathURL.path;
+                    [self.designVC setModelUrl:[NSURL fileURLWithPath:self.explorer.pathURL.path]];
+                }
             }
                 break;
             case NSModalResponseCancel:
             {
-                NSLog(@"Cancel button tapped in Custom Sheet");
+                
             }
                 break;
                 
@@ -97,10 +118,6 @@
         
         self.explorer = nil;
     }];
-}
-
-- (IBAction)onOpenClicked:(id)sender {
-    
 }
 
 - (IBAction)onGoClicked:(id)sender {
@@ -135,8 +152,50 @@
     [version writeToFile:v atomically:YES];
     
     //加载model
-    [self.designVC setModelUrl:[NSURL fileURLWithPath:fullpath]];
+    [self.designVC setModelUrl:[NSURL fileURLWithPath:file]];
 }
 
+- (void)toListenAppEvent
+{
+    [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask | NSMouseMovedMask  handler:^NSEvent * __nullable(NSEvent * __nonnull event) {
+        
+        if (event.type == NSEventTypeMouseMoved)
+        {
+            if (self.designVC && self.designVC.designer)
+            {
+                [self updateWindowTitleStatus:self.designVC.structIsChanged];
+            }
+            return event;
+        }
+        
+        if((([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask) && ([[event charactersIgnoringModifiers] compare:@"s"] == 0)) {
+            if (self.designVC && self.designVC.designer)
+            {
+                if (self.designVC.structIsChanged) {
+                    [self.designVC todoSaveSetValue];
+                    [self.designVC.designer saveToFile:self.designVC.modelUrl];
+                    [self.designVC setIsChangedStruct:NO];
+                }
+                
+                [self updateWindowTitleStatus:self.designVC.structIsChanged];
+                
+                return nil;//拦截系统保存
+            }
+        }
+        
+        return event;
+    }];
+}
+
+- (void)updateWindowTitleStatus:(BOOL)changed
+{
+    NSWindow *wnd = NSApp.windows[0];
+    
+    if (changed) {
+        wnd.title = [NSString stringWithFormat:@"%@*",self.smtitle];
+    } else {
+        wnd.title = [NSString stringWithFormat:@"%@",self.smtitle];
+    }
+}
 
 @end

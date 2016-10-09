@@ -28,18 +28,28 @@
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
     
     [self.browser loadColumnZero];
+    
+    self.lbName.hidden = !self.isCreate;
+    self.tfSaveName.hidden = !self.isCreate;
 }
 
 - (IBAction)onOKClicked:(id)sender {
     
-    if (self.tfSaveName.stringValue.length > 0)
-    {
-        FileSystemNode *clickedNode = [self fileSystemNodeAtRow:self.browser.clickedRow column:self.browser.selectedColumn+1];
-        if (clickedNode != nil) {
-            self.pathURL = clickedNode.URL;
+    FileSystemNode *clickedNode = [self fileSystemNodeAtRow:self.browser.clickedRow column:self.browser.selectedColumn+1];
+    if (clickedNode != nil) {
+        self.pathURL = clickedNode.URL;
+    }
+    
+    if (self.isCreate) {
+        if (self.tfSaveName.stringValue.length > 0) {
+            [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
         }
-        
-        [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+    } else {
+        NSString *ext = [self.pathURL.lastPathComponent pathExtension];
+        if ([ext isEqualToString:@"sqlitemodel"])
+        {
+            [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+        }
     }
 }
 

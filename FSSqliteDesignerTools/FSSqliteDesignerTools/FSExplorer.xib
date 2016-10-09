@@ -8,6 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="FSExplorer">
             <connections>
                 <outlet property="browser" destination="y3H-3J-iLr" id="Ynu-87-Njy"/>
+                <outlet property="lbName" destination="qLE-ja-dcL" id="WRb-Fd-PWs"/>
                 <outlet property="tfSaveName" destination="MOt-hJ-jrp" id="bP2-WO-Wih"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
