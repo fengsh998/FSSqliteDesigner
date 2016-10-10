@@ -9,8 +9,7 @@
 #ifndef FSSqliteApi_h
 #define FSSqliteApi_h
 
-//#import <UIKit/UIKit.h>
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @protocol FSSqliteProtocol <NSObject>
 

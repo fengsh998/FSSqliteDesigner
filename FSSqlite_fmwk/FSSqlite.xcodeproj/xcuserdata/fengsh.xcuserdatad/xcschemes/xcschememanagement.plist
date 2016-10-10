@@ -9,6 +9,16 @@
 			<key>orderHint</key>
 			<integer>2</integer>
 		</dict>
+		<key>FSSqliteA.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
+		<key>allArchForLib.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
+		</dict>
 		<key>alltarget.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -18,6 +28,16 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>9D33DB2F1C3DFE5E00E8E80F</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9DD916091DAA41E700C33557</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9DD9161F1DAA468C00C33557</key>
 		<dict>
 			<key>primary</key>
 			<true/>

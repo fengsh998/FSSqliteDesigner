@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		9DD9161F1DAA468C00C33557 /* allArchForLib */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 9DD916201DAA468C00C33557 /* Build configuration list for PBXAggregateTarget "allArchForLib" */;
+			buildPhases = (
+				9DD916231DAA469200C33557 /* ShellScript */,
+			);
+			dependencies = (
+				9DD916251DAB1ED700C33557 /* PBXTargetDependency */,
+			);
+			name = allArchForLib;
+			productName = allArchForLib;
+		};
 		9DF235681D6C37B300159A47 /* alltarget */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 9DF2356B1D6C37B300159A47 /* Build configuration list for PBXAggregateTarget "alltarget" */;
@@ -30,7 +42,27 @@
 		9D4010781C3E24F5001A9CB7 /* FSSqliteParse.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D4010761C3E24F5001A9CB7 /* FSSqliteParse.h */; };
 		9D4010791C3E24F5001A9CB7 /* FSSqliteParse.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D4010771C3E24F5001A9CB7 /* FSSqliteParse.m */; };
 		9D40107B1C3E2561001A9CB7 /* FSSqliteApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D40107A1C3E2561001A9CB7 /* FSSqliteApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9DD916131DAA422800C33557 /* FSSqliteParse.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D4010771C3E24F5001A9CB7 /* FSSqliteParse.m */; };
+		9DD916141DAA422800C33557 /* FSUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D4010681C3E2355001A9CB7 /* FSUtils.m */; };
+		9DD916151DAA422800C33557 /* FSDesignFileObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D4010601C3E21A6001A9CB7 /* FSDesignFileObject.m */; };
+		9DD916161DAA423600C33557 /* FSSqliteDDL.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D0EDA161C43587000051FE8 /* FSSqliteDDL.h */; };
+		9DD916171DAA423600C33557 /* FSSqliteApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D40107A1C3E2561001A9CB7 /* FSSqliteApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9DD916181DAA423600C33557 /* FSSqliteParse.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D4010761C3E24F5001A9CB7 /* FSSqliteParse.h */; };
+		9DD916191DAA423600C33557 /* FSUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D4010671C3E2355001A9CB7 /* FSUtils.h */; };
+		9DD9161A1DAA423600C33557 /* FSDesignFileObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D40105F1C3E21A6001A9CB7 /* FSDesignFileObject.h */; };
+		9DD9161B1DAA423600C33557 /* FSSqlite.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D33DB331C3DFE5E00E8E80F /* FSSqlite.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9DD9161E1DAA428800C33557 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD9161D1DAA428800C33557 /* Foundation.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9DD916241DAB1ED700C33557 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9D33DB271C3DFE5E00E8E80F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9DD916091DAA41E700C33557;
+			remoteInfo = FSSqliteA;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		9D0EDA161C43587000051FE8 /* FSSqliteDDL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSSqliteDDL.h; sourceTree = "<group>"; };
@@ -44,6 +76,8 @@
 		9D4010761C3E24F5001A9CB7 /* FSSqliteParse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSSqliteParse.h; sourceTree = "<group>"; };
 		9D4010771C3E24F5001A9CB7 /* FSSqliteParse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSSqliteParse.m; sourceTree = "<group>"; };
 		9D40107A1C3E2561001A9CB7 /* FSSqliteApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSSqliteApi.h; sourceTree = "<group>"; };
+		9DD9160A1DAA41E700C33557 /* libFSSqliteA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFSSqliteA.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		9DD9161D1DAA428800C33557 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +85,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9DD916071DAA41E700C33557 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9DD9161E1DAA428800C33557 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +104,7 @@
 			children = (
 				9D33DB321C3DFE5E00E8E80F /* FSSqlite */,
 				9D33DB311C3DFE5E00E8E80F /* Products */,
+				9DD9161C1DAA428800C33557 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -69,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				9D33DB301C3DFE5E00E8E80F /* FSSqlite.framework */,
+				9DD9160A1DAA41E700C33557 /* libFSSqliteA.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -90,6 +134,14 @@
 			path = FSSqlite;
 			sourceTree = "<group>";
 		};
+		9DD9161C1DAA428800C33557 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9DD9161D1DAA428800C33557 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -103,6 +155,19 @@
 				9D4010691C3E2355001A9CB7 /* FSUtils.h in Headers */,
 				9D0EDA171C43587000051FE8 /* FSSqliteDDL.h in Headers */,
 				9D4010781C3E24F5001A9CB7 /* FSSqliteParse.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9DD916081DAA41E700C33557 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9DD916171DAA423600C33557 /* FSSqliteApi.h in Headers */,
+				9DD9161B1DAA423600C33557 /* FSSqlite.h in Headers */,
+				9DD916161DAA423600C33557 /* FSSqliteDDL.h in Headers */,
+				9DD916181DAA423600C33557 /* FSSqliteParse.h in Headers */,
+				9DD916191DAA423600C33557 /* FSUtils.h in Headers */,
+				9DD9161A1DAA423600C33557 /* FSDesignFileObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +192,24 @@
 			productReference = 9D33DB301C3DFE5E00E8E80F /* FSSqlite.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		9DD916091DAA41E700C33557 /* FSSqliteA */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9DD916101DAA41E700C33557 /* Build configuration list for PBXNativeTarget "FSSqliteA" */;
+			buildPhases = (
+				9DD916061DAA41E700C33557 /* Sources */,
+				9DD916071DAA41E700C33557 /* Frameworks */,
+				9DD916081DAA41E700C33557 /* Headers */,
+				9DD916261DAB34E600C33557 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FSSqliteA;
+			productName = FSSqliteA;
+			productReference = 9DD9160A1DAA41E700C33557 /* libFSSqliteA.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -138,6 +221,14 @@
 				TargetAttributes = {
 					9D33DB2F1C3DFE5E00E8E80F = {
 						CreatedOnToolsVersion = 7.2;
+					};
+					9DD916091DAA41E700C33557 = {
+						CreatedOnToolsVersion = 8.0;
+						ProvisioningStyle = Automatic;
+					};
+					9DD9161F1DAA468C00C33557 = {
+						CreatedOnToolsVersion = 8.0;
+						ProvisioningStyle = Automatic;
 					};
 					9DF235681D6C37B300159A47 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -158,6 +249,8 @@
 			targets = (
 				9D33DB2F1C3DFE5E00E8E80F /* FSSqlite */,
 				9DF235681D6C37B300159A47 /* alltarget */,
+				9DD916091DAA41E700C33557 /* FSSqliteA */,
+				9DD9161F1DAA468C00C33557 /* allArchForLib */,
 			);
 		};
 /* End PBXProject section */
@@ -173,6 +266,32 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		9DD916231DAA469200C33557 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# -e表示有失败就全部失败\nset -e\nset +u\n# If we're already inside this script then die\nif [ -n \"$FK_MULTIPLATFORM_BUILD_IN_PROGRESS\" ]; then\nexit 0\nfi\n\n#设置如果使用到未定义的变量则报错\nset -u\n#导入环境变量\nexport FK_MULTIPLATFORM_BUILD_IN_PROGRESS=1\n#framework名称\nFK_FRAMEWORK_NAME=${PROJECT_NAME}\n#需要导出的静态库名称\nFK_INPUT_STATIC_LIB=\"lib${PROJECT_NAME}A.a\"\n#framework存放路径\nFK_FRAMEWORK_LOCATION=\"${BUILT_PRODUCTS_DIR}/${FK_FRAMEWORK_NAME}A.framework\"\n#最终导出静库太库和动态库的位置\nFK_SAVE_DIR=\"${PROJECT_DIR}/Exports\"\nrm -rf \"${FK_SAVE_DIR}\"\nmkdir -p \"${FK_SAVE_DIR}\"\n\nFK_SAVE_LIB_DIR=\"${FK_SAVE_DIR}/Lib\"\nFK_SAVE_LIB_INCLUDE_DIR=\"${FK_SAVE_DIR}/Lib/include\"\nmkdir -p \"${FK_SAVE_LIB_DIR}\"\nFK_SAVE_FMWK_DIR=\"${FK_SAVE_DIR}/Fmwk\"\nmkdir -p \"${FK_SAVE_FMWK_DIR}\"\n\n#编译时头文件目录\nFK_HEADERS_INCLUDE=\"${BUILT_PRODUCTS_DIR}/include\"\n\n#构建静态库\nfunction build_static_library {\n    # Will rebuild the static library as specified\n    #     build_static_library sdk\n    xcrun xcodebuild -project \"${PROJECT_FILE_PATH}\" \\\n    -target \"${TARGET_NAME}\" \\\n    -configuration \"${CONFIGURATION}\" \\\n    -sdk \"${1}\" \\\n    ONLY_ACTIVE_ARCH=NO \\\n    BUILD_DIR=\"${BUILD_DIR}\" \\\n    OBJROOT=\"${OBJROOT}\" \\\n    BUILD_ROOT=\"${BUILD_ROOT}\" \\\n    SYMROOT=\"${SYMROOT}\" $ACTION\n}\n\n#合并cpu架构\nfunction make_fat_library {\n    # Will smash 2 static libs together\n    #     make_fat_library in1 in2 out\n    xcrun lipo -create \"${1}\" \"${2}\" -output \"${3}\"\n}\n\n# 1 - Extract the platform (iphoneos/iphonesimulator) from the SDK name\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]; then\nFK_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\necho \"Could not find platform name from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\n# 2 - Extract the version from the SDK\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]; then\nFK_SDK_VERSION=${BASH_REMATCH[1]}\nelse\necho \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\n# 3 - 互换平台，当用模拟器编时则其它平台为iphoneos,当用真机编译时其它平台为iphonesimulator\nif [ \"$FK_SDK_PLATFORM\" == \"iphoneos\" ]; then\nFK_OTHER_PLATFORM=iphonesimulator\nelse\nFK_OTHER_PLATFORM=iphoneos\nfi\n\n# 4 - Find the build directory\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$FK_SDK_PLATFORM$ ]]; then\nFK_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${FK_OTHER_PLATFORM}\"\nelse\necho \"Could not find other platform build directory.\"\nexit 1\nfi\n\n# 优先编译其它平台的lib库\nbuild_static_library \"${FK_OTHER_PLATFORM}${FK_SDK_VERSION}\"\n\n# If we're currently building for iphonesimulator, then need to rebuild\n#   to ensure that we get both i386 and x86_64\nif [ \"$FK_SDK_PLATFORM\" == \"iphonesimulator\" ]; then\nbuild_static_library \"${SDK_NAME}\"\nfi\n\n# 合并cpu架构,输出到指定位置\nmake_fat_library \"${BUILT_PRODUCTS_DIR}/${FK_INPUT_STATIC_LIB}\" \\\n\"${FK_OTHER_BUILT_PRODUCTS_DIR}/${FK_INPUT_STATIC_LIB}\" \\\n\"${FK_SAVE_LIB_DIR}/${FK_INPUT_STATIC_LIB}\"\n\n#open \"${FK_FRAMEWORK_LOCATION}\"\n#copy framework到保存目录\ncp -a \"${FK_FRAMEWORK_LOCATION}\" \"${FK_SAVE_FMWK_DIR}\"\n\n#copy 头文件\ncp -a \"${FK_HEADERS_INCLUDE}\" \"${FK_SAVE_LIB_INCLUDE_DIR}\"\n\n#copy 合并后的lib到framework中\ncp -a \"${FK_SAVE_LIB_DIR}/${FK_INPUT_STATIC_LIB}\" \\\n\"${FK_SAVE_FMWK_DIR}/${FK_FRAMEWORK_NAME}A.framework/Versions/A/${FK_FRAMEWORK_NAME}A\"\n\nopen \"${FK_SAVE_DIR}\"\n";
+		};
+		9DD916261DAB34E600C33557 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nexport FRAMEWORK_LOCN=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework\"\n\n# Create the path to the real Headers die\nmkdir -p \"${FRAMEWORK_LOCN}/Versions/A/Headers\"\n\n# Create the required symlinks\n/bin/ln -sfh A \"${FRAMEWORK_LOCN}/Versions/Current\"\n/bin/ln -sfh Versions/Current/Headers \"${FRAMEWORK_LOCN}/Headers\"\n/bin/ln -sfh \"Versions/Current/${PRODUCT_NAME}\" \\\n\"${FRAMEWORK_LOCN}/${PRODUCT_NAME}\"\n\n# Copy the public headers into the framework\n/bin/cp -a \"${TARGET_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}/\" \\\n\"${FRAMEWORK_LOCN}/Versions/A/Headers\"";
+		};
 		9DF2356C1D6C37B800159A47 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -199,7 +318,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9DD916061DAA41E700C33557 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9DD916131DAA422800C33557 /* FSSqliteParse.m in Sources */,
+				9DD916141DAA422800C33557 /* FSUtils.m in Sources */,
+				9DD916151DAA422800C33557 /* FSDesignFileObject.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9DD916251DAB1ED700C33557 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9DD916091DAA41E700C33557 /* FSSqliteA */;
+			targetProxy = 9DD916241DAB1ED700C33557 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		9D33DB361C3DFE5E00E8E80F /* Debug */ = {
@@ -300,9 +437,11 @@
 				INFOPLIST_FILE = FSSqlite/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = mh_dylib;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fsh.FSSqlite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
 		};
@@ -316,9 +455,61 @@
 				INFOPLIST_FILE = FSSqlite/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = mh_dylib;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fsh.FSSqlite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+		9DD916111DAA41E700C33557 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRIVATE_HEADERS_FOLDER_PATH = /include;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = /include;
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+			};
+			name = Debug;
+		};
+		9DD916121DAA41E700C33557 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRIVATE_HEADERS_FOLDER_PATH = /include;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = /include;
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+			};
+			name = Release;
+		};
+		9DD916211DAA468C00C33557 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		9DD916221DAA468C00C33557 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -357,6 +548,22 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		9DD916101DAA41E700C33557 /* Build configuration list for PBXNativeTarget "FSSqliteA" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9DD916111DAA41E700C33557 /* Debug */,
+				9DD916121DAA41E700C33557 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		9DD916201DAA468C00C33557 /* Build configuration list for PBXAggregateTarget "allArchForLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9DD916211DAA468C00C33557 /* Debug */,
+				9DD916221DAA468C00C33557 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		9DF2356B1D6C37B300159A47 /* Build configuration list for PBXAggregateTarget "alltarget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -364,6 +571,7 @@
 				9DF2356A1D6C37B300159A47 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
