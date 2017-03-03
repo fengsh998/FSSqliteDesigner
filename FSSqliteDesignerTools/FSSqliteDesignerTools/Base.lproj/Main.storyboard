@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -735,8 +736,8 @@
                                         </textFieldCell>
                                     </textField>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ef6-5z-g2t">
-                                        <rect key="frame" x="588" y="5" width="41" height="34"/>
-                                        <buttonCell key="cell" type="bevel" title="go" bezelStyle="regularSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N5e-54-gCl">
+                                        <rect key="frame" x="567" y="5" width="62" height="34"/>
+                                        <buttonCell key="cell" type="bevel" title="位置" bezelStyle="regularSquare" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N5e-54-gCl">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -752,7 +753,7 @@
                                     <constraint firstItem="Ef4-ga-Mdb" firstAttribute="top" secondItem="MV5-gT-ByZ" secondAttribute="top" id="ABC-2R-782"/>
                                     <constraint firstAttribute="bottom" secondItem="Ef4-ga-Mdb" secondAttribute="bottom" id="JmF-0H-ZGV"/>
                                     <constraint firstItem="5jC-x7-Kt7" firstAttribute="top" secondItem="MV5-gT-ByZ" secondAttribute="top" constant="14" id="L2b-lY-Rab"/>
-                                    <constraint firstItem="Ef6-5z-g2t" firstAttribute="leading" secondItem="Ewz-7V-P93" secondAttribute="trailing" constant="29" id="OqR-HQ-V7M"/>
+                                    <constraint firstItem="Ef6-5z-g2t" firstAttribute="leading" secondItem="Ewz-7V-P93" secondAttribute="trailing" constant="8" id="OqR-HQ-V7M"/>
                                     <constraint firstItem="5jC-x7-Kt7" firstAttribute="leading" secondItem="tt4-dm-uiv" secondAttribute="trailing" constant="8" id="RsU-Du-GTa"/>
                                     <constraint firstItem="Ewz-7V-P93" firstAttribute="leading" secondItem="5jC-x7-Kt7" secondAttribute="trailing" constant="8" id="Vhd-a3-E26"/>
                                     <constraint firstItem="tt4-dm-uiv" firstAttribute="leading" secondItem="Ef4-ga-Mdb" secondAttribute="trailing" id="a8G-Nv-vqq"/>
@@ -765,7 +766,7 @@
                                     <constraint firstItem="Ewz-7V-P93" firstAttribute="top" secondItem="MV5-gT-ByZ" secondAttribute="top" constant="14" id="vdS-AJ-qYU"/>
                                 </constraints>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="cVv-Db-HNc">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="cVv-Db-HNc" customClass="FKDragDropView">
                                 <rect key="frame" x="0.0" y="0.0" width="647" height="334"/>
                             </customView>
                         </subviews>

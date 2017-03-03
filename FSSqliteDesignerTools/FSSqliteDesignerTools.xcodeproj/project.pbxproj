@@ -35,6 +35,7 @@
 		9D9B7F421D963B6200190C12 /* PreviewView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D9B7F411D963B6200190C12 /* PreviewView.xib */; };
 		9D9B7F441D963BA100190C12 /* HeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D9B7F431D963BA100190C12 /* HeaderView.xib */; };
 		9D9B7FC61D992E3800190C12 /* ubs.sqlitemodeld in Resources */ = {isa = PBXBuildFile; fileRef = 9D9B7FC51D992E3800190C12 /* ubs.sqlitemodeld */; };
+		9DD57B091E692890006C6313 /* FKDragDropView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD57B071E692890006C6313 /* FKDragDropView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +89,8 @@
 		9D9B7F411D963B6200190C12 /* PreviewView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreviewView.xib; sourceTree = "<group>"; };
 		9D9B7F431D963BA100190C12 /* HeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HeaderView.xib; sourceTree = "<group>"; };
 		9D9B7FC51D992E3800190C12 /* ubs.sqlitemodeld */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ubs.sqlitemodeld; path = ../../../../../Desktop/db/ubs.sqlitemodeld; sourceTree = "<group>"; };
+		9DD57B071E692890006C6313 /* FKDragDropView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FKDragDropView.m; sourceTree = "<group>"; };
+		9DD57B081E692890006C6313 /* FKDragDropView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FKDragDropView.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +130,8 @@
 		9D392D2B1D94D9CB00AE52CB /* FSSqliteDesignerTools */ = {
 			isa = PBXGroup;
 			children = (
+				9DD57B071E692890006C6313 /* FKDragDropView.m */,
+				9DD57B081E692890006C6313 /* FKDragDropView.h */,
 				9D9B7F431D963BA100190C12 /* HeaderView.xib */,
 				9D9B7F411D963B6200190C12 /* PreviewView.xib */,
 				9D9B7F381D963A5A00190C12 /* FileSystemBrowserCell.h */,
@@ -281,6 +286,7 @@
 				9D392D311D94D9CB00AE52CB /* main.m in Sources */,
 				9D392D2E1D94D9CB00AE52CB /* AppDelegate.m in Sources */,
 				9D392D811D95072100AE52CB /* FSDesignerViewController+column.m in Sources */,
+				9DD57B091E692890006C6313 /* FKDragDropView.m in Sources */,
 				9D3A9DBA1D9540C500830B1A /* FSExplorer.m in Sources */,
 				9D392D881D95072100AE52CB /* FSOutlineView.m in Sources */,
 				9D9B7F3F1D963A5A00190C12 /* FileSystemNode.m in Sources */,

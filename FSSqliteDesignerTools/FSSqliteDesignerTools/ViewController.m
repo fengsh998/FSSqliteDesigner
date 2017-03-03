@@ -13,7 +13,7 @@
 #import "FSExplorer.h"
 
 
-@interface ViewController()
+@interface ViewController()<DragDropViewDelegate>
 @property (nonatomic, strong)  FSDesignerViewController               *designVC;
 @property (nonatomic, strong)  FSDesignerView                         *sqliteDesignView;
 @property (nonatomic, strong)  FSExplorer                             *explorer;
@@ -27,7 +27,7 @@
 
 //    NSKeyedArchiver
     // Do any additional setup after loading the view.
-    
+    self.container.delegate = self;
     NSBundle *bd = [NSBundle bundleForClass:self.class];
     self.designVC = [[FSDesignerViewController alloc]initWithNibName:@"FSDesignerViewController" bundle:bd];
     self.designVC.view.translatesAutoresizingMaskIntoConstraints = NO;
@@ -120,6 +120,7 @@
     }];
 }
 
+////打开目录位置
 - (IBAction)onGoClicked:(id)sender {
     if (self.lbpath.stringValue.length > 0)
     {
@@ -197,5 +198,110 @@
         wnd.title = [NSString stringWithFormat:@"%@",self.smtitle];
     }
 }
+
+///拖拽结束
+-(void)dragDropView:(FKDragDropView *)dropview FileList:(NSArray*)fileList
+{
+    NSString * path = fileList.lastObject;
+    NSString * ext = path.pathExtension;
+    if ([ext isEqualToString:@"sqlitemodeld"] || [ext isEqualToString:@"sqlitemodel"]) {
+        
+        if (self.designVC.structIsChanged) {
+            NSLog(@"结构有改变，是否保存");
+            
+            NSAlert *alert = [[NSAlert alloc]init];
+            [alert addButtonWithTitle:@"确定"];
+            [alert addButtonWithTitle:@"取消"];
+            [alert setMessageText:@"警告"];
+            [alert setInformativeText:@"当前数据结构模型有改变,确认不保存吗？"];
+            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert beginSheetModalForWindow:[self.view window] completionHandler:^(NSModalResponse returnCode) {
+                if(returnCode == NSAlertFirstButtonReturn) {
+                    if ([ext isEqualToString:@"sqlitemodel"]) {
+                        //直接打开
+                        self.lbpath.stringValue = path;
+                        [self.designVC setModelUrl:[NSURL fileURLWithPath:path]];
+                    } else {
+                        
+                        NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:path];
+                        
+                        //            NSLog(@"1.Contents of %@:",path);
+                        NSString *plist = nil;
+                        NSString *tpath = nil;
+                        while ((tpath = [dirEnum nextObject]) != nil)
+                        {
+                            @autoreleasepool {
+                                NSString *extfile = tpath.pathExtension;
+                                if ([extfile isEqualToString:@"plist"]) {
+                                    plist = tpath;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (plist.length > 0) {
+                            NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:[path stringByAppendingPathComponent:plist]];
+                            
+                            NSString *model = dic[@"currentModelName"];
+                            
+                            if (model.length > 0) {
+                                NSString *modelpath = [path stringByAppendingPathComponent:model];
+                                self.lbpath.stringValue = modelpath;
+                                [self.designVC setModelUrl:[NSURL fileURLWithPath:modelpath]];
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                    [self updateWindowTitleStatus:NO];
+                    
+                } else if(returnCode == NSAlertSecondButtonReturn){
+                    
+                }
+            }];
+            
+        } else {
+        
+            if ([ext isEqualToString:@"sqlitemodel"]) {
+                //直接打开
+                self.lbpath.stringValue = path;
+                [self.designVC setModelUrl:[NSURL fileURLWithPath:path]];
+            } else {
+               
+                NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:path];
+                
+    //            NSLog(@"1.Contents of %@:",path);
+                NSString *plist = nil;
+                NSString *tpath = nil;
+                while ((tpath = [dirEnum nextObject]) != nil)
+                {
+                    @autoreleasepool {
+                        NSString *extfile = tpath.pathExtension;
+                        if ([extfile isEqualToString:@"plist"]) {
+                            plist = tpath;
+                            break;
+                        }
+                    }
+                }
+                
+                if (plist.length > 0) {
+                    NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:[path stringByAppendingPathComponent:plist]];
+                    
+                    NSString *model = dic[@"currentModelName"];
+                    
+                    if (model.length > 0) {
+                        path = [path stringByAppendingPathComponent:model];
+                        self.lbpath.stringValue = path;
+                        [self.designVC setModelUrl:[NSURL fileURLWithPath:path]];
+                    }
+
+                }
+                    
+            }
+        }
+    }
+}
+
 
 @end

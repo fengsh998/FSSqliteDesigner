@@ -8,6 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface FSOutlineView : NSOutlineView
+@interface FSOutlineView : NSOutlineView//<NSDraggingDestination,NSDraggingSource>
 
 @end

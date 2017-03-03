@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "FKDragDropView.h"
 
 @interface ViewController : NSViewController
 @property (weak) IBOutlet NSTextField *lbpath;
-@property (weak) IBOutlet NSView *container;
+@property (weak) IBOutlet FKDragDropView *container;
 
 
 @end
