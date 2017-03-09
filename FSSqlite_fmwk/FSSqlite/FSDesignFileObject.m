@@ -1545,12 +1545,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 + (NSString *)covertFieldConstraint:(FSFieldConstraint)constraint
 {
     NSString *cst = @"";
-
+    BOOL haspk = NO;
     if (constraint & fcPrimarykey) {
         cst = [cst stringByAppendingString:@" PRIMARY KEY"];
+        haspk = YES;
     }
     
-    if (constraint & fcAutoIncreament) {
+    if ((constraint & fcAutoIncreament) && haspk) {
         cst = [cst stringByAppendingString:@" AUTOINCREMENT"];
     }
     
@@ -1569,11 +1570,13 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 {
     NSMutableArray *arr = [NSMutableArray array];
     
+    BOOL haspk = NO;
     if (constraint & fcPrimarykey) {
         [arr addObject:@"PRIMARY KEY"];
+        haspk = YES;
     }
     
-    if (constraint & fcAutoIncreament) {
+    if ((constraint & fcAutoIncreament) && haspk) {
         [arr addObject:@"AUTOINCREMENT"];
     }
     

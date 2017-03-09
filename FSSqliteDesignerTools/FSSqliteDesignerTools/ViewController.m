@@ -169,7 +169,7 @@
             return event;
         }
         
-        if((([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask) && ([[event charactersIgnoringModifiers] compare:@"s"] == 0)) {
+        if((([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask) && ([[event /*charactersIgnoringModifiers*/characters] compare:@"s"] == 0)) {
             if (self.designVC && self.designVC.designer)
             {
                 if (self.designVC.structIsChanged) {
