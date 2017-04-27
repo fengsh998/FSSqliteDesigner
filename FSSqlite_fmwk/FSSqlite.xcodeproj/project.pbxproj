@@ -473,6 +473,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				EXECUTABLE_PREFIX = lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_CFLAGS = "-fembed-bitcode";
 				PRIVATE_HEADERS_FOLDER_PATH = /include;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = /include;
@@ -491,6 +492,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				EXECUTABLE_PREFIX = lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_CFLAGS = "-fembed-bitcode";
 				PRIVATE_HEADERS_FOLDER_PATH = /include;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = /include;
@@ -555,6 +557,7 @@
 				9DD916121DAA41E700C33557 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9DD916201DAA468C00C33557 /* Build configuration list for PBXAggregateTarget "allArchForLib" */ = {
 			isa = XCConfigurationList;
@@ -563,6 +566,7 @@
 				9DD916221DAA468C00C33557 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9DF2356B1D6C37B300159A47 /* Build configuration list for PBXAggregateTarget "alltarget" */ = {
 			isa = XCConfigurationList;
