@@ -235,11 +235,11 @@
             NSMutableArray *ans = [NSMutableArray array];
             NSMutableArray *bns = [NSMutableArray array];
             for (FSColumn *col in atab.allColumns) {
-                [ans addObject:[NSString stringWithFormat:@"\"%@\"",col.fieldName]];
+                [ans addObject:[NSString stringWithFormat:@"\"%@\"",[col.fieldName uppercaseString]]];
             }
             
             for (FSColumn *col in btab.allColumns) {
-                [bns addObject:[NSString stringWithFormat:@"\"%@\"",col.fieldName]];
+                [bns addObject:[NSString stringWithFormat:@"\"%@\"",[col.fieldName uppercaseString]]];
             }
             
             NSArray *commfields = [self same:ans with:bns];

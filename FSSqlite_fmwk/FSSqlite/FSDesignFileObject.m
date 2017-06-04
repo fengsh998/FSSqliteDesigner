@@ -1592,7 +1592,7 @@ UNIQUE 或去除此键值的定义，去除后将默认创建普通索引，而�
 
 - (NSString *)makeSqlKeyValue
 {
-    NSString *sqlkv = [NSString stringWithFormat:@"\"%@\" %@",self.fieldName,[self covertToString:self.fieldtype]];
+    NSString *sqlkv = [NSString stringWithFormat:@"\"%@\" %@",[self.fieldName uppercaseString],[self covertToString:self.fieldtype]];
     
     NSString *constraint = [[self class]covertFieldConstraint:self.constraint];
     
