@@ -281,7 +281,12 @@
                         [fs addObject:[bcol makeSqlKeyValue]];
                     }
                     
-                    [sqls addObject:[NSString stringWithFormat:@"ALTER TABLE \"%@\" ADD %@",tablename,[fs componentsJoinedByString:@","]]];
+                    ///因sqlite3 不支持多列只有拆了
+//                    [sqls addObject:[NSString stringWithFormat:@"ALTER TABLE \"%@\" ADD %@",tablename,[fs componentsJoinedByString:@","]]];
+                    for (NSString *field in fs) {
+                        NSString *alertsql = [NSString stringWithFormat:@"ALTER TABLE \"%@\" ADD %@",tablename,[field uppercaseString]];
+                        [sqls addObject:alertsql];
+                    }
                 }
                 else
                 {

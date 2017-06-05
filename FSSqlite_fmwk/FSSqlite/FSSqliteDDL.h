@@ -16,10 +16,12 @@
 #define CREATE_VIEW_FMT_SQL             (@"CREATE VIEW IF NOT EXISTS \"%@\" AS \"%@\"")
 ///创建索引 (第一个参数是否唯一索引)
 #define CREATE_INDEX_FMT_SQL            (@"CREATE %@ INDEX IF NOT EXISTS %@ ON %@ (%@)")
-///修改表
+///修改表 (sqlite不支持多列)
 #define ALTER_TABLE_ADD_COLUMN_SQL      (@"ALTER TABLE \"%@\" ADD COLUMN \"%@\"")
 ///导数据(参1为目标表名,参2为目标表名中的字段名,参3为需要导的字段,参4导出表)
 #define EXPORT_DATA_DEST_TABLE          (@"INSERT INTO %@(%@) SELECT %@ FROM %@")
+///单独删除某列 (sqlite不支持多列)
+#define ALTER_TABLE_DROP_COLUMN_SQL     (@"ALTER TABLE \"%@\" DROP COLUMN \"%@\"")
 
 ///重健索引
 #define REBUILDINDEX                    (@"REINDEX")
